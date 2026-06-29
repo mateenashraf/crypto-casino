@@ -36,10 +36,6 @@
     const btnText = document.getElementById('walletBtnText');
     const sidebarBal = document.getElementById('sidebarBalance');
     const ticketCountEl = document.getElementById('sidebarTicketCount');
-    const statTickets = document.getElementById('statTickets');
-    const walletAddr = document.getElementById('walletAddress');
-    const disconnectBtn = document.getElementById('disconnectBtn');
-
     const myTickets = wallet.getAllTickets().filter(
       (t) => t.wallet?.toLowerCase() === addr?.toLowerCase()
     ).length;
@@ -71,7 +67,6 @@
       document.getElementById('withdrawForm').hidden = true;
     }
 
-    if (statTickets) statTickets.textContent = wallet.getAllTickets().length.toLocaleString();
   }
 
   async function refreshBalances() {
@@ -185,7 +180,7 @@
     showTxStatus('withdrawStatus', 'Processing...', 'pending');
     try {
       await wallet.withdraw(amount, to || undefined);
-      showTxStatus('withdrawStatus', 'Withdrawal sent (demo)', 'success');
+      showTxStatus('withdrawStatus', 'Withdrawal sent!', 'success');
       await refreshBalances();
       renderTxHistory();
       toast('Withdrawal processed', 'success');
