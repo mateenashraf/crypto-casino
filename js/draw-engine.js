@@ -11,7 +11,7 @@ const DrawEngine = (() => {
     {
       id: 'daily',
       name: 'Daily Draw',
-      icon: '☀️',
+      icon: 'sun',
       prizes: [2000, 2500, 3000, 3500],
       getPrize: (date) => {
         const prizes = [2000, 2500, 3000, 3500];
@@ -27,7 +27,7 @@ const DrawEngine = (() => {
     {
       id: 'weekly',
       name: 'Weekly Mega',
-      icon: '📅',
+      icon: 'calendar-days',
       prize: 2_000_000,
       getNextDraw: () => {
         const n = new Date();
@@ -42,7 +42,7 @@ const DrawEngine = (() => {
     {
       id: 'monthly',
       name: 'Monthly Jackpot',
-      icon: '🌙',
+      icon: 'moon',
       prize: 5_000_000,
       getNextDraw: () => {
         const n = new Date();
@@ -54,7 +54,7 @@ const DrawEngine = (() => {
     {
       id: 'semi-annual',
       name: '6-Month Grand',
-      icon: '💎',
+      icon: 'gem',
       prize: 20_000_000,
       getNextDraw: () => {
         const n = new Date();
@@ -74,7 +74,7 @@ const DrawEngine = (() => {
     {
       id: 'yearly',
       name: 'Yearly Ultra',
-      icon: '👑',
+      icon: 'crown',
       prize: 50_000_000,
       getNextDraw: () => {
         const n = new Date();
@@ -232,7 +232,10 @@ const DrawEngine = (() => {
     set('statDraw', formatCountdown(diff));
 
     const label = document.getElementById('featuredDrawLabel');
-    if (label) label.textContent = `${tier.icon} ${tier.name}`;
+    if (label) {
+      label.innerHTML = `${window.Icons?.inline(tier.icon, 16, 'icon icon-gold icon-inline') || ''}<span>${tier.name}</span>`;
+      label.classList.add('featured-draw-label');
+    }
 
     const sub = document.getElementById('featuredDrawSub');
     if (sub) sub.textContent = `Prize: ${formatUsd(prize)} · Pick 6 numbers to enter`;
@@ -272,7 +275,7 @@ const DrawEngine = (() => {
       const active = tier.id === selectedDrawId ? ' active' : '';
       return `
         <button type="button" class="draw-card${active}" data-draw-id="${tier.id}">
-          <span class="draw-card-icon">${tier.icon}</span>
+          <span class="draw-card-icon">${window.Icons?.inline(tier.icon, 26, 'icon draw-icon') || ''}</span>
           <span class="draw-card-name">${tier.name}</span>
           <span class="draw-card-prize">${formatUsd(prize)}</span>
           <span class="draw-card-timer">${formatCountdown(diff)}</span>
