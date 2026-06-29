@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StarBitz — Crypto Casino</title>
+  <meta name="description" content="Play 5,000+ casino games with instant crypto deposits. Bitcoin, Ethereum, USDT & more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <a href="#" class="logo">
+          <span class="logo-star">★</span>
+          <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
+        </a>
+        <nav class="header-nav">
+          <a href="#games" class="nav-link active">Games</a>
+          <a href="#promotions" class="nav-link">Promotions</a>
+          <a href="#live" class="nav-link">Live Casino</a>
+          <a href="#vip" class="nav-link">VIP</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn-icon" id="searchBtn" aria-label="Search games">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="signInBtn">Sign In</button>
+          <button class="btn btn-primary" id="walletBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h.01"/></svg>
+            <span id="walletBtnText">Connect Wallet</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-item active" data-category="all">
+            <span class="sidebar-icon">🎰</span> All Games
+          </a>
+          <a href="#" class="sidebar-item" data-category="slots">
+            <span class="sidebar-icon">🍒</span> Slots
+          </a>
+          <a href="#" class="sidebar-item" data-category="live">
+            <span class="sidebar-icon">🎥</span> Live Casino
+          </a>
+          <a href="#" class="sidebar-item" data-category="table">
+            <span class="sidebar-icon">🃏</span> Table Games
+          </a>
+          <a href="#" class="sidebar-item" data-category="jackpot">
+            <span class="sidebar-icon">💎</span> Jackpots
+          </a>
+          <a href="#" class="sidebar-item" data-category="new">
+            <span class="sidebar-icon">✨</span> New Releases
+          </a>
+          <a href="#" class="sidebar-item" data-category="provably">
+            <span class="sidebar-icon">🔒</span> Provably Fair
+          </a>
+          <div class="sidebar-divider"></div>
+          <a href="#promotions" class="sidebar-item">
+            <span class="sidebar-icon">🎁</span> Promotions
+          </a>
+          <a href="#" class="sidebar-item">
+            <span class="sidebar-icon">👑</span> VIP Club
+          </a>
+        </nav>
+        <div class="sidebar-balance" id="sidebarBalance" hidden>
+          <span class="balance-label">Casino Balance</span>
+          <span class="balance-amount" id="sidebarBalanceAmount">0.0000 ETH</span>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+        <!-- Stats ticker -->
+        <div class="stats-bar">
+          <div class="stat">
+            <span class="stat-icon">🏆</span>
+            <div>
+              <span class="stat-value" id="statJackpot">$12,847,392</span>
+              <span class="stat-label">Total Jackpots</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">⚡</span>
+            <div>
+              <span class="stat-value">~6 min</span>
+              <span class="stat-label">Avg. Cashout</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">💬</span>
+            <div>
+              <span class="stat-value">24/7</span>
+              <span class="stat-label">Live Support</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">🎮</span>
+            <div>
+              <span class="stat-value" id="statGames">5,247</span>
+              <span class="stat-label">Games Available</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero -->
+        <section class="hero">
+          <div class="hero-slide active" style="--hero-bg: linear-gradient(135deg, #1a0808 0%, #4a1520 40%, #0d2818 100%)">
+            <div class="hero-content">
+              <span class="hero-badge">Welcome Package</span>
+              <h1>Get up to <span class="text-gold">5 BTC</span> + 180 Free Spins</h1>
+              <p>Instant crypto deposits. No KYC for crypto players. Play 5,000+ games from top providers.</p>
+              <div class="hero-actions">
+                <button class="btn btn-gold btn-lg" id="heroDepositBtn">Deposit & Play</button>
+                <button class="btn btn-outline btn-lg">Learn More</button>
+              </div>
+            </div>
+            <div class="hero-visual">
+              <div class="hero-coins">
+                <span>₿</span><span>Ξ</span><span>◎</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-dots">
+            <button class="hero-dot active"></button>
+            <button class="hero-dot"></button>
+            <button class="hero-dot"></button>
+          </div>
+        </section>
+
+        <!-- Quick crypto bar -->
+        <section class="crypto-bar">
+          <span class="crypto-bar-label">Accepted Cryptos</span>
+          <div class="crypto-icons">
+            <span class="crypto-chip" data-crypto="BTC">₿ BTC</span>
+            <span class="crypto-chip active" data-crypto="ETH">Ξ ETH</span>
+            <span class="crypto-chip" data-crypto="USDT">₮ USDT</span>
+            <span class="crypto-chip" data-crypto="LTC">Ł LTC</span>
+            <span class="crypto-chip" data-crypto="DOGE">Ð DOGE</span>
+            <span class="crypto-chip" data-crypto="SOL">◎ SOL</span>
+          </div>
+        </section>
+
+        <!-- Game sections -->
+        <div id="games">
+          <section class="game-section" data-section="popular">
+            <div class="section-header">
+              <h2>🔥 Popular Games</h2>
+              <a href="#" class="see-all">See all →</a>
+            </div>
+            <div class="game-slider" id="popularGames"></div>
+          </section>
+
+          <section class="game-section" data-section="new">
+            <div class="section-header">
+              <h2>✨ New Releases</h2>
+              <a href="#" class="see-all">See all →</a>
+            </div>
+            <div class="game-slider" id="newGames"></div>
+          </section>
+
+          <section class="game-section" data-section="live">
+            <div class="section-header">
+              <h2>🎥 Live Casino</h2>
+              <a href="#" class="see-all">See all →</a>
+            </div>
+            <div class="game-slider" id="liveGames"></div>
+          </section>
+
+          <section class="game-section" data-section="jackpot">
+            <div class="section-header">
+              <h2>💎 Jackpot Games</h2>
+              <a href="#" class="see-all">See all →</a>
+            </div>
+            <div class="game-slider" id="jackpotGames"></div>
+          </section>
+        </div>
+
+        <!-- Promotions -->
+        <section class="promotions" id="promotions">
+          <div class="section-header">
+            <h2>🎁 Active Promotions</h2>
+          </div>
+          <div class="promo-grid">
+            <article class="promo-card">
+              <div class="promo-badge">HOT</div>
+              <h3>Welcome Bonus</h3>
+              <p>100% up to 1 BTC on your first deposit + 180 free spins on selected slots.</p>
+              <button class="btn btn-gold">Claim Now</button>
+            </article>
+            <article class="promo-card">
+              <div class="promo-badge">NEW</div>
+              <h3>Wednesday Free Spins</h3>
+              <p>Deposit 0.01 ETH+ on Wednesdays and get 20 wager-free free spins.</p>
+              <button class="btn btn-outline">Details</button>
+            </article>
+            <article class="promo-card">
+              <div class="promo-badge">VIP</div>
+              <h3>Reload Bonus</h3>
+              <p>VIP members get 50% reload bonus every Monday up to 0.5 BTC.</p>
+              <button class="btn btn-outline">Join VIP</button>
+            </article>
+          </div>
+        </section>
+
+        <!-- Providers -->
+        <section class="providers">
+          <div class="section-header">
+            <h2>Game Providers</h2>
+          </div>
+          <div class="provider-logos">
+            <span>Pragmatic Play</span>
+            <span>Evolution</span>
+            <span>NetEnt</span>
+            <span>Play'n GO</span>
+            <span>Microgaming</span>
+            <span>BGaming</span>
+            <span>Push Gaming</span>
+            <span>Hacksaw</span>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="logo-star">★</span>
+          <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
+          <p>Licensed crypto casino demo. For entertainment purposes only.</p>
+        </div>
+        <div class="footer-links">
+          <div>
+            <h4>Casino</h4>
+            <a href="#">Slots</a>
+            <a href="#">Live Casino</a>
+            <a href="#">Table Games</a>
+            <a href="#">Jackpots</a>
+          </div>
+          <div>
+            <h4>Support</h4>
+            <a href="#">FAQ</a>
+            <a href="#">Live Chat</a>
+            <a href="#">Responsible Gaming</a>
+          </div>
+          <div>
+            <h4>Crypto</h4>
+            <a href="#">Deposit Guide</a>
+            <a href="#">Withdrawals</a>
+            <a href="#">Provably Fair</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 StarBitz. Demo project — not affiliated with BitStarz.</p>
+        <div class="footer-crypto">
+          <span>₿</span><span>Ξ</span><span>◎</span><span>₮</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Wallet Modal -->
+  <div class="modal-overlay" id="walletModal" hidden>
+    <div class="modal wallet-modal">
+      <button class="modal-close" id="walletModalClose" aria-label="Close">×</button>
+      <div class="wallet-header">
+        <h2>StarBitz Wallet</h2>
+        <p class="wallet-address" id="walletAddress" hidden></p>
+      </div>
+      <div class="wallet-tabs">
+        <button class="wallet-tab active" data-tab="deposit">Deposit</button>
+        <button class="wallet-tab" data-tab="withdraw">Withdraw</button>
+        <button class="wallet-tab" data-tab="balance">Balance</button>
+      </div>
+      <div class="wallet-panels">
+        <!-- Deposit -->
+        <div class="wallet-panel active" id="panel-deposit">
+          <div class="wallet-connect-prompt" id="connectPrompt">
+            <div class="wallet-icon-large">🔗</div>
+            <h3>Connect Your Wallet</h3>
+            <p>Connect MetaMask or any Web3 wallet to deposit crypto instantly.</p>
+            <button class="btn btn-primary btn-lg btn-block" id="connectWalletBtn">Connect Wallet</button>
+          </div>
+          <div class="wallet-deposit-form" id="depositForm" hidden>
+            <div class="balance-display">
+              <span>Wallet Balance</span>
+              <strong id="walletEthBalance">0.0000 ETH</strong>
+            </div>
+            <div class="balance-display casino">
+              <span>Casino Balance</span>
+              <strong id="casinoBalance">0.0000 ETH</strong>
+            </div>
+            <label class="field-label">Select Currency</label>
+            <div class="currency-select">
+              <button class="currency-option active" data-symbol="ETH">Ξ ETH</button>
+              <button class="currency-option" data-symbol="USDT">₮ USDT</button>
+              <button class="currency-option" data-symbol="BTC">₿ BTC</button>
+            </div>
+            <label class="field-label" for="depositAmount">Amount</label>
+            <div class="amount-input-wrap">
+              <input type="number" id="depositAmount" placeholder="0.00" min="0" step="0.001" />
+              <button class="btn-max" id="depositMax">MAX</button>
+            </div>
+            <div class="quick-amounts">
+              <button data-amount="0.01">0.01</button>
+              <button data-amount="0.05">0.05</button>
+              <button data-amount="0.1">0.1</button>
+              <button data-amount="0.5">0.5</button>
+            </div>
+            <p class="field-hint">Deposits are sent on-chain to the casino treasury. Demo uses Sepolia testnet.</p>
+            <button class="btn btn-gold btn-lg btn-block" id="depositBtn">Deposit Now</button>
+            <div class="tx-status" id="depositStatus" hidden></div>
+          </div>
+        </div>
+        <!-- Withdraw -->
+        <div class="wallet-panel" id="panel-withdraw">
+          <div class="wallet-connect-prompt" id="withdrawConnectPrompt">
+            <p>Connect wallet to withdraw your casino balance.</p>
+            <button class="btn btn-primary btn-block" id="connectForWithdraw">Connect Wallet</button>
+          </div>
+          <div id="withdrawForm" hidden>
+            <div class="balance-display casino">
+              <span>Available to Withdraw</span>
+              <strong id="withdrawBalance">0.0000 ETH</strong>
+            </div>
+            <label class="field-label" for="withdrawAmount">Amount (ETH)</label>
+            <input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.001" class="text-input" />
+            <label class="field-label" for="withdrawAddress">Destination Address</label>
+            <input type="text" id="withdrawAddress" placeholder="0x..." class="text-input" />
+            <p class="field-hint">Withdrawals are processed instantly in this demo (simulated on-chain transfer).</p>
+            <button class="btn btn-primary btn-lg btn-block" id="withdrawBtn">Withdraw</button>
+            <div class="tx-status" id="withdrawStatus" hidden></div>
+          </div>
+        </div>
+        <!-- Balance -->
+        <div class="wallet-panel" id="panel-balance">
+          <div class="balance-cards">
+            <div class="balance-card">
+              <span class="balance-card-label">Wallet (On-Chain)</span>
+              <span class="balance-card-value" id="balanceWallet">—</span>
+            </div>
+            <div class="balance-card highlight">
+              <span class="balance-card-label">Casino Balance</span>
+              <span class="balance-card-value" id="balanceCasino">—</span>
+            </div>
+          </div>
+          <div class="tx-history">
+            <h4>Recent Transactions</h4>
+            <ul id="txHistory">
+              <li class="tx-empty">No transactions yet</li>
+            </ul>
+          </div>
+          <button class="btn btn-ghost btn-block" id="disconnectBtn" hidden>Disconnect Wallet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal-overlay" id="searchModal" hidden>
+    <div class="modal search-modal">
+      <button class="modal-close" id="searchModalClose" aria-label="Close">×</button>
+      <div class="search-header">
+        <input type="search" id="gameSearchInput" placeholder="Search 5,000+ games..." autofocus />
+      </div>
+      <div class="search-filters">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="slots">Slots</button>
+        <button class="filter-chip" data-filter="live">Live</button>
+        <button class="filter-chip" data-filter="table">Table</button>
+        <button class="filter-chip" data-filter="jackpot">Jackpot</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- Game Play Modal -->
+  <div class="modal-overlay" id="gameModal" hidden>
+    <div class="modal game-modal">
+      <button class="modal-close" id="gameModalClose" aria-label="Close">×</button>
+      <div class="game-modal-content" id="gameModalContent">
+        <div class="game-preview">
+          <div class="game-preview-icon" id="gamePreviewIcon">🎰</div>
+          <h2 id="gamePreviewTitle">Game Title</h2>
+          <p id="gamePreviewProvider">Provider</p>
+          <p class="game-preview-hint">Connect wallet and deposit to play. This is a demo — games are simulated.</p>
+          <button class="btn btn-gold btn-lg" id="playGameBtn">Play for Real</button>
+          <button class="btn btn-outline" id="demoPlayBtn">Try Demo</button>
+        </div>
+        <div class="game-simulator" id="gameSimulator" hidden>
+          <div class="slot-machine">
+            <div class="slot-reels" id="slotReels">
+              <div class="reel">🍒</div>
+              <div class="reel">🍋</div>
+              <div class="reel">⭐</div>
+            </div>
+            <p class="slot-result" id="slotResult">Place a bet and spin!</p>
+            <div class="slot-controls">
+              <input type="number" id="betAmount" value="0.001" min="0.001" step="0.001" class="text-input" />
+              <button class="btn btn-gold" id="spinBtn">SPIN</button>
+            </div>
+            <p class="slot-balance">Balance: <span id="gameBalance">0</span> ETH</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
