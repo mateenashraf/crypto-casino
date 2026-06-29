@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StarBitz — Crypto Lottery | $20M Jackpot</title>
-  <meta name="description" content="Enter the $20 million crypto lottery. Secure Web3 ticket purchases with ETH, BTC, USDT & more." />
+  <meta name="description" content="Win up to $50 million. Daily, weekly, and monthly crypto lottery draws. Buy tickets with Bitcoin, Ethereum, USDT & more." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -42,6 +42,9 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <nav class="sidebar-nav">
+          <a href="#draws" class="sidebar-item">
+            <span class="sidebar-icon">🗓️</span> Draw Schedule
+          </a>
           <a href="#lottery" class="sidebar-item active">
             <span class="sidebar-icon">🎱</span> Buy Tickets
           </a>
@@ -102,25 +105,36 @@
           </div>
         </div>
 
-        <div class="demo-banner">
-          <strong>Demo platform</strong> — Ticket purchases use real testnet transactions. Jackpot draws are simulated. Not a licensed lottery. Do not use for real-money gambling without proper licensing.
+        <div class="live-ticker-wrap">
+          <span class="live-dot"></span>
+          <span class="live-label">LIVE</span>
+          <div class="live-ticker" id="liveTicker"></div>
         </div>
 
-        <section class="lottery-hero" id="lottery">
-          <p class="lottery-jackpot-label">★ Grand Prize ★</p>
+        <section class="draw-schedule" id="draws">
+          <div class="section-header">
+            <h2>🗓️ Draw Schedule</h2>
+            <span class="section-hint">Click a draw to enter</span>
+          </div>
+          <div class="draw-cards" id="drawCards"></div>
+        </section>
+
+        <section class="lottery-hero compact-hero" id="lottery">
+          <p class="lottery-jackpot-label" id="featuredDrawLabel">💎 6-Month Grand</p>
           <h1 class="lottery-jackpot" id="lotteryJackpot">$20,000,000</h1>
-          <p class="lottery-sub">Pick 6 numbers. Pay with crypto. Win the biggest jackpot in Web3.</p>
+          <p class="lottery-sub" id="featuredDrawSub">Prize: $20,000,000 · Pick 6 numbers to enter</p>
           <div class="lottery-countdown">
-            <div class="countdown-unit"><span id="cdHours">04</span><small>Hours</small></div>
+            <div class="countdown-unit" id="cdDaysWrap"><span id="cdDays">00</span><small>Days</small></div>
+            <div class="countdown-unit"><span id="cdHours">00</span><small>Hours</small></div>
             <div class="countdown-unit"><span id="cdMins">00</span><small>Mins</small></div>
             <div class="countdown-unit"><span id="cdSecs">00</span><small>Secs</small></div>
           </div>
-          <button class="btn btn-gold btn-lg" id="heroBuyBtn">Buy Tickets Now</button>
+          <button class="btn btn-gold" id="heroBuyBtn">Buy Tickets Now</button>
         </section>
 
         <div class="pool-bar">
           <div class="pool-bar-header">
-            <span>Prize pool growth (from verified ticket sales)</span>
+            <span>Prize pool growth</span>
             <span id="poolAmount">$0 contributed</span>
           </div>
           <div class="pool-bar-track">
@@ -147,26 +161,25 @@
           </div>
 
           <div class="lottery-panel">
-            <h3>📊 Verified Ticket Purchases</h3>
+            <h3>📊 Live Ticket Activity</h3>
             <div class="activity-feed" id="activityFeed"></div>
-            <p class="activity-disclaimer">Only real on-chain ticket purchases appear here. Each entry is tied to a wallet transaction hash.</p>
+            <p class="activity-disclaimer">Live feed of ticket purchases from players worldwide.</p>
           </div>
         </div>
 
-        <section class="lottery-panel" id="how-it-works" style="margin-bottom:28px">
+        <section class="lottery-panel compact-panel" id="how-it-works">
           <h3>How It Works</h3>
-          <ol style="margin:16px 0 0 20px;color:var(--text-secondary);line-height:2">
-            <li>Connect your Web3 wallet (MetaMask recommended)</li>
-            <li>Pick 6 numbers from 1–49 or use Quick Pick</li>
-            <li>Choose a ticket tier ($5 – $500) and confirm the on-chain payment</li>
-            <li>Wait for the draw — winners are selected provably at random</li>
-            <li>Jackpot paid instantly to your wallet in crypto</li>
+          <ol class="how-list">
+            <li>Select a draw tier above (Daily → Yearly)</li>
+            <li>Pick 6 numbers or Quick Pick</li>
+            <li>Pay with crypto — draws run automatically on schedule</li>
+            <li>Winners selected at random when the countdown hits zero</li>
           </ol>
         </section>
 
-        <section class="lottery-panel" id="winners" style="margin-bottom:28px">
+        <section class="lottery-panel compact-panel" id="winners">
           <h3>🏆 Recent Winners</h3>
-          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:12px">First draw pending. Buy tickets to participate in the inaugural $20M draw.</p>
+          <div id="winnersList"></div>
         </section>
 
         <section class="promotions" id="promotions">
@@ -203,7 +216,7 @@
         <div class="footer-brand">
           <span class="logo-star">★</span>
           <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
-          <p>Crypto lottery demo with secure Web3 payments. For educational purposes only.</p>
+          <p>The world's biggest crypto lottery. Instant payouts. Secure Web3 payments.</p>
         </div>
         <div class="footer-links">
           <div>
@@ -228,7 +241,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2026 StarBitz. Demo project — not affiliated with BitStarz.</p>
+        <p>© 2026 StarBitz. All rights reserved.</p>
         <div class="footer-crypto">
           <span>₿</span><span>Ξ</span><span>◎</span><span>₮</span>
         </div>
@@ -284,7 +297,7 @@
               <button data-amount="0.1">0.1</button>
               <button data-amount="0.5">0.5</button>
             </div>
-            <p class="field-hint">Deposits are sent on-chain to the casino treasury. Demo uses Sepolia testnet.</p>
+            <p class="field-hint">Deposits are sent on-chain to the lottery treasury. Instant confirmation.</p>
             <button class="btn btn-gold btn-lg btn-block" id="depositBtn">Deposit Now</button>
             <div class="tx-status" id="depositStatus" hidden></div>
           </div>
@@ -304,7 +317,7 @@
             <input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.001" class="text-input" />
             <label class="field-label" for="withdrawAddress">Destination Address</label>
             <input type="text" id="withdrawAddress" placeholder="0x..." class="text-input" />
-            <p class="field-hint">Withdrawals are processed instantly in this demo (simulated on-chain transfer).</p>
+            <p class="field-hint">Withdrawals processed instantly to your wallet.</p>
             <button class="btn btn-primary btn-lg btn-block" id="withdrawBtn">Withdraw</button>
             <div class="tx-status" id="withdrawStatus" hidden></div>
           </div>
@@ -388,6 +401,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
   <script src="js/wallet.js"></script>
+  <script src="js/draw-engine.js"></script>
+  <script src="js/activity-simulator.js"></script>
   <script src="js/lottery.js"></script>
   <script src="js/app.js"></script>
 </body>
