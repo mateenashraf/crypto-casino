@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StarBitz — Crypto Casino</title>
-  <meta name="description" content="Play 5,000+ casino games with instant crypto deposits. Bitcoin, Ethereum, USDT & more." />
+  <title>StarBitz — Crypto Lottery | $20M Jackpot</title>
+  <meta name="description" content="Enter the $20 million crypto lottery. Secure Web3 ticket purchases with ETH, BTC, USDT & more." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -23,15 +23,12 @@
           <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
         </a>
         <nav class="header-nav">
-          <a href="#games" class="nav-link active">Games</a>
+          <a href="#lottery" class="nav-link active">Lottery</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#winners" class="nav-link">Winners</a>
           <a href="#promotions" class="nav-link">Promotions</a>
-          <a href="#live" class="nav-link">Live Casino</a>
-          <a href="#vip" class="nav-link">VIP</a>
         </nav>
         <div class="header-actions">
-          <button class="btn-icon" id="searchBtn" aria-label="Search games">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </button>
           <button class="btn btn-ghost" id="signInBtn">Sign In</button>
           <button class="btn btn-primary" id="walletBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h.01"/></svg>
@@ -45,38 +42,29 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <nav class="sidebar-nav">
-          <a href="#" class="sidebar-item active" data-category="all">
-            <span class="sidebar-icon">🎰</span> All Games
+          <a href="#lottery" class="sidebar-item active">
+            <span class="sidebar-icon">🎱</span> Buy Tickets
           </a>
-          <a href="#" class="sidebar-item" data-category="slots">
-            <span class="sidebar-icon">🍒</span> Slots
+          <a href="#how-it-works" class="sidebar-item">
+            <span class="sidebar-icon">📋</span> How It Works
           </a>
-          <a href="#" class="sidebar-item" data-category="live">
-            <span class="sidebar-icon">🎥</span> Live Casino
+          <a href="#winners" class="sidebar-item">
+            <span class="sidebar-icon">🏆</span> Past Winners
           </a>
-          <a href="#" class="sidebar-item" data-category="table">
-            <span class="sidebar-icon">🃏</span> Table Games
-          </a>
-          <a href="#" class="sidebar-item" data-category="jackpot">
-            <span class="sidebar-icon">💎</span> Jackpots
-          </a>
-          <a href="#" class="sidebar-item" data-category="new">
-            <span class="sidebar-icon">✨</span> New Releases
-          </a>
-          <a href="#" class="sidebar-item" data-category="provably">
-            <span class="sidebar-icon">🔒</span> Provably Fair
+          <a href="#" class="sidebar-item" id="myTicketsLink">
+            <span class="sidebar-icon">🎟️</span> My Tickets
           </a>
           <div class="sidebar-divider"></div>
           <a href="#promotions" class="sidebar-item">
             <span class="sidebar-icon">🎁</span> Promotions
           </a>
-          <a href="#" class="sidebar-item">
-            <span class="sidebar-icon">👑</span> VIP Club
+          <a href="#" class="sidebar-item" id="sidebarWalletBtn">
+            <span class="sidebar-icon">🔗</span> Wallet
           </a>
         </nav>
         <div class="sidebar-balance" id="sidebarBalance" hidden>
-          <span class="balance-label">Casino Balance</span>
-          <span class="balance-amount" id="sidebarBalanceAmount">0.0000 ETH</span>
+          <span class="balance-label">Your Tickets</span>
+          <span class="balance-amount" id="sidebarTicketCount">0</span>
         </div>
       </aside>
 
@@ -87,147 +75,123 @@
           <div class="stat">
             <span class="stat-icon">🏆</span>
             <div>
-              <span class="stat-value" id="statJackpot">$12,847,392</span>
-              <span class="stat-label">Total Jackpots</span>
+              <span class="stat-value" id="statJackpot">$20,000,000</span>
+              <span class="stat-label">Grand Jackpot</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon">⚡</span>
+            <span class="stat-icon">🎟️</span>
             <div>
-              <span class="stat-value">~6 min</span>
-              <span class="stat-label">Avg. Cashout</span>
+              <span class="stat-value" id="statTickets">0</span>
+              <span class="stat-label">Tickets Sold</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon">💬</span>
+            <span class="stat-icon">🔒</span>
             <div>
-              <span class="stat-value">24/7</span>
-              <span class="stat-label">Live Support</span>
+              <span class="stat-value">On-Chain</span>
+              <span class="stat-label">Secure Web3</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon">🎮</span>
+            <span class="stat-icon">⏱️</span>
             <div>
-              <span class="stat-value" id="statGames">5,247</span>
-              <span class="stat-label">Games Available</span>
+              <span class="stat-value" id="statDraw">4h 00m</span>
+              <span class="stat-label">Next Draw</span>
             </div>
           </div>
         </div>
 
-        <!-- Hero -->
-        <section class="hero">
-          <div class="hero-slide active" style="--hero-bg: linear-gradient(135deg, #1a0808 0%, #4a1520 40%, #0d2818 100%)">
-            <div class="hero-content">
-              <span class="hero-badge">Welcome Package</span>
-              <h1>Get up to <span class="text-gold">5 BTC</span> + 180 Free Spins</h1>
-              <p>Instant crypto deposits. No KYC for crypto players. Play 5,000+ games from top providers.</p>
-              <div class="hero-actions">
-                <button class="btn btn-gold btn-lg" id="heroDepositBtn">Deposit & Play</button>
-                <button class="btn btn-outline btn-lg">Learn More</button>
-              </div>
-            </div>
-            <div class="hero-visual">
-              <div class="hero-coins">
-                <span>₿</span><span>Ξ</span><span>◎</span>
-              </div>
-            </div>
-          </div>
-          <div class="hero-dots">
-            <button class="hero-dot active"></button>
-            <button class="hero-dot"></button>
-            <button class="hero-dot"></button>
-          </div>
-        </section>
-
-        <!-- Quick crypto bar -->
-        <section class="crypto-bar">
-          <span class="crypto-bar-label">Accepted Cryptos</span>
-          <div class="crypto-icons">
-            <span class="crypto-chip" data-crypto="BTC">₿ BTC</span>
-            <span class="crypto-chip active" data-crypto="ETH">Ξ ETH</span>
-            <span class="crypto-chip" data-crypto="USDT">₮ USDT</span>
-            <span class="crypto-chip" data-crypto="LTC">Ł LTC</span>
-            <span class="crypto-chip" data-crypto="DOGE">Ð DOGE</span>
-            <span class="crypto-chip" data-crypto="SOL">◎ SOL</span>
-          </div>
-        </section>
-
-        <!-- Game sections -->
-        <div id="games">
-          <section class="game-section" data-section="popular">
-            <div class="section-header">
-              <h2>🔥 Popular Games</h2>
-              <a href="#" class="see-all">See all →</a>
-            </div>
-            <div class="game-slider" id="popularGames"></div>
-          </section>
-
-          <section class="game-section" data-section="new">
-            <div class="section-header">
-              <h2>✨ New Releases</h2>
-              <a href="#" class="see-all">See all →</a>
-            </div>
-            <div class="game-slider" id="newGames"></div>
-          </section>
-
-          <section class="game-section" data-section="live">
-            <div class="section-header">
-              <h2>🎥 Live Casino</h2>
-              <a href="#" class="see-all">See all →</a>
-            </div>
-            <div class="game-slider" id="liveGames"></div>
-          </section>
-
-          <section class="game-section" data-section="jackpot">
-            <div class="section-header">
-              <h2>💎 Jackpot Games</h2>
-              <a href="#" class="see-all">See all →</a>
-            </div>
-            <div class="game-slider" id="jackpotGames"></div>
-          </section>
+        <div class="demo-banner">
+          <strong>Demo platform</strong> — Ticket purchases use real testnet transactions. Jackpot draws are simulated. Not a licensed lottery. Do not use for real-money gambling without proper licensing.
         </div>
 
-        <!-- Promotions -->
+        <section class="lottery-hero" id="lottery">
+          <p class="lottery-jackpot-label">★ Grand Prize ★</p>
+          <h1 class="lottery-jackpot" id="lotteryJackpot">$20,000,000</h1>
+          <p class="lottery-sub">Pick 6 numbers. Pay with crypto. Win the biggest jackpot in Web3.</p>
+          <div class="lottery-countdown">
+            <div class="countdown-unit"><span id="cdHours">04</span><small>Hours</small></div>
+            <div class="countdown-unit"><span id="cdMins">00</span><small>Mins</small></div>
+            <div class="countdown-unit"><span id="cdSecs">00</span><small>Secs</small></div>
+          </div>
+          <button class="btn btn-gold btn-lg" id="heroBuyBtn">Buy Tickets Now</button>
+        </section>
+
+        <div class="pool-bar">
+          <div class="pool-bar-header">
+            <span>Prize pool growth (from verified ticket sales)</span>
+            <span id="poolAmount">$0 contributed</span>
+          </div>
+          <div class="pool-bar-track">
+            <div class="pool-bar-fill" id="poolBarFill"></div>
+          </div>
+        </div>
+
+        <div class="lottery-grid">
+          <div class="lottery-panel">
+            <h3>🎱 Select Your Numbers</h3>
+            <div class="selected-numbers" id="selectedPills"></div>
+            <div class="number-grid" id="numberGrid"></div>
+            <div style="display:flex;gap:10px;margin-bottom:20px">
+              <button class="btn btn-outline" id="quickPickBtn" type="button">Quick Pick</button>
+              <button class="btn btn-ghost" id="clearNumbersBtn" type="button">Clear</button>
+            </div>
+            <h3>💰 Ticket Price</h3>
+            <div class="ticket-tiers" id="ticketTiers"></div>
+            <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Buy Ticket with Crypto</button>
+            <div class="tx-status" id="ticketStatus" hidden></div>
+            <div class="security-badge">
+              🔒 Secured by on-chain payments · Chain-validated · Rate-limited · Min/max enforced
+            </div>
+          </div>
+
+          <div class="lottery-panel">
+            <h3>📊 Verified Ticket Purchases</h3>
+            <div class="activity-feed" id="activityFeed"></div>
+            <p class="activity-disclaimer">Only real on-chain ticket purchases appear here. Each entry is tied to a wallet transaction hash.</p>
+          </div>
+        </div>
+
+        <section class="lottery-panel" id="how-it-works" style="margin-bottom:28px">
+          <h3>How It Works</h3>
+          <ol style="margin:16px 0 0 20px;color:var(--text-secondary);line-height:2">
+            <li>Connect your Web3 wallet (MetaMask recommended)</li>
+            <li>Pick 6 numbers from 1–49 or use Quick Pick</li>
+            <li>Choose a ticket tier ($5 – $500) and confirm the on-chain payment</li>
+            <li>Wait for the draw — winners are selected provably at random</li>
+            <li>Jackpot paid instantly to your wallet in crypto</li>
+          </ol>
+        </section>
+
+        <section class="lottery-panel" id="winners" style="margin-bottom:28px">
+          <h3>🏆 Recent Winners</h3>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:12px">First draw pending. Buy tickets to participate in the inaugural $20M draw.</p>
+        </section>
+
         <section class="promotions" id="promotions">
           <div class="section-header">
-            <h2>🎁 Active Promotions</h2>
+            <h2>🎁 Lottery Promotions</h2>
           </div>
           <div class="promo-grid">
             <article class="promo-card">
               <div class="promo-badge">HOT</div>
-              <h3>Welcome Bonus</h3>
-              <p>100% up to 1 BTC on your first deposit + 180 free spins on selected slots.</p>
-              <button class="btn btn-gold">Claim Now</button>
+              <h3>2x Ticket Tuesday</h3>
+              <p>Buy any $50+ ticket on Tuesdays and receive a free bonus entry for the $20M draw.</p>
+              <button class="btn btn-gold" id="promoBuyBtn">Buy Tickets</button>
             </article>
             <article class="promo-card">
               <div class="promo-badge">NEW</div>
-              <h3>Wednesday Free Spins</h3>
-              <p>Deposit 0.01 ETH+ on Wednesdays and get 20 wager-free free spins.</p>
-              <button class="btn btn-outline">Details</button>
+              <h3>Refer & Earn</h3>
+              <p>Share your referral link. Earn 10% of every ticket your friends purchase.</p>
+              <button class="btn btn-outline">Get Link</button>
             </article>
             <article class="promo-card">
               <div class="promo-badge">VIP</div>
-              <h3>Reload Bonus</h3>
-              <p>VIP members get 50% reload bonus every Monday up to 0.5 BTC.</p>
-              <button class="btn btn-outline">Join VIP</button>
+              <h3>Mega Bundle</h3>
+              <p>Buy 10 × $100 tickets and get 3 free entries. Best odds to hit the jackpot.</p>
+              <button class="btn btn-outline" id="megaBundleBtn">View Bundle</button>
             </article>
-          </div>
-        </section>
-
-        <!-- Providers -->
-        <section class="providers">
-          <div class="section-header">
-            <h2>Game Providers</h2>
-          </div>
-          <div class="provider-logos">
-            <span>Pragmatic Play</span>
-            <span>Evolution</span>
-            <span>NetEnt</span>
-            <span>Play'n GO</span>
-            <span>Microgaming</span>
-            <span>BGaming</span>
-            <span>Push Gaming</span>
-            <span>Hacksaw</span>
           </div>
         </section>
       </main>
@@ -239,15 +203,15 @@
         <div class="footer-brand">
           <span class="logo-star">★</span>
           <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
-          <p>Licensed crypto casino demo. For entertainment purposes only.</p>
+          <p>Crypto lottery demo with secure Web3 payments. For educational purposes only.</p>
         </div>
         <div class="footer-links">
           <div>
-            <h4>Casino</h4>
-            <a href="#">Slots</a>
-            <a href="#">Live Casino</a>
-            <a href="#">Table Games</a>
-            <a href="#">Jackpots</a>
+            <h4>Lottery</h4>
+            <a href="#lottery">Buy Tickets</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#winners">Winners</a>
+            <a href="#">Odds & Prizes</a>
           </div>
           <div>
             <h4>Support</h4>
@@ -423,8 +387,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
-  <script src="js/games.js"></script>
   <script src="js/wallet.js"></script>
+  <script src="js/lottery.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
