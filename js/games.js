@@ -41,7 +41,7 @@ function generateGames(count) {
       category,
       icon: GAME_ICONS[i % GAME_ICONS.length],
       badge: i % 7 === 0 ? 'hot' : i % 11 === 0 ? 'new' : i % 13 === 0 ? 'jackpot' : null,
-      gradient: `hsl(${(i * 23 + 350) % 40 + 350}, 55%, 22%)`,
+      gradient: `hsl(${(i * 37) % 360}, 45%, 25%)`,
     });
   }
   return games;
