@@ -1,7 +1,7 @@
 /**
  * Game catalog — mock data similar to BitStarz game library
  */
-const GAME_ICONS = ['🎰', '🍒', '💎', '🃏', '🎲', '⭐', '🔥', '👑', '🍀', '🎯', '🦊', '🐉', '🌙', '⚡', '🎪'];
+const GAME_ICONS = window.Icons?.GAME_ICON_SET || ['dices', 'cherry', 'gem', 'spade', 'dices', 'star', 'flame', 'crown', 'clover', 'target', 'sparkles', 'zap', 'moon', 'zap', 'tent'];
 const PROVIDERS = ['Pragmatic Play', 'Evolution', 'NetEnt', "Play'n GO", 'BGaming', 'Push Gaming', 'Hacksaw', 'Microgaming', 'Relax Gaming', 'Nolimit City'];
 
 const GAME_TITLES = [
@@ -68,11 +68,12 @@ function renderGameCard(game) {
   const badgeHtml = game.badge
     ? `<span class="game-badge ${game.badge}">${game.badge}</span>`
     : '';
+  const iconHtml = window.Icons?.inline(game.icon, 40, 'icon game-card-icon') || '';
   return `
     <article class="game-card" data-game-id="${game.id}">
       <div class="game-thumb" style="background: linear-gradient(145deg, ${game.gradient}, var(--bg-card))">
         ${badgeHtml}
-        <div class="game-thumb-placeholder">${game.icon}</div>
+        <div class="game-thumb-placeholder">${iconHtml}</div>
       </div>
       <h3>${game.title}</h3>
       <p>${game.provider}</p>
