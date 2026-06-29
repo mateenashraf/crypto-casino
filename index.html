@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https: wss:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>StarBitz — Crypto Lottery | $20M Jackpot</title>
   <meta name="description" content="Win up to $50 million. Daily, weekly, and monthly crypto lottery draws. Buy tickets with Bitcoin, Ethereum, USDT & more." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -409,7 +411,8 @@
   <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script src="js/security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="js/icons.js"></script>
   <script src="js/wallet.js"></script>
   <script src="js/draw-engine.js"></script>

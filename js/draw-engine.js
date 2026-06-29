@@ -298,15 +298,16 @@ const DrawEngine = (() => {
       return;
     }
 
+    const esc = window.SBSecurity.escapeHtml;
     el.innerHTML = winners.slice(0, 12).map((w) => `
       <div class="winner-row">
-        <div class="winner-prize">${formatUsd(w.prize)}</div>
+        <div class="winner-prize">${esc(formatUsd(w.prize))}</div>
         <div class="winner-meta">
-          <strong>${w.drawName}</strong>
-          <span>Winning: ${w.numbers.join(' · ')}</span>
-          <span class="winner-wallet">${w.winner.wallet}</span>
+          <strong>${esc(w.drawName)}</strong>
+          <span>Winning: ${esc(w.numbers.join(' · '))}</span>
+          <span class="winner-wallet">${esc(w.winner.wallet)}</span>
         </div>
-        <div class="winner-time">${new Date(w.timestamp).toLocaleDateString()}</div>
+        <div class="winner-time">${esc(new Date(w.timestamp).toLocaleDateString())}</div>
       </div>
     `).join('');
   }

@@ -101,9 +101,10 @@ const ActivitySimulator = (() => {
     const el = document.getElementById('liveTicker');
     if (!el || !feedItems.length) return;
     const latest = feedItems.slice(0, 8);
+    const esc = window.SBSecurity.escapeHtml;
     el.innerHTML = latest.map((e) => `
       <span class="ticker-item">
-        <strong>${e.wallet}</strong> bought ${formatUsd(e.usdPrice)} ticket
+        <strong>${esc(e.wallet)}</strong> bought ${esc(formatUsd(e.usdPrice))} ticket
       </span>
     `).join('<span class="ticker-sep">•</span>');
   }
