@@ -97,7 +97,96 @@ input { font-family: inherit; }
   font-size: 1.35rem;
   flex-shrink: 0;
 }
-.logo-star { color: var(--accent-gold); font-size: 1.1rem; }
+.logo-star { color: var(--accent-gold); display: inline-flex; align-items: center; }
+.logo-star svg { stroke: var(--accent-gold); fill: var(--accent-gold); }
+.icon-star svg { fill: currentColor; }
+.sidebar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.sidebar-item.active .sidebar-icon,
+.sidebar-item:hover .sidebar-icon { color: var(--accent-purple); }
+
+/* Icon system */
+.icon { display: block; flex-shrink: 0; }
+.icon-inline { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.icon-gold { color: var(--accent-gold); }
+.icon-gold svg { stroke: var(--accent-gold); }
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(124, 92, 252, 0.12);
+  color: var(--accent-purple);
+  flex-shrink: 0;
+}
+.stat-icon svg { stroke: var(--accent-purple); }
+
+.section-title,
+.panel-title,
+.featured-draw-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-gold);
+}
+.title-icon svg { stroke: var(--accent-gold); }
+
+.draw-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(124, 92, 252, 0.15);
+  color: var(--accent-purple);
+  margin-bottom: 4px;
+}
+.draw-card.active .draw-card-icon {
+  background: rgba(245, 183, 49, 0.15);
+  color: var(--accent-gold);
+}
+.draw-card.active .draw-card-icon svg { stroke: var(--accent-gold); }
+
+.wallet-icon-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: rgba(124, 92, 252, 0.15);
+  color: var(--accent-purple);
+}
+.wallet-icon-large svg { stroke: var(--accent-purple); }
+
+.security-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.security-badge [data-icon] {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--accent-green);
+}
+.security-badge svg { stroke: var(--accent-green); }
+
 .logo-accent { color: var(--accent-gold); }
 
 .header-nav {
@@ -209,7 +298,6 @@ input { font-family: inherit; }
   background: var(--bg-elevated);
   color: var(--text-primary);
 }
-.sidebar-icon { font-size: 1.1rem; width: 24px; text-align: center; }
 .sidebar-divider { height: 1px; background: var(--border); margin: 12px 0; }
 
 .sidebar-balance {
@@ -407,9 +495,12 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
   background: linear-gradient(145deg, var(--bg-elevated), var(--bg-card));
+  color: var(--accent-purple);
 }
+.game-thumb-placeholder svg,
+.game-card-icon svg { stroke: var(--accent-purple); }
+.game-card:hover .game-thumb-placeholder svg { stroke: var(--accent-gold); }
 .game-badge {
   position: absolute;
   top: 8px;
@@ -512,7 +603,28 @@ input { font-family: inherit; }
   font-size: 0.75rem;
   color: var(--text-muted);
 }
-.footer-crypto { display: flex; gap: 12px; font-size: 1.2rem; opacity: 0.5; }
+.footer-crypto {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.crypto-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(124, 92, 252, 0.1);
+  color: var(--text-secondary);
+  opacity: 0.85;
+  transition: color 0.2s, background 0.2s;
+}
+.crypto-badge:hover {
+  color: var(--accent-gold);
+  background: rgba(245, 183, 49, 0.12);
+}
+.crypto-badge svg { stroke: currentColor; }
 
 /* Modals */
 .modal-overlay {
@@ -592,7 +704,6 @@ input { font-family: inherit; }
 .wallet-panel.active { display: block; }
 
 .wallet-connect-prompt { text-align: center; padding: 24px 0; }
-.wallet-icon-large { font-size: 3rem; margin-bottom: 12px; }
 .wallet-connect-prompt h3 { margin-bottom: 8px; }
 .wallet-connect-prompt p { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 20px; }
 
@@ -615,6 +726,10 @@ input { font-family: inherit; }
 .currency-select { display: flex; gap: 8px; }
 .currency-option {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 10px;
   border-radius: var(--radius-sm);
   background: var(--bg-card);
@@ -623,6 +738,12 @@ input { font-family: inherit; }
   font-weight: 600;
   transition: border-color 0.2s, background 0.2s;
 }
+.currency-icon {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+}
+.currency-option.active .currency-icon svg { stroke: var(--accent-gold); }
 .currency-option.active {
   border-color: var(--accent-gold);
   background: rgba(212, 175, 55, 0.12);
@@ -753,7 +874,18 @@ input { font-family: inherit; }
 /* Game modal */
 .game-modal { max-width: 480px; padding: 32px; }
 .game-preview { text-align: center; }
-.game-preview-icon { font-size: 4rem; margin-bottom: 16px; }
+.game-preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  background: rgba(124, 92, 252, 0.15);
+  color: var(--accent-purple);
+}
+.game-preview-icon svg { stroke: var(--accent-purple); }
 .game-preview h2 { margin-bottom: 4px; }
 .game-preview p { color: var(--text-muted); font-size: 0.875rem; }
 .game-preview-hint { margin: 16px 0 24px !important; }
@@ -778,9 +910,11 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  color: var(--accent-gold);
   transition: transform 0.1s;
 }
+.reel svg { stroke: var(--accent-gold); }
+.reel .icon-star svg { fill: var(--accent-gold); stroke: var(--accent-gold); }
 .reel.spinning { animation: reelSpin 0.1s linear infinite; }
 @keyframes reelSpin {
   0% { transform: translateY(-4px); }
@@ -882,7 +1016,6 @@ input { font-family: inherit; }
   border-color: var(--accent-gold);
   background: rgba(245, 183, 49, 0.1);
 }
-.draw-card-icon { font-size: 1.4rem; }
 .draw-card-name { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
 .draw-card-prize { font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); }
 .draw-card-timer { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
