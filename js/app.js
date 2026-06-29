@@ -227,5 +227,6 @@
   });
 
   window.LotteryApp.init();
+  window.Icons?.hydrate();
   wallet.tryAutoConnect().then(() => updateWalletUI());
 })();
