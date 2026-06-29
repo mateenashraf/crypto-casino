@@ -16,7 +16,6 @@ const LotteryApp = (() => {
   const wallet = () => window.SecureWeb3;
   let selectedNumbers = [];
   let selectedTier = TICKET_TIERS[1];
-  let drawEnd = Date.now() + 4 * 60 * 60 * 1000;
 
   function usdToEth(usd) {
     return parseFloat((usd / ETH_USD_RATE).toFixed(6));
@@ -86,53 +85,75 @@ const LotteryApp = (() => {
     });
   }
 
+  function getDisplayPool() {
+    let total = wallet().getPoolContributions();
+    if (window.ActivitySimulator?.isEnabled()) {
+      total += window.ActivitySimulator.getSimulatedPool();
+    }
+    return total;
+  }
+
+  function getDisplayTicketCount() {
+    let count = wallet().getAllTickets().length;
+    if (window.ActivitySimulator?.isEnabled()) {
+      count += window.ActivitySimulator.getSimulatedTicketCount();
+    }
+    return count;
+  }
+
   function updateJackpot() {
-    const contributions = wallet().getPoolContributions();
-    const poolPct = Math.min((contributions / JACKPOT_USD) * 100, 99.9);
-    const el = document.getElementById('lotteryJackpot');
+    const contributions = getDisplayPool();
+    const featured = window.DrawEngine?.getSelectedDraw();
+    const jackpotTarget = featured
+      ? (featured.getPrize ? featured.getPrize(new Date()) : featured.prize)
+      : JACKPOT_USD;
+    const poolPct = Math.min((contributions / jackpotTarget) * 100, 99.9);
     const fill = document.getElementById('poolBarFill');
     const poolAmt = document.getElementById('poolAmount');
-    const statJackpot = document.getElementById('statJackpot');
+    const statTickets = document.getElementById('statTickets');
 
-    if (el) el.textContent = formatUsd(JACKPOT_USD);
-    if (statJackpot) statJackpot.textContent = formatUsd(JACKPOT_USD);
-    if (fill) fill.style.width = `${Math.max(poolPct, 2)}%`;
-    if (poolAmt) poolAmt.textContent = `${formatUsd(contributions)} contributed`;
+    if (fill) fill.style.width = `${Math.max(poolPct, 8)}%`;
+    if (poolAmt) poolAmt.textContent = `${formatUsd(contributions)} in play`;
+    if (statTickets) statTickets.textContent = getDisplayTicketCount().toLocaleString();
   }
 
   function renderActivityFeed() {
     const feed = document.getElementById('activityFeed');
     if (!feed) return;
 
-    const tickets = wallet().getAllTickets().slice(0, 25);
-    if (!tickets.length) {
-      feed.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;padding:20px 0;text-align:center">No ticket purchases yet. Be the first!</p>';
+    const real = wallet().getAllTickets().map((t) => ({
+      wallet: wallet().shortenAddress(t.wallet),
+      numbers: t.numbers,
+      usdPrice: t.usdPrice,
+      simulated: false,
+      timestamp: t.timestamp,
+    }));
+
+    const simulated = window.ActivitySimulator?.isEnabled()
+      ? window.ActivitySimulator.getFeedItems()
+      : [];
+
+    const merged = [...real, ...simulated]
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 30);
+
+    if (!merged.length) {
+      feed.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;padding:20px 0;text-align:center">Waiting for ticket activity...</p>';
       return;
     }
 
-    feed.innerHTML = tickets.map((t) => `
-      <div class="activity-item">
-        <span class="wallet">${wallet().shortenAddress(t.wallet)}</span>
-        <span>bought ticket · ${t.numbers.join(', ')}</span>
+    feed.innerHTML = merged.map((t) => `
+      <div class="activity-item ${t.simulated ? 'simulated' : 'verified'}">
+        <span class="wallet">${t.wallet}</span>
+        <span>${t.numbers.join(', ')}</span>
         <span class="amount">${formatUsd(t.usdPrice)}</span>
       </div>
     `).join('');
   }
 
-  function updateCountdown() {
-    const diff = Math.max(0, drawEnd - Date.now());
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = String(val).padStart(2, '0'); };
-    set('cdHours', h);
-    set('cdMins', m);
-    set('cdSecs', s);
-
-    if (diff <= 0) {
-      drawEnd = Date.now() + 4 * 60 * 60 * 1000;
-    }
+  function onSimulatedActivity() {
+    updateJackpot();
+    renderActivityFeed();
   }
 
   async function buyTicket() {
@@ -155,7 +176,10 @@ const LotteryApp = (() => {
     if (status) { status.hidden = false; status.className = 'tx-status pending'; status.textContent = 'Confirm in your wallet...'; }
 
     try {
-      await wallet().buyLotteryTicket(eth, selectedNumbers, selectedTier.usd);
+      const ticket = await wallet().buyLotteryTicket(eth, selectedNumbers, selectedTier.usd);
+      if (window.DrawEngine) {
+        window.DrawEngine.registerTicket(window.DrawEngine.getSelectedDrawId(), ticket);
+      }
       if (status) { status.className = 'tx-status success'; status.textContent = `Ticket purchased for ${selectedTier.label}!`; }
       window.AppUI?.toast(`Ticket confirmed — ${selectedTier.label}`, 'success');
       selectedNumbers = [];
@@ -176,8 +200,6 @@ const LotteryApp = (() => {
     renderTiers();
     updateJackpot();
     renderActivityFeed();
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
 
     document.getElementById('quickPickBtn')?.addEventListener('click', quickPick);
     document.getElementById('clearNumbersBtn')?.addEventListener('click', () => {
@@ -192,9 +214,17 @@ const LotteryApp = (() => {
         renderActivityFeed();
       }
     });
+
+    if (window.DrawEngine) {
+      window.DrawEngine.init();
+    }
+
+    if (window.ActivitySimulator?.isEnabled()) {
+      window.ActivitySimulator.init();
+    }
   }
 
-  return { init, JACKPOT_USD, formatUsd };
+  return { init, JACKPOT_USD, formatUsd, onSimulatedActivity, updateJackpot, renderActivityFeed };
 })();
 
 window.LotteryApp = LotteryApp;
