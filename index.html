@@ -19,7 +19,7 @@
           <span></span><span></span><span></span>
         </button>
         <a href="#" class="logo">
-          <span class="logo-star">★</span>
+          <span class="logo-star" data-icon="star" data-icon-size="22"></span>
           <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
         </a>
         <nav class="header-nav">
@@ -43,26 +43,26 @@
       <aside class="sidebar" id="sidebar">
         <nav class="sidebar-nav">
           <a href="#draws" class="sidebar-item">
-            <span class="sidebar-icon">🗓️</span> Draw Schedule
+            <span class="sidebar-icon" data-icon="calendar" data-icon-size="18"></span> Draw Schedule
           </a>
           <a href="#lottery" class="sidebar-item active">
-            <span class="sidebar-icon">🎱</span> Buy Tickets
+            <span class="sidebar-icon" data-icon="ticket" data-icon-size="18"></span> Buy Tickets
           </a>
           <a href="#how-it-works" class="sidebar-item">
-            <span class="sidebar-icon">📋</span> How It Works
+            <span class="sidebar-icon" data-icon="clipboard-list" data-icon-size="18"></span> How It Works
           </a>
           <a href="#winners" class="sidebar-item">
-            <span class="sidebar-icon">🏆</span> Past Winners
+            <span class="sidebar-icon" data-icon="trophy" data-icon-size="18"></span> Past Winners
           </a>
           <a href="#" class="sidebar-item" id="myTicketsLink">
-            <span class="sidebar-icon">🎟️</span> My Tickets
+            <span class="sidebar-icon" data-icon="ticket" data-icon-size="18"></span> My Tickets
           </a>
           <div class="sidebar-divider"></div>
           <a href="#promotions" class="sidebar-item">
-            <span class="sidebar-icon">🎁</span> Promotions
+            <span class="sidebar-icon" data-icon="gift" data-icon-size="18"></span> Promotions
           </a>
           <a href="#" class="sidebar-item" id="sidebarWalletBtn">
-            <span class="sidebar-icon">🔗</span> Wallet
+            <span class="sidebar-icon" data-icon="wallet" data-icon-size="18"></span> Wallet
           </a>
         </nav>
         <div class="sidebar-balance" id="sidebarBalance" hidden>
@@ -76,28 +76,28 @@
         <!-- Stats ticker -->
         <div class="stats-bar">
           <div class="stat">
-            <span class="stat-icon">🏆</span>
+            <span class="stat-icon" data-icon="trophy" data-icon-size="22"></span>
             <div>
               <span class="stat-value" id="statJackpot">$20,000,000</span>
               <span class="stat-label">Grand Jackpot</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon">🎟️</span>
+            <span class="stat-icon" data-icon="ticket" data-icon-size="22"></span>
             <div>
               <span class="stat-value" id="statTickets">0</span>
               <span class="stat-label">Tickets Sold</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon">🔒</span>
+            <span class="stat-icon" data-icon="shield-check" data-icon-size="22"></span>
             <div>
               <span class="stat-value">On-Chain</span>
               <span class="stat-label">Secure Web3</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon">⏱️</span>
+            <span class="stat-icon" data-icon="clock" data-icon-size="22"></span>
             <div>
               <span class="stat-value" id="statDraw">4h 00m</span>
               <span class="stat-label">Next Draw</span>
@@ -113,14 +113,14 @@
 
         <section class="draw-schedule" id="draws">
           <div class="section-header">
-            <h2>🗓️ Draw Schedule</h2>
+            <h2 class="section-title"><span class="title-icon" data-icon="calendar" data-icon-size="20"></span> Draw Schedule</h2>
             <span class="section-hint">Click a draw to enter</span>
           </div>
           <div class="draw-cards" id="drawCards"></div>
         </section>
 
         <section class="lottery-hero compact-hero" id="lottery">
-          <p class="lottery-jackpot-label" id="featuredDrawLabel">💎 6-Month Grand</p>
+          <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>6-Month Grand</span></p>
           <h1 class="lottery-jackpot" id="lotteryJackpot">$20,000,000</h1>
           <p class="lottery-sub" id="featuredDrawSub">Prize: $20,000,000 · Pick 6 numbers to enter</p>
           <div class="lottery-countdown">
@@ -144,24 +144,25 @@
 
         <div class="lottery-grid">
           <div class="lottery-panel">
-            <h3>🎱 Select Your Numbers</h3>
+            <h3 class="panel-title"><span class="title-icon" data-icon="dices" data-icon-size="18"></span> Select Your Numbers</h3>
             <div class="selected-numbers" id="selectedPills"></div>
             <div class="number-grid" id="numberGrid"></div>
             <div style="display:flex;gap:10px;margin-bottom:20px">
               <button class="btn btn-outline" id="quickPickBtn" type="button">Quick Pick</button>
               <button class="btn btn-ghost" id="clearNumbersBtn" type="button">Clear</button>
             </div>
-            <h3>💰 Ticket Price</h3>
+            <h3 class="panel-title"><span class="title-icon" data-icon="coins" data-icon-size="18"></span> Ticket Price</h3>
             <div class="ticket-tiers" id="ticketTiers"></div>
             <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Buy Ticket with Crypto</button>
             <div class="tx-status" id="ticketStatus" hidden></div>
             <div class="security-badge">
-              🔒 Secured by on-chain payments · Chain-validated · Rate-limited · Min/max enforced
+              <span data-icon="shield-check" data-icon-size="16"></span>
+              Secured by on-chain payments · Chain-validated · Rate-limited · Min/max enforced
             </div>
           </div>
 
           <div class="lottery-panel">
-            <h3>📊 Live Ticket Activity</h3>
+            <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Live Ticket Activity</h3>
             <div class="activity-feed" id="activityFeed"></div>
             <p class="activity-disclaimer">Live feed of ticket purchases from players worldwide.</p>
           </div>
@@ -178,13 +179,13 @@
         </section>
 
         <section class="lottery-panel compact-panel" id="winners">
-          <h3>🏆 Recent Winners</h3>
+          <h3 class="panel-title"><span class="title-icon" data-icon="trophy" data-icon-size="18"></span> Recent Winners</h3>
           <div id="winnersList"></div>
         </section>
 
         <section class="promotions" id="promotions">
           <div class="section-header">
-            <h2>🎁 Lottery Promotions</h2>
+            <h2 class="section-title"><span class="title-icon" data-icon="gift" data-icon-size="20"></span> Lottery Promotions</h2>
           </div>
           <div class="promo-grid">
             <article class="promo-card">
@@ -214,7 +215,7 @@
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <span class="logo-star">★</span>
+          <span class="logo-star icon-gold" data-icon="star" data-icon-size="20"></span>
           <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
           <p>The world's biggest crypto lottery. Instant payouts. Secure Web3 payments.</p>
         </div>
@@ -243,7 +244,10 @@
       <div class="footer-bottom">
         <p>© 2026 StarBitz. All rights reserved.</p>
         <div class="footer-crypto">
-          <span>₿</span><span>Ξ</span><span>◎</span><span>₮</span>
+          <span class="crypto-badge" data-icon="bitcoin" data-icon-size="18" title="Bitcoin"></span>
+          <span class="crypto-badge" data-icon="ethereum" data-icon-size="18" title="Ethereum"></span>
+          <span class="crypto-badge" data-icon="solana" data-icon-size="18" title="Solana"></span>
+          <span class="crypto-badge" data-icon="circle-dollar" data-icon-size="18" title="USDT"></span>
         </div>
       </div>
     </footer>
@@ -266,7 +270,7 @@
         <!-- Deposit -->
         <div class="wallet-panel active" id="panel-deposit">
           <div class="wallet-connect-prompt" id="connectPrompt">
-            <div class="wallet-icon-large">🔗</div>
+            <div class="wallet-icon-large" data-icon="link-2" data-icon-size="48"></div>
             <h3>Connect Your Wallet</h3>
             <p>Connect MetaMask or any Web3 wallet to deposit crypto instantly.</p>
             <button class="btn btn-primary btn-lg btn-block" id="connectWalletBtn">Connect Wallet</button>
@@ -282,9 +286,15 @@
             </div>
             <label class="field-label">Select Currency</label>
             <div class="currency-select">
-              <button class="currency-option active" data-symbol="ETH">Ξ ETH</button>
-              <button class="currency-option" data-symbol="USDT">₮ USDT</button>
-              <button class="currency-option" data-symbol="BTC">₿ BTC</button>
+              <button class="currency-option active" data-symbol="ETH">
+                <span class="currency-icon" data-icon="ethereum" data-icon-size="16"></span> ETH
+              </button>
+              <button class="currency-option" data-symbol="USDT">
+                <span class="currency-icon" data-icon="circle-dollar" data-icon-size="16"></span> USDT
+              </button>
+              <button class="currency-option" data-symbol="BTC">
+                <span class="currency-icon" data-icon="bitcoin" data-icon-size="16"></span> BTC
+              </button>
             </div>
             <label class="field-label" for="depositAmount">Amount</label>
             <div class="amount-input-wrap">
@@ -370,7 +380,7 @@
       <button class="modal-close" id="gameModalClose" aria-label="Close">×</button>
       <div class="game-modal-content" id="gameModalContent">
         <div class="game-preview">
-          <div class="game-preview-icon" id="gamePreviewIcon">🎰</div>
+          <div class="game-preview-icon" id="gamePreviewIcon" data-icon="dices" data-icon-size="56"></div>
           <h2 id="gamePreviewTitle">Game Title</h2>
           <p id="gamePreviewProvider">Provider</p>
           <p class="game-preview-hint">Connect wallet and deposit to play. This is a demo — games are simulated.</p>
@@ -380,9 +390,9 @@
         <div class="game-simulator" id="gameSimulator" hidden>
           <div class="slot-machine">
             <div class="slot-reels" id="slotReels">
-              <div class="reel">🍒</div>
-              <div class="reel">🍋</div>
-              <div class="reel">⭐</div>
+              <div class="reel" data-icon="cherry" data-icon-size="36"></div>
+              <div class="reel" data-icon="lemon" data-icon-size="36"></div>
+              <div class="reel" data-icon="star" data-icon-size="36"></div>
             </div>
             <p class="slot-result" id="slotResult">Place a bet and spin!</p>
             <div class="slot-controls">
@@ -400,6 +410,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script src="js/icons.js"></script>
   <script src="js/wallet.js"></script>
   <script src="js/draw-engine.js"></script>
   <script src="js/activity-simulator.js"></script>
