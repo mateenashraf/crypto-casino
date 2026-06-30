@@ -6,7 +6,7 @@ const SecureWeb3 = (() => {
     // Sepolia testnet (change to 1 for mainnet in production)
     ALLOWED_CHAIN_IDS: [11155111, 1],
     CHAIN_NAMES: { 1: 'Ethereum Mainnet', 11155111: 'Sepolia Testnet' },
-    TREASURY_ADDRESS: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
+    TREASURY_ADDRESS: '0x18EAD9D8fEC234d33a8E8644F12Fb355c6Af6c3E',
     // Deploy LotteryPool.sol and set address here for contract-based entries
     LOTTERY_CONTRACT: null,
     MIN_ETH: 0.001,
@@ -98,8 +98,42 @@ const SecureWeb3 = (() => {
     setStorage(CONFIG.STORAGE_TX, all);
   }
 
+  const EXPLORER_BASES = {
+    1: 'https://etherscan.io',
+    11155111: 'https://sepolia.etherscan.io',
+  };
+
   function getAllTickets() {
     try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_TICKETS) || '[]'); } catch { return []; }
+  }
+
+  function isValidAddress(addr) {
+    try {
+      return ethers.isAddress(addr);
+    } catch {
+      return false;
+    }
+  }
+
+  function normalizeAddress(addr) {
+    return isValidAddress(addr) ? ethers.getAddress(addr) : null;
+  }
+
+  function getTicketsByAddress(addr) {
+    const normalized = normalizeAddress(addr);
+    if (!normalized) return [];
+    const key = normalized.toLowerCase();
+    return getAllTickets().filter((t) => t.wallet?.toLowerCase() === key);
+  }
+
+  function getExplorerTxUrl(hash, chainId = 11155111) {
+    const base = EXPLORER_BASES[chainId] || EXPLORER_BASES[11155111];
+    return `${base}/tx/${hash}`;
+  }
+
+  function getExplorerAddressUrl(addr, chainId = 11155111) {
+    const base = EXPLORER_BASES[chainId] || EXPLORER_BASES[11155111];
+    return `${base}/address/${addr}`;
   }
 
   function saveTicket(ticket, silent = false) {
@@ -235,6 +269,7 @@ const SecureWeb3 = (() => {
         amountEth: parseFloat(perTicketEth.toFixed(6)),
         usdPrice: parseFloat(perTicketUsd.toFixed(2)),
         hash: receipt.hash,
+        chainId,
         timestamp: baseTime + i,
         bundleIndex: qty > 1 ? i + 1 : null,
         bundleTotal: qty > 1 ? qty : null,
@@ -301,7 +336,8 @@ const SecureWeb3 = (() => {
 
   return {
     connect, disconnect, deposit, withdraw, buyLotteryTicket, buyLotteryTicketBulk,
-    getWalletBalance, getCasinoBalance, getTransactions, getAllTickets,
+    getWalletBalance, getCasinoBalance, getTransactions, getAllTickets, getTicketsByAddress,
+    getExplorerTxUrl, getExplorerAddressUrl, isValidAddress, normalizeAddress,
     getPoolContributions, isConnected: () => !!address,
     getAddress: () => address, getChainId: () => chainId,
     getTreasuryAddress: () => CONFIG.TREASURY_ADDRESS,
