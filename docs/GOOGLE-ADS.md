@@ -1,4 +1,4 @@
-# StarBitz — Google Ads Playbook ($100/month)
+# NeonDraw — Google Ads Playbook ($100/month)
 
 Budget: **~$3.30/day** · Goal: **ticket purchases / wallet connects**
 
@@ -185,7 +185,7 @@ affiliate program
 ### Headlines (use 15, rotate)
 
 1. Win Up To $50 Million
-2. StarBitz Crypto Lottery
+2. NeonDraw Crypto Lottery
 3. Daily Draws From $2,000
 4. $20M Jackpot — Enter Now
 5. Buy Tickets With Crypto
@@ -212,7 +212,7 @@ Pick 6 numbers, pay with crypto, win instantly. $20M grand draw + daily prizes f
 The biggest crypto lottery online. Automatic draws. Live jackpots. Secure Web3 payments. Enter before the countdown ends.
 
 **Description 4:**  
-Weekly $2M · Monthly $5M · Yearly $50M. StarBitz — instant deposits, fast withdrawals, provably fair draws.
+Weekly $2M · Monthly $5M · Yearly $50M. NeonDraw — instant deposits, fast withdrawals, provably fair draws.
 
 ### URL settings
 
