@@ -708,6 +708,17 @@ input { font-family: inherit; }
   object-fit: contain;
   filter: brightness(1.12) contrast(1.05);
 }
+.partner-logo-ph {
+  max-height: 48px;
+  filter: saturate(1.35) contrast(1.12) brightness(1.1)
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.08));
+}
+.partner-card-ph .partner-meta strong {
+  color: #ffd24d;
+}
+.partner-card-ph .partner-meta span {
+  color: rgba(255, 210, 77, 0.85);
+}
 .partner-badge-official {
   background: rgba(245, 183, 49, 0.15);
   color: var(--accent-gold);
