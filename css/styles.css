@@ -29,7 +29,6 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  height: 100%;
 }
 
 body {
@@ -39,7 +38,12 @@ body {
   line-height: 1.5;
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 12px);
 }
 
 #app {
