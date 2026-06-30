@@ -28,7 +28,35 @@
     toast,
     openWallet: () => openModal(walletModal),
     closeWallet: () => closeModal(walletModal),
+    scrollToSection,
   };
+
+  const SCROLL_OFFSET = 76;
+
+  function scrollToSection(selector) {
+    const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    document.getElementById('sidebar')?.classList.remove('open');
+  }
+
+  function initNavigation() {
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (!href || href === '#') {
+          e.preventDefault();
+          return;
+        }
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          scrollToSection(target);
+        }
+      });
+    });
+  }
 
   function updateWalletUI() {
     const connected = wallet.isConnected();
@@ -131,9 +159,7 @@
     e.preventDefault();
     openModal(walletModal);
   });
-  document.getElementById('heroBuyBtn')?.addEventListener('click', () => {
-    document.getElementById('lottery')?.scrollIntoView({ behavior: 'smooth' });
-  });
+  document.getElementById('heroBuyBtn')?.addEventListener('click', () => scrollToSection('#lottery'));
 
   document.getElementById('disconnectBtn').addEventListener('click', () => {
     wallet.disconnect();
@@ -223,6 +249,8 @@
     }
   });
 
+  initNavigation();
+  document.body.style.overflow = '';
   window.LotteryApp.init();
   window.Icons?.hydrate();
   wallet.tryAutoConnect().then(() => updateWalletUI());
