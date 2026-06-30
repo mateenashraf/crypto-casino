@@ -1,4 +1,4 @@
-# StarBitz — Website Documentation
+# NeonDraw — Website Documentation
 
 ## Live links
 
@@ -27,7 +27,7 @@ MetaMask requires **HTTPS** or **localhost** — do not open `index.html` as a f
 
 ## Product overview
 
-**StarBitz** is a crypto lottery platform with Web3 wallet payments, automatic scheduled draws, and live ticket activity.
+**NeonDraw** is a crypto lottery platform with Web3 wallet payments, automatic scheduled draws, and live ticket activity.
 
 ### Draw schedule & prizes
 
@@ -95,7 +95,7 @@ Edit `js/wallet.js`:
 
 ```javascript
 ALLOWED_CHAIN_IDS: [11155111, 1],  // Sepolia testnet, Mainnet
-TREASURY_ADDRESS: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
+TREASURY_ADDRESS: '0x18EAD9D8fEC234d33a8E8644F12Fb355c6Af6c3E',
 LOTTERY_CONTRACT: null,            // Set after deploying LotteryPool.sol
 MIN_ETH: 0.001,
 MAX_ETH: 2,
