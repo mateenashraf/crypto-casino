@@ -28,8 +28,10 @@ const PartnerNetwork = (() => {
       id: 'planet-hollywood',
       name: 'Planet Hollywood Las Vegas',
       tagline: 'Las Vegas Strip · Resort & Casino',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Planet_Hollywood_logo.svg',
+      logoUrl: 'assets/partners/planet-hollywood.svg',
       width: 200,
+      imgClass: 'partner-logo-ph',
+      cardClass: 'partner-card-ph',
     },
     {
       id: 'the-linq',
@@ -60,12 +62,12 @@ const PartnerNetwork = (() => {
     if (!grid) return;
 
     grid.innerHTML = VEGAS_PARTNERS.map((p) => `
-      <article class="partner-card partner-card-official" title="${p.name}">
-        <div class="partner-logo-wrap partner-logo-real">
+      <article class="partner-card partner-card-official ${p.cardClass || ''}" title="${p.name}">
+        <div class="partner-logo-wrap partner-logo-real ${p.logoClass || ''}">
           <img
             src="${p.logoUrl}"
             alt="${p.name} logo"
-            class="partner-real-logo"
+            class="partner-real-logo ${p.imgClass || ''}"
             width="${p.width}"
             height="auto"
             loading="lazy"
