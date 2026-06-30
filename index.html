@@ -153,6 +153,16 @@
             </div>
             <h3 class="panel-title"><span class="title-icon" data-icon="coins" data-icon-size="18"></span> Ticket Price</h3>
             <div class="ticket-tiers" id="ticketTiers"></div>
+            <div class="active-offer-banner" id="activeOfferBanner" hidden></div>
+            <div class="custom-tier-panel" id="customTierPanel" hidden>
+              <label class="field-label" for="customAmount">Custom amount (USD)</label>
+              <div class="custom-amount-wrap">
+                <span class="custom-amount-prefix">$</span>
+                <input type="number" id="customAmount" min="1" max="6400" step="1" value="25" placeholder="Enter amount" class="text-input custom-amount-input" />
+              </div>
+              <p class="field-hint">$1 per ticket · enter any amount to see how many entries you get</p>
+            </div>
+            <div class="purchase-summary" id="purchaseSummary"></div>
             <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Buy Ticket with Crypto</button>
             <div class="tx-status" id="ticketStatus" hidden></div>
             <div class="security-badge">
@@ -187,26 +197,7 @@
           <div class="section-header">
             <h2 class="section-title"><span class="title-icon" data-icon="gift" data-icon-size="20"></span> Lottery Promotions</h2>
           </div>
-          <div class="promo-grid">
-            <article class="promo-card">
-              <div class="promo-badge">HOT</div>
-              <h3>2x Ticket Tuesday</h3>
-              <p>Buy any $50+ ticket on Tuesdays and receive a free bonus entry for the $20M draw.</p>
-              <button class="btn btn-gold" id="promoBuyBtn">Buy Tickets</button>
-            </article>
-            <article class="promo-card">
-              <div class="promo-badge">NEW</div>
-              <h3>Refer & Earn</h3>
-              <p>Share your referral link. Earn 10% of every ticket your friends purchase.</p>
-              <button class="btn btn-outline">Get Link</button>
-            </article>
-            <article class="promo-card">
-              <div class="promo-badge">VIP</div>
-              <h3>Mega Bundle</h3>
-              <p>Buy 10 × $100 tickets and get 3 free entries. Best odds to hit the jackpot.</p>
-              <button class="btn btn-outline" id="megaBundleBtn">View Bundle</button>
-            </article>
-          </div>
+          <div class="promo-grid" id="promoGrid"></div>
         </section>
       </main>
     </div>
