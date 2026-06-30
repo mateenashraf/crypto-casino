@@ -288,6 +288,18 @@ const DrawEngine = (() => {
     });
   }
 
+  function updateDrawCardTimers() {
+    const el = document.getElementById('drawCards');
+    if (!el) return;
+    el.querySelectorAll('.draw-card').forEach((card) => {
+      const tier = DRAW_TIERS.find((t) => t.id === card.dataset.drawId);
+      if (!tier) return;
+      const next = state[tier.id]?.nextDraw || tier.getNextDraw();
+      const timerEl = card.querySelector('.draw-card-timer');
+      if (timerEl) timerEl.textContent = formatCountdown(next - Date.now());
+    });
+  }
+
   function renderWinners() {
     const el = document.getElementById('winnersList');
     if (!el) return;
@@ -313,9 +325,8 @@ const DrawEngine = (() => {
 
   function tick() {
     checkDraws();
-    renderDrawCards();
+    updateDrawCardTimers();
     updateFeaturedDraw();
-    renderWinners();
   }
 
   function init() {
@@ -330,6 +341,7 @@ const DrawEngine = (() => {
     window.addEventListener('draw-completed', (e) => {
       const w = e.detail;
       window.AppUI?.toast(`${w.drawName}: ${formatUsd(w.prize)} won!`, 'success');
+      renderDrawCards();
       renderWinners();
     });
   }
