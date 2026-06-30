@@ -3,26 +3,205 @@
  */
 const LotteryApp = (() => {
   const JACKPOT_USD = 20_000_000;
-  const ETH_USD_RATE = 3200; // demo rate for display
+  const ETH_USD_RATE = 3200;
+  const BASE_TICKET_USD = 1;
+  const MAX_CUSTOM_USD = 6400;
+
   const TICKET_TIERS = [
-    { usd: 5, label: '$5' },
-    { usd: 20, label: '$20' },
-    { usd: 50, label: '$50' },
-    { usd: 100, label: '$100' },
-    { usd: 300, label: '$300' },
-    { usd: 500, label: '$500' },
+    { usd: 1, label: '$1', tag: 'Starter' },
+    { usd: 5, label: '$5', tag: null },
+    { usd: 10, label: '$10', tag: 'Popular' },
+    { usd: 50, label: '$50', tag: null },
+    { usd: 100, label: '$100', tag: 'Best Value' },
+    { usd: 300, label: '$300', tag: null },
+    { usd: 500, label: '$500', tag: 'VIP' },
+  ];
+
+  const OFFERS = [
+    {
+      id: 'lucky-dip',
+      badge: 'STARTER',
+      badgeClass: 'starter',
+      title: '$1 Lucky Dip',
+      desc: 'One dollar. One dream. Jump in with the lowest entry on the board.',
+      usd: 1,
+      qty: 1,
+      cta: 'Try $1',
+    },
+    {
+      id: 'bundle-5',
+      badge: 'SAVE 20%',
+      badgeClass: 'save',
+      title: '5 Tickets for $4',
+      desc: 'Grab 5 entries for the price of 4 — same numbers, 5× the odds.',
+      usd: 4,
+      qty: 5,
+      unitUsd: 0.8,
+      cta: 'Claim Offer',
+    },
+    {
+      id: 'power-100',
+      badge: 'BONUS',
+      badgeClass: 'bonus',
+      title: '$100 Power Pack',
+      desc: '$100 ticket plus 10 free $1 bonus entries — 11 shots at the jackpot.',
+      usd: 100,
+      qty: 11,
+      unitUsd: 100 / 11,
+      cta: 'Get Power Pack',
+    },
+    {
+      id: 'high-roller',
+      badge: 'VIP',
+      badgeClass: 'vip',
+      title: '$500 High Roller',
+      desc: 'Premium entry with VIP draw weighting and priority winner pool access.',
+      usd: 500,
+      qty: 1,
+      cta: 'Go VIP',
+    },
+    {
+      id: 'bulk-50',
+      badge: '10% OFF',
+      badgeClass: 'save',
+      title: '50+ Bulk Saver',
+      desc: '50 tickets for $45 — automatic 10% bulk discount. Same numbers, massive odds boost.',
+      usd: 45,
+      qty: 50,
+      unitUsd: 0.9,
+      cta: 'Build Bundle',
+    },
+    {
+      id: 'flash-friday',
+      badge: '2× ENTRIES',
+      badgeClass: 'hot',
+      title: 'Flash Friday Double',
+      desc: 'Every $50 ticket this Friday includes a matching bonus entry — free.',
+      usd: 50,
+      qty: 2,
+      unitUsd: 25,
+      cta: 'Double Up',
+    },
   ];
 
   const wallet = () => window.SecureWeb3;
   let selectedNumbers = [];
-  let selectedTier = TICKET_TIERS[1];
+  let selection = {
+    mode: 'tier',
+    usd: 10,
+    label: '$10',
+    quantity: 1,
+    totalUsd: 10,
+    unitUsd: 10,
+    offerId: null,
+  };
+  let customAmountUsd = 25;
+  let walletAfford = { eth: 0, usd: 0, tickets: 0 };
 
   function usdToEth(usd) {
     return parseFloat((usd / ETH_USD_RATE).toFixed(6));
   }
 
   function formatUsd(n) {
-    return '$' + Math.round(n).toLocaleString();
+    return '$' + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+  }
+
+  function getPurchaseSummary() {
+    if (selection.mode === 'custom') {
+      const amount = Math.min(Math.max(1, Math.floor(customAmountUsd)), MAX_CUSTOM_USD);
+      const affordable = walletAfford.tickets > 0 ? Math.min(amount, walletAfford.tickets) : amount;
+      const qty = Math.max(1, affordable);
+      return {
+        mode: 'custom',
+        label: 'Custom',
+        quantity: qty,
+        unitUsd: BASE_TICKET_USD,
+        totalUsd: qty * BASE_TICKET_USD,
+        totalEth: usdToEth(qty * BASE_TICKET_USD),
+      };
+    }
+
+    return {
+      mode: selection.mode,
+      label: selection.label,
+      quantity: selection.quantity,
+      unitUsd: selection.unitUsd,
+      totalUsd: selection.totalUsd,
+      totalEth: usdToEth(selection.totalUsd),
+      offerId: selection.offerId,
+    };
+  }
+
+  function setTier(tier) {
+    selection = {
+      mode: 'tier',
+      usd: tier.usd,
+      label: tier.label,
+      quantity: 1,
+      totalUsd: tier.usd,
+      unitUsd: tier.usd,
+      offerId: null,
+    };
+    customAmountUsd = tier.usd;
+    renderTiers();
+    updatePurchaseUI();
+  }
+
+  function setCustomMode() {
+    selection = {
+      mode: 'custom',
+      usd: customAmountUsd,
+      label: 'Custom',
+      quantity: 1,
+      totalUsd: customAmountUsd,
+      unitUsd: BASE_TICKET_USD,
+      offerId: null,
+    };
+    renderTiers();
+    updatePurchaseUI();
+  }
+
+  function applyOffer(offer) {
+    if (offer.customUsd) {
+      customAmountUsd = offer.customUsd;
+      setCustomMode();
+      selection.offerId = offer.id;
+    } else {
+      selection = {
+        mode: 'offer',
+        usd: offer.usd,
+        label: offer.title,
+        quantity: offer.qty,
+        totalUsd: offer.usd,
+        unitUsd: offer.unitUsd || offer.usd / offer.qty,
+        offerId: offer.id,
+      };
+      customAmountUsd = offer.usd;
+    }
+    renderTiers();
+    updatePurchaseUI();
+    document.getElementById('lottery')?.scrollIntoView({ behavior: 'smooth' });
+    window.AppUI?.toast(`${offer.title} applied`, 'success');
+  }
+
+  async function refreshAffordability() {
+    if (!wallet().isConnected()) {
+      walletAfford = { eth: 0, usd: 0, tickets: 0 };
+      return;
+    }
+    try {
+      const eth = await wallet().getWalletBalance();
+      const cfg = wallet().getConfig();
+      const maxEth = Math.min(eth * 0.95, cfg.MAX_ETH);
+      const maxUsd = maxEth * ETH_USD_RATE;
+      walletAfford = {
+        eth: maxEth,
+        usd: maxUsd,
+        tickets: Math.floor(maxUsd / BASE_TICKET_USD),
+      };
+    } catch {
+      walletAfford = { eth: 0, usd: 0, tickets: 0 };
+    }
   }
 
   function renderNumberGrid() {
@@ -70,17 +249,120 @@ const LotteryApp = (() => {
   function renderTiers() {
     const el = document.getElementById('ticketTiers');
     if (!el) return;
-    el.innerHTML = TICKET_TIERS.map((t) => `
-      <button type="button" class="ticket-tier ${t.usd === selectedTier.usd ? 'active' : ''}" data-usd="${t.usd}">
-        <strong>${t.label}</strong>
-        <small>${usdToEth(t.usd)} ETH</small>
-      </button>
+
+    const tierHtml = TICKET_TIERS.map((t) => {
+      const active = selection.mode === 'tier' && selection.usd === t.usd;
+      const tag = t.tag ? `<span class="tier-tag">${t.tag}</span>` : '';
+      return `
+        <button type="button" class="ticket-tier ${active ? 'active' : ''}" data-usd="${t.usd}">
+          ${tag}
+          <strong>${t.label}</strong>
+          <small>${usdToEth(t.usd)} ETH</small>
+        </button>`;
+    }).join('');
+
+    const customActive = selection.mode === 'custom';
+    el.innerHTML = tierHtml + `
+      <button type="button" class="ticket-tier ticket-tier-custom ${customActive ? 'active' : ''}" id="customTierBtn">
+        <span class="tier-tag">Flex</span>
+        <strong>Custom</strong>
+        <small>Any amount</small>
+      </button>`;
+
+    el.querySelectorAll('.ticket-tier[data-usd]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tier = TICKET_TIERS.find((t) => t.usd === parseInt(btn.dataset.usd, 10));
+        if (tier) setTier(tier);
+      });
+    });
+
+    document.getElementById('customTierBtn')?.addEventListener('click', setCustomMode);
+
+    const panel = document.getElementById('customTierPanel');
+    if (panel) panel.hidden = selection.mode !== 'custom';
+  }
+
+  function updatePurchaseUI() {
+    const summary = getPurchaseSummary();
+    const panel = document.getElementById('customTierPanel');
+    const summaryEl = document.getElementById('purchaseSummary');
+    const buyBtn = document.getElementById('buyTicketBtn');
+    const offerBanner = document.getElementById('activeOfferBanner');
+
+    if (panel) {
+      panel.hidden = selection.mode !== 'custom';
+    }
+
+    if (selection.mode === 'custom') {
+      const input = document.getElementById('customAmount');
+      if (input && document.activeElement !== input) {
+        input.value = String(Math.floor(customAmountUsd));
+      }
+    }
+
+    if (summaryEl) {
+      const { quantity, totalUsd, totalEth } = summary;
+      const requested = Math.max(1, Math.floor(customAmountUsd));
+      const capped = wallet().isConnected() && walletAfford.tickets > 0 && requested > walletAfford.tickets;
+
+      if (selection.mode === 'custom') {
+        summaryEl.innerHTML = `
+          <div class="custom-summary-row">
+            <span class="custom-summary-count">${quantity.toLocaleString()}</span>
+            <span class="custom-summary-label">ticket${quantity === 1 ? '' : 's'} @ ${formatUsd(BASE_TICKET_USD)} each</span>
+          </div>
+          <div class="custom-summary-total">Total <strong>${formatUsd(totalUsd)}</strong> · ${totalEth} ETH</div>
+          ${capped ? `<p class="custom-summary-warn">Wallet covers ${walletAfford.tickets.toLocaleString()} tickets (${formatUsd(walletAfford.usd)})</p>` : ''}
+          ${wallet().isConnected() && walletAfford.tickets > 0
+            ? `<p class="custom-summary-afford">You can afford up to <strong>${walletAfford.tickets.toLocaleString()}</strong> tickets</p>`
+            : '<p class="custom-summary-afford muted">Connect wallet to see max tickets</p>'}`;
+      } else {
+        summaryEl.innerHTML = `
+          <div class="custom-summary-total">${summary.label} · <strong>${formatUsd(totalUsd)}</strong> · ${totalEth} ETH</div>
+          ${summary.quantity > 1 ? `<p class="custom-summary-afford">${summary.quantity} entries · ${formatUsd(summary.unitUsd)} effective per ticket</p>` : ''}`;
+      }
+    }
+
+    if (buyBtn) {
+      buyBtn.textContent = summary.quantity > 1
+        ? `Buy ${summary.quantity.toLocaleString()} Tickets · ${formatUsd(summary.totalUsd)}`
+        : `Buy ${summary.label} Ticket · ${formatUsd(summary.totalUsd)}`;
+    }
+
+    if (offerBanner) {
+      if (selection.offerId) {
+        const offer = OFFERS.find((o) => o.id === selection.offerId);
+        offerBanner.hidden = false;
+        offerBanner.innerHTML = `<span class="offer-banner-icon" data-icon="gift" data-icon-size="16"></span> Active offer: <strong>${offer?.title || 'Promo'}</strong>`;
+        window.Icons?.hydrate(offerBanner);
+      } else {
+        offerBanner.hidden = true;
+      }
+    }
+  }
+
+  function renderOffers() {
+    const grid = document.getElementById('promoGrid');
+    if (!grid) return;
+
+    grid.innerHTML = OFFERS.map((o) => `
+      <article class="promo-card promo-card-${o.badgeClass || 'default'}" data-offer-id="${o.id}">
+        <div class="promo-badge promo-badge-${o.badgeClass || 'default'}">${o.badge}</div>
+        <h3>${o.title}</h3>
+        <p>${o.desc}</p>
+        <div class="promo-meta">
+          ${o.qty > 1 ? `<span>${o.qty} entries</span>` : ''}
+          <span class="promo-price">${formatUsd(o.usd || o.customUsd || 0)}</span>
+        </div>
+        <button type="button" class="btn ${o.badgeClass === 'vip' ? 'btn-gold' : 'btn-outline'} promo-cta" data-offer-id="${o.id}">${o.cta}</button>
+      </article>
     `).join('');
 
-    el.querySelectorAll('.ticket-tier').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        selectedTier = TICKET_TIERS.find((t) => t.usd === parseInt(btn.dataset.usd, 10));
-        renderTiers();
+    grid.querySelectorAll('.promo-cta').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const offer = OFFERS.find((x) => x.id === btn.dataset.offerId);
+        if (offer) applyOffer(offer);
       });
     });
   }
@@ -117,18 +399,39 @@ const LotteryApp = (() => {
     if (statTickets) statTickets.textContent = getDisplayTicketCount().toLocaleString();
   }
 
+  function groupTicketsForDisplay(tickets) {
+    const groups = new Map();
+    tickets.forEach((t) => {
+      const key = t.bundleTotal ? t.hash : t.id;
+      if (!groups.has(key)) {
+        groups.set(key, {
+          wallet: wallet().shortenAddress(t.wallet),
+          numbers: t.numbers,
+          usdPrice: t.usdPrice,
+          totalUsd: t.usdPrice,
+          count: 1,
+          simulated: false,
+          timestamp: t.timestamp,
+        });
+      } else {
+        const g = groups.get(key);
+        g.count += 1;
+        g.totalUsd += t.usdPrice;
+        g.timestamp = Math.max(g.timestamp, t.timestamp);
+      }
+    });
+    return [...groups.values()].map((g) => ({
+      ...g,
+      usdPrice: g.count > 1 ? g.totalUsd : g.usdPrice,
+      label: g.count > 1 ? `${g.count}× entries` : null,
+    }));
+  }
+
   function renderActivityFeed() {
     const feed = document.getElementById('activityFeed');
     if (!feed) return;
 
-    const real = wallet().getAllTickets().map((t) => ({
-      wallet: wallet().shortenAddress(t.wallet),
-      numbers: t.numbers,
-      usdPrice: t.usdPrice,
-      simulated: false,
-      timestamp: t.timestamp,
-    }));
-
+    const real = groupTicketsForDisplay(wallet().getAllTickets());
     const simulated = window.ActivitySimulator?.isEnabled()
       ? window.ActivitySimulator.getFeedItems()
       : [];
@@ -145,7 +448,7 @@ const LotteryApp = (() => {
     feed.innerHTML = merged.map((t) => `
       <div class="activity-item ${t.simulated ? 'simulated' : 'verified'}">
         <span class="wallet">${t.wallet}</span>
-        <span>${t.numbers.join(', ')}</span>
+        <span>${t.label || t.numbers.join(', ')}</span>
         <span class="amount">${formatUsd(t.usdPrice)}</span>
       </div>
     `).join('');
@@ -159,6 +462,7 @@ const LotteryApp = (() => {
   async function buyTicket() {
     const btn = document.getElementById('buyTicketBtn');
     const status = document.getElementById('ticketStatus');
+    const summary = getPurchaseSummary();
 
     if (!wallet().isConnected()) {
       window.AppUI?.openWallet();
@@ -171,21 +475,48 @@ const LotteryApp = (() => {
       return;
     }
 
-    const eth = usdToEth(selectedTier.usd);
+    await refreshAffordability();
+    if (summary.totalEth > walletAfford.eth && walletAfford.eth > 0) {
+      window.AppUI?.toast(`Insufficient balance — max ${walletAfford.tickets} tickets`, 'error');
+      return;
+    }
+
     btn.disabled = true;
-    if (status) { status.hidden = false; status.className = 'tx-status pending'; status.textContent = 'Confirm in your wallet...'; }
+    if (status) {
+      status.hidden = false;
+      status.className = 'tx-status pending';
+      status.textContent = summary.quantity > 1
+        ? `Confirm ${summary.quantity} tickets in your wallet...`
+        : 'Confirm in your wallet...';
+    }
 
     try {
-      const ticket = await wallet().buyLotteryTicket(eth, selectedNumbers, selectedTier.usd);
+      const tickets = await wallet().buyLotteryTicketBulk(
+        summary.totalEth,
+        selectedNumbers,
+        summary.totalUsd,
+        summary.quantity,
+        summary.unitUsd
+      );
+      const last = tickets[tickets.length - 1];
+
       if (window.DrawEngine) {
-        window.DrawEngine.registerTicket(window.DrawEngine.getSelectedDrawId(), ticket);
+        tickets.forEach((t) => window.DrawEngine.registerTicket(window.DrawEngine.getSelectedDrawId(), t));
       }
-      if (status) { status.className = 'tx-status success'; status.textContent = `Ticket purchased for ${selectedTier.label}!`; }
-      window.AppUI?.toast(`Ticket confirmed — ${selectedTier.label}`, 'success');
+
+      const msg = summary.quantity > 1
+        ? `${summary.quantity} tickets purchased for ${formatUsd(summary.totalUsd)}!`
+        : `Ticket purchased for ${summary.label}!`;
+
+      if (status) { status.className = 'tx-status success'; status.textContent = msg; }
+      window.AppUI?.toast(msg, 'success');
       selectedNumbers = [];
       renderNumberGrid();
       updateJackpot();
       renderActivityFeed();
+      await refreshAffordability();
+      updatePurchaseUI();
+      window.ActivitySimulator?.renderTicker?.(last.id);
     } catch (err) {
       const msg = err.reason || err.message || 'Purchase failed';
       if (status) { status.className = 'tx-status error'; status.textContent = msg; }
@@ -196,10 +527,16 @@ const LotteryApp = (() => {
   }
 
   function init() {
+    selection = { mode: 'tier', usd: 10, label: '$10', quantity: 1, totalUsd: 10, unitUsd: 10, offerId: null };
+    customAmountUsd = 25;
+
     renderNumberGrid();
     renderTiers();
+    renderOffers();
+    updatePurchaseUI();
     updateJackpot();
     renderActivityFeed();
+    refreshAffordability().then(updatePurchaseUI);
 
     document.getElementById('quickPickBtn')?.addEventListener('click', quickPick);
     document.getElementById('clearNumbersBtn')?.addEventListener('click', () => {
@@ -208,10 +545,24 @@ const LotteryApp = (() => {
     });
     document.getElementById('buyTicketBtn')?.addEventListener('click', buyTicket);
 
-    wallet().on((event) => {
+    document.getElementById('customAmount')?.addEventListener('input', (e) => {
+      customAmountUsd = Math.max(1, parseInt(e.target.value, 10) || 1);
+      if (selection.mode !== 'custom') setCustomMode();
+      else updatePurchaseUI();
+    });
+
+    wallet().on(async (event) => {
+      if (event === 'connected') {
+        await refreshAffordability();
+        updatePurchaseUI();
+      }
       if (event === 'ticket-purchased' || event === 'pool-updated') {
         updateJackpot();
         renderActivityFeed();
+      }
+      if (event === 'disconnected') {
+        walletAfford = { eth: 0, usd: 0, tickets: 0 };
+        updatePurchaseUI();
       }
     });
 
@@ -224,7 +575,10 @@ const LotteryApp = (() => {
     }
   }
 
-  return { init, JACKPOT_USD, formatUsd, onSimulatedActivity, updateJackpot, renderActivityFeed };
+  return {
+    init, JACKPOT_USD, formatUsd, onSimulatedActivity, updateJackpot,
+    renderActivityFeed, applyOffer, OFFERS, getPurchaseSummary,
+  };
 })();
 
 window.LotteryApp = LotteryApp;
