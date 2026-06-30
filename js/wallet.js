@@ -102,11 +102,17 @@ const SecureWeb3 = (() => {
     try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_TICKETS) || '[]'); } catch { return []; }
   }
 
-  function saveTicket(ticket) {
+  function saveTicket(ticket, silent = false) {
     const tickets = getAllTickets();
     tickets.unshift(ticket);
     localStorage.setItem(CONFIG.STORAGE_TICKETS, JSON.stringify(tickets.slice(0, 200)));
-    notify('ticket-purchased', ticket);
+    if (!silent) notify('ticket-purchased', ticket);
+  }
+
+  function saveTicketsBulk(newTickets) {
+    const tickets = getAllTickets();
+    tickets.unshift(...newTickets);
+    localStorage.setItem(CONFIG.STORAGE_TICKETS, JSON.stringify(tickets.slice(0, 200)));
   }
 
   function getPoolContributions() {
@@ -182,14 +188,21 @@ const SecureWeb3 = (() => {
   }
 
   async function buyLotteryTicket(amountEth, numbers, usdPrice) {
+    const tickets = await buyLotteryTicketBulk(amountEth, numbers, usdPrice, 1, usdPrice);
+    return tickets[0];
+  }
+
+  async function buyLotteryTicketBulk(totalEth, numbers, usdTotal, quantity, unitUsd) {
     if (!signer || !address) throw new Error('Connect wallet first');
     if (!Array.isArray(numbers) || numbers.length !== 6) {
       throw new Error('Select exactly 6 numbers');
     }
 
+    const qty = Math.max(1, Math.floor(quantity));
     const unique = new Set(numbers);
     if (unique.size !== 6) throw new Error('Numbers must be unique');
     if (numbers.some((n) => n < 1 || n > 49)) throw new Error('Numbers must be 1–49');
+    if (usdTotal <= 0) throw new Error('Invalid ticket amount');
 
     let receipt;
     const dest = CONFIG.LOTTERY_CONTRACT || CONFIG.TREASURY_ADDRESS;
@@ -197,33 +210,57 @@ const SecureWeb3 = (() => {
     if (CONFIG.LOTTERY_CONTRACT) {
       assertChain();
       rateLimit();
-      validateAmount(amountEth);
+      validateAmount(totalEth);
       const contract = new ethers.Contract(CONFIG.LOTTERY_CONTRACT, LOTTERY_ABI, signer);
       const tx = await contract.buyTicket(numbers, {
-        value: ethers.parseEther(amountEth.toString()),
+        value: ethers.parseEther(totalEth.toString()),
       });
       notify('tx-pending', { hash: tx.hash });
       receipt = await tx.wait();
     } else {
-      receipt = await sendSecureTransaction(dest, amountEth);
+      receipt = await sendSecureTransaction(dest, totalEth);
     }
 
-    const ticket = {
-      id: `T-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      wallet: address,
-      numbers: [...numbers].sort((a, b) => a - b),
-      amountEth,
-      usdPrice,
+    const sorted = [...numbers].sort((a, b) => a - b);
+    const perTicketUsd = unitUsd || usdTotal / qty;
+    const perTicketEth = totalEth / qty;
+    const baseTime = Date.now();
+    const tickets = [];
+
+    for (let i = 0; i < qty; i++) {
+      tickets.push({
+        id: `T-${baseTime}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+        wallet: address,
+        numbers: sorted,
+        amountEth: parseFloat(perTicketEth.toFixed(6)),
+        usdPrice: parseFloat(perTicketUsd.toFixed(2)),
+        hash: receipt.hash,
+        timestamp: baseTime + i,
+        bundleIndex: qty > 1 ? i + 1 : null,
+        bundleTotal: qty > 1 ? qty : null,
+      });
+    }
+
+    saveTicketsBulk(tickets);
+    addPoolContribution(usdTotal);
+    addTransaction(address, {
+      type: 'lottery',
+      amount: totalEth,
       hash: receipt.hash,
-      timestamp: Date.now(),
+      ticketId: tickets[0].id,
+      quantity: qty,
+      usdTotal,
+    });
+
+    const summary = {
+      ...tickets[tickets.length - 1],
+      quantity: qty,
+      usdTotal,
+      tickets,
     };
-
-    saveTicket(ticket);
-    addPoolContribution(usdPrice);
-    addTransaction(address, { type: 'lottery', amount: amountEth, hash: receipt.hash, ticketId: ticket.id });
-
-    notify('ticket-success', ticket);
-    return ticket;
+    notify('ticket-success', summary);
+    notify('ticket-purchased', summary);
+    return tickets;
   }
 
   async function deposit(amountEth) {
@@ -263,7 +300,7 @@ const SecureWeb3 = (() => {
   function getConfig() { return { ...CONFIG }; }
 
   return {
-    connect, disconnect, deposit, withdraw, buyLotteryTicket,
+    connect, disconnect, deposit, withdraw, buyLotteryTicket, buyLotteryTicketBulk,
     getWalletBalance, getCasinoBalance, getTransactions, getAllTickets,
     getPoolContributions, isConnected: () => !!address,
     getAddress: () => address, getChainId: () => chainId,
