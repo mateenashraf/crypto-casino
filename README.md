@@ -1,4 +1,4 @@
-# StarBitz — Crypto Lottery
+# NeonDraw — Crypto Lottery
 
 Crypto lottery platform with Web3 wallet payments, automatic draws, and live ticket activity.
 
