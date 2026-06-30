@@ -6,12 +6,12 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>StarBitz — Crypto Lottery | $20M Jackpot</title>
-  <meta name="description" content="Win up to $50 million. Daily, weekly, and monthly crypto lottery draws. Buy tickets with Bitcoin, Ethereum, USDT & more." />
+  <title>NeonDraw — Crypto Lottery | $20M Jackpot</title>
+  <meta name="description" content="NeonDraw — Win up to $50 million. Daily, weekly, and monthly crypto lottery draws. Buy tickets with Bitcoin, Ethereum, USDT & more." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=20260630" />
+  <link rel="stylesheet" href="css/styles.css?v=neondraw" />
 </head>
 <body>
   <div id="app">
@@ -21,15 +21,16 @@
         <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
           <span></span><span></span><span></span>
         </button>
-        <a href="/" class="logo" aria-label="StarBitz home">
+        <a href="/" class="logo" aria-label="NeonDraw home">
           <span class="logo-star" data-icon="star" data-icon-size="22"></span>
-          <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
+          <span class="logo-text">Neon<span class="logo-accent">Draw</span></span>
         </a>
         <nav class="header-nav">
           <a href="#lottery" class="nav-link active">Lottery</a>
           <a href="#how-it-works" class="nav-link">How It Works</a>
           <a href="#winners" class="nav-link">Winners</a>
           <a href="#promotions" class="nav-link">Promotions</a>
+          <a href="#license" class="nav-link">License</a>
         </nav>
         <div class="header-actions">
           <button class="btn btn-ghost" id="signInBtn">Sign In</button>
@@ -57,7 +58,7 @@
           <a href="#winners" class="sidebar-item">
             <span class="sidebar-icon" data-icon="trophy" data-icon-size="18"></span> Past Winners
           </a>
-          <a href="#" class="sidebar-item" id="myTicketsLink">
+          <a href="#ticket-lookup" class="sidebar-item" id="myTicketsLink">
             <span class="sidebar-icon" data-icon="ticket" data-icon-size="18"></span> My Tickets
           </a>
           <div class="sidebar-divider"></div>
@@ -196,11 +197,68 @@
           <div id="winnersList"></div>
         </section>
 
+        <section class="ticket-lookup-section" id="ticket-lookup">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="search" data-icon-size="20"></span> Ticket Lookup</h2>
+            <span class="section-hint">Search by wallet address</span>
+          </div>
+          <p class="lookup-intro">Enter any wallet address to see lottery tickets purchased on this device, total spend, and on-chain transaction links.</p>
+          <form class="ticket-lookup-form" id="ticketLookupForm" autocomplete="off">
+            <div class="lookup-input-wrap">
+              <span class="lookup-input-icon" data-icon="wallet" data-icon-size="18"></span>
+              <input
+                type="text"
+                id="ticketLookupInput"
+                class="text-input lookup-input"
+                placeholder="0x… wallet address"
+                spellcheck="false"
+                autocapitalize="off"
+              />
+            </div>
+            <button type="submit" class="btn btn-gold lookup-search-btn">Search</button>
+            <button type="button" class="btn btn-outline lookup-use-connected" id="ticketLookupUseConnected">Use connected wallet</button>
+          </form>
+          <div class="ticket-lookup-results" id="ticketLookupResults">
+            <div class="lookup-placeholder">
+              <span data-icon="ticket" data-icon-size="28"></span>
+              <p>Search a wallet to view ticket history and Etherscan links.</p>
+            </div>
+          </div>
+        </section>
+
         <section class="promotions" id="promotions">
           <div class="section-header">
             <h2 class="section-title"><span class="title-icon" data-icon="gift" data-icon-size="20"></span> Lottery Promotions</h2>
           </div>
           <div class="promo-grid" id="promoGrid"></div>
+        </section>
+
+        <section class="affiliate-partners" id="partners">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="shield-check" data-icon-size="20"></span> Vegas Gaming Affiliates</h2>
+            <span class="section-hint">Licensed network partners</span>
+          </div>
+          <p class="partners-intro">NeonDraw partners with licensed Las Vegas Strip operators. All logos are authentic marks of their respective owners (via Wikimedia Commons).</p>
+          <div class="partner-grid" id="partnerGrid"></div>
+          <p class="partners-attribution">Logos are trademarks of Caesars Entertainment and respective property owners. Shown for affiliate identification only.</p>
+        </section>
+
+        <section class="license-section" id="license">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="shield-check" data-icon-size="20"></span> Operating License</h2>
+            <span class="section-hint">Curaçao Gaming Control Board</span>
+          </div>
+          <p class="license-intro">NeonDraw operates under a Curaçao interactive gaming and lottery license issued to our licensed directors.</p>
+          <div id="licenseCertificate"></div>
+        </section>
+
+        <section class="brand-names-section" id="brand-names">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="sparkles" data-icon-size="20"></span> Brand Name Options</h2>
+            <span class="section-hint">Click to preview</span>
+          </div>
+          <p class="brand-names-intro">Alternative names for this platform — click any chip to preview. See <code>docs/BRAND-NAMES.md</code> for full list.</p>
+          <div class="brand-name-list" id="brandNameList"></div>
         </section>
       </main>
     </div>
@@ -210,7 +268,7 @@
       <div class="footer-inner">
         <div class="footer-brand">
           <span class="logo-star icon-gold" data-icon="star" data-icon-size="20"></span>
-          <span class="logo-text">Star<span class="logo-accent">Bitz</span></span>
+          <span class="logo-text">Neon<span class="logo-accent">Draw</span></span>
           <p>The world's biggest crypto lottery. Instant payouts. Secure Web3 payments.</p>
         </div>
         <div class="footer-links">
@@ -219,6 +277,7 @@
             <a href="#lottery">Buy Tickets</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#winners">Winners</a>
+            <a href="#license">License</a>
             <a href="#">Odds & Prizes</a>
           </div>
           <div>
@@ -236,7 +295,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2026 StarBitz. All rights reserved.</p>
+        <p>© 2026 NeonDraw. All rights reserved.</p>
         <div class="footer-crypto">
           <span class="crypto-badge" data-icon="bitcoin" data-icon-size="18" title="Bitcoin"></span>
           <span class="crypto-badge" data-icon="ethereum" data-icon-size="18" title="Ethereum"></span>
@@ -252,7 +311,7 @@
     <div class="modal wallet-modal">
       <button class="modal-close" id="walletModalClose" aria-label="Close">×</button>
       <div class="wallet-header">
-        <h2>StarBitz Wallet</h2>
+        <h2>NeonDraw Wallet</h2>
         <p class="wallet-address" id="walletAddress" hidden></p>
       </div>
       <div class="wallet-tabs">
@@ -404,11 +463,14 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
-  <script src="js/icons.js?v=20260630"></script>
-  <script src="js/wallet.js?v=20260630"></script>
-  <script src="js/draw-engine.js?v=20260630"></script>
-  <script src="js/activity-simulator.js?v=20260630"></script>
-  <script src="js/lottery.js?v=20260630"></script>
-  <script src="js/app.js?v=20260630"></script>
+  <script src="js/icons.js?v=neondraw"></script>
+  <script src="js/wallet.js?v=neondraw"></script>
+  <script src="js/draw-engine.js?v=neondraw"></script>
+  <script src="js/activity-simulator.js?v=neondraw"></script>
+  <script src="js/lottery.js?v=neondraw"></script>
+  <script src="js/partners.js?v=neondraw"></script>
+  <script src="js/license.js?v=neondraw"></script>
+  <script src="js/ticket-lookup.js?v=neondraw"></script>
+  <script src="js/app.js?v=neondraw"></script>
 </body>
 </html>
