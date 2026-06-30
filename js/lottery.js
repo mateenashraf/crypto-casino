@@ -180,7 +180,7 @@ const LotteryApp = (() => {
     }
     renderTiers();
     updatePurchaseUI();
-    document.getElementById('lottery')?.scrollIntoView({ behavior: 'smooth' });
+    window.AppUI?.scrollToSection?.('#lottery');
     window.AppUI?.toast(`${offer.title} applied`, 'success');
   }
 
