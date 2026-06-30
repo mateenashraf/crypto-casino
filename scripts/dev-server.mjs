@@ -51,7 +51,7 @@ createServer(async (req, res) => {
     res.end('Not found');
   }
 }).listen(PORT, '0.0.0.0', () => {
-  console.log(`StarBitz dev server (no cache)`);
+  console.log(`NeonDraw dev server (no cache)`);
   console.log(`  → http://localhost:${PORT}`);
   console.log(`  → http://127.0.0.1:${PORT}`);
 });
