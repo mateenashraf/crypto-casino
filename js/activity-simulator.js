@@ -4,7 +4,7 @@
 const ActivitySimulator = (() => {
   const LIVE_FEED_ENABLED = true;
   const STORAGE_KEY = 'starbitz_live_pool';
-  const TICKET_AMOUNTS = [1, 5, 20, 34, 50, 75, 100, 150, 200, 300, 500];
+  const TICKET_AMOUNTS = [1, 5, 10, 50, 100, 300, 500];
   const INTERVAL_MS = { min: 2200, max: 6500 };
 
   let simulatedPool = 0;
@@ -22,9 +22,9 @@ const ActivitySimulator = (() => {
 
   function randomAmount() {
     const roll = Math.random();
-    if (roll < 0.45) return TICKET_AMOUNTS[Math.floor(Math.random() * 5)];
-    if (roll < 0.8) return TICKET_AMOUNTS[5 + Math.floor(Math.random() * 4)];
-    return TICKET_AMOUNTS[9 + Math.floor(Math.random() * 2)];
+    if (roll < 0.45) return TICKET_AMOUNTS[Math.floor(Math.random() * 4)];
+    if (roll < 0.85) return TICKET_AMOUNTS[3 + Math.floor(Math.random() * 3)];
+    return TICKET_AMOUNTS[4 + Math.floor(Math.random() * 3)];
   }
 
   function randomNumbers() {
@@ -94,18 +94,78 @@ const ActivitySimulator = (() => {
   }
 
   function formatUsd(n) {
-    return '$' + Math.round(n).toLocaleString();
+    return '$' + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
-  function renderTicker() {
+  function getRealEvents() {
+    const wallet = window.SecureWeb3;
+    if (!wallet?.getAllTickets) return [];
+    const groups = new Map();
+    wallet.getAllTickets().forEach((t) => {
+      const key = t.bundleTotal ? t.hash : t.id;
+      if (!groups.has(key)) {
+        groups.set(key, {
+          id: t.id,
+          wallet: wallet.shortenAddress(t.wallet),
+          usdPrice: t.usdPrice,
+          count: 1,
+          simulated: false,
+          timestamp: t.timestamp,
+        });
+      } else {
+        const g = groups.get(key);
+        g.count += 1;
+        g.usdPrice += t.usdPrice;
+        g.timestamp = Math.max(g.timestamp, t.timestamp);
+      }
+    });
+    return [...groups.values()];
+  }
+
+  function getMergedItems() {
+    const byId = new Map();
+    [...getRealEvents(), ...feedItems].forEach((e) => {
+      const existing = byId.get(e.id);
+      if (!existing || e.timestamp >= existing.timestamp) byId.set(e.id, e);
+    });
+    return [...byId.values()].sort((a, b) => b.timestamp - a.timestamp).slice(0, 20);
+  }
+
+  function formatTickerItem(e, highlightId) {
+    const isNew = e.id === highlightId;
+    const isYou = !e.simulated
+      && window.SecureWeb3?.isConnected?.()
+      && e.wallet === window.SecureWeb3.shortenAddress(window.SecureWeb3.getAddress());
+    const amount = formatUsd(e.usdPrice);
+    const qtyTag = e.count > 1 ? ` <span class="ticker-qty">(${e.count}×)</span>` : '';
+    const youTag = isYou ? ' <em class="ticker-you">(you)</em>' : '';
+    return `<span class="ticker-item${isNew ? ' ticker-item-new' : ''}${isYou ? ' ticker-item-you' : ''}">
+      <strong>${e.wallet}</strong>${youTag} bought <span class="ticker-amount">${amount}</span> ticket${e.count > 1 ? 's' : ''}${qtyTag}
+    </span>`;
+  }
+
+  function renderTicker(highlightId) {
     const el = document.getElementById('liveTicker');
-    if (!el || !feedItems.length) return;
-    const latest = feedItems.slice(0, 8);
-    el.innerHTML = latest.map((e) => `
-      <span class="ticker-item">
-        <strong>${e.wallet}</strong> bought ${formatUsd(e.usdPrice)} ticket
-      </span>
-    `).join('<span class="ticker-sep">•</span>');
+    if (!el) return;
+
+    const items = getMergedItems();
+    if (!items.length) {
+      el.innerHTML = '<span class="ticker-item">Waiting for ticket purchases...</span>';
+      return;
+    }
+
+    el.innerHTML = items.map((e) => formatTickerItem(e, highlightId)).join('<span class="ticker-sep">•</span>');
+
+    if (highlightId) {
+      const newEl = el.querySelector('.ticker-item-new');
+      newEl?.scrollIntoView?.({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+      setTimeout(() => newEl?.classList.remove('ticker-item-new'), 2800);
+    }
+  }
+
+  function onActivity(highlightId) {
+    renderTicker(highlightId);
+    window.LotteryApp?.onSimulatedActivity?.();
   }
 
   function init() {
@@ -116,9 +176,14 @@ const ActivitySimulator = (() => {
 
     scheduleNext();
 
-    window.addEventListener('lottery-activity', () => {
-      renderTicker();
-      window.LotteryApp?.onSimulatedActivity?.();
+    window.addEventListener('lottery-activity', (ev) => {
+      onActivity(ev.detail?.id);
+    });
+
+    window.SecureWeb3?.on?.((event, data) => {
+      if (event === 'ticket-purchased' && data?.id) {
+        onActivity(data.id);
+      }
     });
 
     renderTicker();
@@ -130,7 +195,7 @@ const ActivitySimulator = (() => {
 
   return {
     init, stop, isEnabled, getSimulatedPool, getSimulatedTicketCount,
-    getFeedItems, generateEvent, formatUsd,
+    getFeedItems, getMergedItems, generateEvent, formatUsd, renderTicker,
   };
 })();
 
