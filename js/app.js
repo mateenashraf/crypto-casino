@@ -134,9 +134,6 @@
   document.getElementById('heroBuyBtn')?.addEventListener('click', () => {
     document.getElementById('lottery')?.scrollIntoView({ behavior: 'smooth' });
   });
-  document.getElementById('promoBuyBtn')?.addEventListener('click', () => {
-    document.getElementById('lottery')?.scrollIntoView({ behavior: 'smooth' });
-  });
 
   document.getElementById('disconnectBtn').addEventListener('click', () => {
     wallet.disconnect();
