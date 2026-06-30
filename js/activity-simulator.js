@@ -157,8 +157,9 @@ const ActivitySimulator = (() => {
     el.innerHTML = items.map((e) => formatTickerItem(e, highlightId)).join('<span class="ticker-sep">•</span>');
 
     if (highlightId) {
+      // Scroll only inside the ticker strip — never the whole page
+      el.scrollTo({ left: 0, behavior: 'smooth' });
       const newEl = el.querySelector('.ticker-item-new');
-      newEl?.scrollIntoView?.({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
       setTimeout(() => newEl?.classList.remove('ticker-item-new'), 2800);
     }
   }
