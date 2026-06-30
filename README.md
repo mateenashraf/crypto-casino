@@ -10,10 +10,18 @@ Crypto lottery platform with Web3 wallet payments, automatic draws, and live tic
 
 ```bash
 cd ~/Projects/crypto-casino
-ruby -run -e httpd . -p 8080
+./scripts/start-dev.sh
 ```
 
-Open **http://localhost:8080**
+Or manually:
+
+```bash
+node scripts/dev-server.mjs 8080
+```
+
+Open **http://127.0.0.1:8080** (use `127.0.0.1`, not a bookmarked old tab).
+
+If you still see old content: hard refresh with **Cmd+Shift+R** or open an incognito window.
 
 ---
 
