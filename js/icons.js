@@ -1,5 +1,5 @@
 /**
- * StarBitz icon system — inline SVG (Lucide-style)
+ * NeonDraw icon system — inline SVG (Lucide-style)
  */
 const Icons = (() => {
   const paths = {
@@ -36,6 +36,10 @@ const Icons = (() => {
     spade: '<path d="M12 18v4"/><path d="M6 8c0 3.314 2.686 6 6 6s6-2.686 6-6a6 6 0 0 0-12 0Z"/><path d="M12 14V2"/>',
     tent: '<path d="M3.5 21 14 3l10.5 18H3.5Z"/><path d="M14 3v18"/><path d="M8.5 15h11"/>',
     sparkles: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.5l-6.1-1.7a.5.5 0 0 1 0-.96l6.1-1.7a2 2 0 0 0 1.437-1.437l1.7-6.1a.5.5 0 0 1 .96 0l1.7 6.1a2 2 0 0 0 1.437 1.437l6.1 1.7a.5.5 0 0 1 0 .96l-6.1 1.7a2 2 0 0 0-1.437 1.437l-1.7 6.1a.5.5 0 0 1-.96 0l-1.7-6.1a2 2 0 0 0-1.437-1.437Z"/><path d="M20 3v4M22 5h-4M4 17v4M6 19H2"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    'search-x': '<path d="m13.5 13.5 5 5"/><path d="M8.5 8.5 3.5 3.5"/><circle cx="11" cy="11" r="8"/>',
+    'external-link': '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
   };
 
   const GAME_ICON_SET = ['dices', 'cherry', 'gem', 'spade', 'dices', 'star', 'flame', 'crown', 'clover', 'target', 'sparkles', 'zap', 'moon', 'zap', 'tent'];
