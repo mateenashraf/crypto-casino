@@ -1,5 +1,5 @@
 /**
- * StarBitz — lottery app UI
+ * NeonDraw — lottery app UI
  */
 (function () {
   const wallet = window.SecureWeb3;
@@ -226,21 +226,9 @@
   });
 
   document.getElementById('myTicketsLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!wallet.isConnected()) {
-      openModal(walletModal);
-      toast('Connect wallet to view your tickets', 'info');
-      return;
+    if (wallet.isConnected()) {
+      setTimeout(() => window.TicketLookup?.useConnectedWallet(), 400);
     }
-    const tickets = wallet.getAllTickets().filter(
-      (t) => t.wallet?.toLowerCase() === wallet.getAddress()?.toLowerCase()
-    );
-    if (!tickets.length) {
-      toast('No tickets yet — buy your first entry!', 'info');
-      return;
-    }
-    const summary = tickets.slice(0, 3).map((t) => `#${t.id.slice(-5)}: ${t.numbers.join('-')}`).join(', ');
-    toast(`Your tickets: ${summary}${tickets.length > 3 ? '...' : ''}`, 'success');
   });
 
   wallet.on((event) => {
@@ -252,6 +240,9 @@
   initNavigation();
   document.body.style.overflow = '';
   window.LotteryApp.init();
+  window.PartnerNetwork?.init();
+  window.LicenseDisplay?.init();
+  window.TicketLookup?.init();
   window.Icons?.hydrate();
   wallet.tryAutoConnect().then(() => updateWalletUI());
 })();
