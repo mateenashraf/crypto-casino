@@ -1,5 +1,5 @@
 /**
- * StarBitz Crypto Lottery — $20M jackpot, real on-chain ticket purchases
+ * NeonDraw Crypto Lottery — $20M jackpot, real on-chain ticket purchases
  */
 const LotteryApp = (() => {
   const JACKPOT_USD = 20_000_000;
