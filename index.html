@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org; connect-src 'self' https: wss:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -462,7 +464,8 @@
   <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script src="js/security.js?v=neondraw"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="js/icons.js?v=neondraw"></script>
   <script src="js/wallet.js?v=neondraw"></script>
   <script src="js/draw-engine.js?v=neondraw"></script>

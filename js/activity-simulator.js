@@ -136,11 +136,12 @@ const ActivitySimulator = (() => {
     const isYou = !e.simulated
       && window.SecureWeb3?.isConnected?.()
       && e.wallet === window.SecureWeb3.shortenAddress(window.SecureWeb3.getAddress());
-    const amount = formatUsd(e.usdPrice);
-    const qtyTag = e.count > 1 ? ` <span class="ticker-qty">(${e.count}×)</span>` : '';
+    const esc = window.SBSecurity.escapeHtml;
+    const amount = esc(formatUsd(e.usdPrice));
+    const qtyTag = e.count > 1 ? ` <span class="ticker-qty">(${esc(e.count)}×)</span>` : '';
     const youTag = isYou ? ' <em class="ticker-you">(you)</em>' : '';
     return `<span class="ticker-item${isNew ? ' ticker-item-new' : ''}${isYou ? ' ticker-item-you' : ''}">
-      <strong>${e.wallet}</strong>${youTag} bought <span class="ticker-amount">${amount}</span> ticket${e.count > 1 ? 's' : ''}${qtyTag}
+      <strong>${esc(e.wallet)}</strong>${youTag} bought <span class="ticker-amount">${amount}</span> ticket${e.count > 1 ? 's' : ''}${qtyTag}
     </span>`;
   }
 

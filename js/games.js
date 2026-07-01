@@ -65,18 +65,19 @@ function searchGames(query, filter = 'all') {
 }
 
 function renderGameCard(game) {
+  const esc = window.SBSecurity.escapeHtml;
   const badgeHtml = game.badge
-    ? `<span class="game-badge ${game.badge}">${game.badge}</span>`
+    ? `<span class="game-badge ${esc(game.badge)}">${esc(game.badge)}</span>`
     : '';
   const iconHtml = window.Icons?.inline(game.icon, 40, 'icon game-card-icon') || '';
   return `
-    <article class="game-card" data-game-id="${game.id}">
-      <div class="game-thumb" style="background: linear-gradient(145deg, ${game.gradient}, var(--bg-card))">
+    <article class="game-card" data-game-id="${esc(game.id)}">
+      <div class="game-thumb" style="background: linear-gradient(145deg, ${esc(game.gradient)}, var(--bg-card))">
         ${badgeHtml}
         <div class="game-thumb-placeholder">${iconHtml}</div>
       </div>
-      <h3>${game.title}</h3>
-      <p>${game.provider}</p>
+      <h3>${esc(game.title)}</h3>
+      <p>${esc(game.provider)}</p>
     </article>
   `;
 }

@@ -124,10 +124,11 @@
       return;
     }
 
+    const esc = window.SBSecurity.escapeHtml;
     list.innerHTML = txs.map((tx) => `
       <li>
-        <span class="tx-type-${tx.type === 'lottery' ? 'deposit' : tx.type}">${tx.type}</span>
-        <span>${parseFloat(tx.amount).toFixed(4)} ETH</span>
+        <span class="tx-type-${esc(tx.type === 'lottery' ? 'deposit' : tx.type)}">${esc(tx.type)}</span>
+        <span>${esc(parseFloat(tx.amount).toFixed(4))} ETH</span>
       </li>
     `).join('');
   }

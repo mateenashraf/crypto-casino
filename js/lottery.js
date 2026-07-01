@@ -445,11 +445,12 @@ const LotteryApp = (() => {
       return;
     }
 
+    const esc = window.SBSecurity.escapeHtml;
     feed.innerHTML = merged.map((t) => `
       <div class="activity-item ${t.simulated ? 'simulated' : 'verified'}">
-        <span class="wallet">${t.wallet}</span>
-        <span>${t.label || t.numbers.join(', ')}</span>
-        <span class="amount">${formatUsd(t.usdPrice)}</span>
+        <span class="wallet">${esc(t.wallet)}</span>
+        <span>${esc(t.label || t.numbers.join(', '))}</span>
+        <span class="amount">${esc(formatUsd(t.usdPrice))}</span>
       </div>
     `).join('');
   }
