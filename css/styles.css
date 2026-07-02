@@ -562,6 +562,23 @@ input { font-family: inherit; }
 .promo-card:hover::before { opacity: 1; }
 .promo-card-vip { border-color: rgba(245, 183, 49, 0.25); background: linear-gradient(160deg, rgba(245, 183, 49, 0.06), var(--bg-card)); }
 .promo-card-hot::before { opacity: 1; background: linear-gradient(90deg, #ff4757, #ff9f43); }
+.promo-card-ticket-prize {
+  border-color: rgba(124, 92, 252, 0.35);
+  background: linear-gradient(160deg, rgba(124, 92, 252, 0.1), var(--bg-card));
+}
+.promo-card-prize-product::before {
+  opacity: 1;
+  background: linear-gradient(90deg, #7c5cfc, #00d68f);
+}
+.promo-badge-ticket-prize {
+  background: rgba(124, 92, 252, 0.2);
+  color: #c4b5fd;
+  border-color: rgba(124, 92, 252, 0.4);
+}
+.promo-price-ticket {
+  color: #c4b5fd;
+  font-weight: 800;
+}
 .promo-badge {
   position: absolute;
   top: 16px;
@@ -1936,6 +1953,32 @@ input { font-family: inherit; }
   font-size: 0.85rem;
 }
 .winner-prize { font-weight: 800; color: var(--accent-gold); white-space: nowrap; }
+.winner-prize-ticket { color: #c4b5fd; }
+.draw-card-prize-ticket { color: #c4b5fd; }
+.free-ticket-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(124, 92, 252, 0.12), rgba(0, 214, 143, 0.08));
+  border: 1px solid rgba(124, 92, 252, 0.35);
+}
+.free-ticket-icon { color: #c4b5fd; flex-shrink: 0; }
+.free-ticket-text {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-width: 180px;
+}
+.free-ticket-text strong { color: #c4b5fd; }
+.free-ticket-redeem-btn {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
 .winner-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .winner-meta span { font-size: 0.75rem; color: var(--text-muted); }
 .winner-wallet { font-family: monospace; }
