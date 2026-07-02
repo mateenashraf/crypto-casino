@@ -1,11 +1,12 @@
 /**
- * Live lottery activity feed — simulates global ticket purchase stream
+ * Live lottery activity feed, simulates global ticket purchase stream
  */
 const ActivitySimulator = (() => {
   const LIVE_FEED_ENABLED = true;
   const STORAGE_KEY = 'starbitz_live_pool';
   const TICKET_AMOUNTS = [1, 5, 10, 50, 100, 300, 500];
-  const INTERVAL_MS = { min: 2200, max: 6500 };
+  /** Ticket buys outpace wins (~4–8/min) so the feed feels busy but believable */
+  const INTERVAL_MS = { min: 5000, max: 14_000 };
 
   let simulatedPool = 0;
   let simulatedTickets = 0;
@@ -45,6 +46,27 @@ const ActivitySimulator = (() => {
   function savePool() {
     localStorage.setItem(STORAGE_KEY, simulatedPool.toFixed(2));
     localStorage.setItem(STORAGE_KEY + '_count', String(simulatedTickets));
+  }
+
+  function addWinEvent(entry) {
+    if (!entry?.winner) return;
+
+    const event = {
+      id: `win-${entry.timestamp}-${entry.drawId}-${Math.random().toString(36).slice(2, 6)}`,
+      type: 'win',
+      wallet: entry.winner.wallet,
+      drawName: entry.drawName,
+      prizeLabel: entry.prizeLabel || entry.prize,
+      prizeType: entry.prizeType,
+      numbers: entry.numbers,
+      simulated: !entry.fromRealTicket,
+      timestamp: entry.timestamp,
+    };
+
+    feedItems.unshift(event);
+    feedItems = feedItems.slice(0, 40);
+    window.dispatchEvent(new CustomEvent('lottery-activity', { detail: event }));
+    return event;
   }
 
   function generateEvent() {
@@ -136,6 +158,21 @@ const ActivitySimulator = (() => {
     const isYou = !e.simulated
       && window.SecureWeb3?.isConnected?.()
       && e.wallet === window.SecureWeb3.shortenAddress(window.SecureWeb3.getAddress());
+
+    if (e.type === 'win') {
+      const prizeClass = e.prizeType === 'free_ticket'
+        ? ' ticker-prize-ticket'
+        : ' ticker-prize-cash';
+      const youTag = isYou ? ' <em class="ticker-you">(you)</em>' : '';
+      const when = new Date(e.timestamp).toLocaleString(undefined, {
+        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+      });
+      return `<span class="ticker-item ticker-item-win${isNew ? ' ticker-item-new' : ''}${isYou ? ' ticker-item-you' : ''}">
+        <strong>${e.wallet}</strong>${youTag} won <span class="ticker-amount${prizeClass}">${e.prizeLabel}</span> · ${e.drawName}
+        <span class="ticker-when">${when}</span>
+      </span>`;
+    }
+
     const amount = formatUsd(e.usdPrice);
     const qtyTag = e.count > 1 ? ` <span class="ticker-qty">(${e.count}×)</span>` : '';
     const youTag = isYou ? ' <em class="ticker-you">(you)</em>' : '';
@@ -157,7 +194,7 @@ const ActivitySimulator = (() => {
     el.innerHTML = items.map((e) => formatTickerItem(e, highlightId)).join('<span class="ticker-sep">•</span>');
 
     if (highlightId) {
-      // Scroll only inside the ticker strip — never the whole page
+      // Scroll only inside the ticker strip, never the whole page
       el.scrollTo({ left: 0, behavior: 'smooth' });
       const newEl = el.querySelector('.ticker-item-new');
       setTimeout(() => newEl?.classList.remove('ticker-item-new'), 2800);
@@ -169,11 +206,34 @@ const ActivitySimulator = (() => {
     window.LotteryApp?.onSimulatedActivity?.();
   }
 
+  function seedWinEventsFromWinners() {
+    let winners = [];
+    try {
+      winners = JSON.parse(localStorage.getItem('starbitz_draw_winners') || '[]');
+    } catch { /* ignore */ }
+    winners.slice(0, 5).forEach((entry) => {
+      feedItems.push({
+        id: `win-${entry.timestamp}-${entry.drawId}`,
+        type: 'win',
+        wallet: entry.winner?.wallet || fakeWallet(),
+        drawName: entry.drawName,
+        prizeLabel: entry.prizeLabel || formatUsd(entry.prize || 0),
+        prizeType: entry.prizeType || 'cash',
+        numbers: entry.numbers,
+        simulated: true,
+        timestamp: entry.timestamp,
+      });
+    });
+    feedItems.sort((a, b) => b.timestamp - a.timestamp);
+    feedItems = feedItems.slice(0, 40);
+  }
+
   function init() {
     if (!LIVE_FEED_ENABLED) return;
     loadPool();
 
-    for (let i = 0; i < 12; i++) generateEvent();
+    for (let i = 0; i < 8; i++) generateEvent();
+    seedWinEventsFromWinners();
 
     scheduleNext();
 
@@ -196,7 +256,7 @@ const ActivitySimulator = (() => {
 
   return {
     init, stop, isEnabled, getSimulatedPool, getSimulatedTicketCount,
-    getFeedItems, getMergedItems, generateEvent, formatUsd, renderTicker,
+    getFeedItems, getMergedItems, generateEvent, formatUsd, renderTicker, addWinEvent,
   };
 })();
 
