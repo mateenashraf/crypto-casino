@@ -1,5 +1,5 @@
 /**
- * NeonDraw — lottery app UI
+ * NeonDraw, lottery app UI
  */
 (function () {
   const wallet = window.SecureWeb3;
@@ -161,6 +161,10 @@
     openModal(walletModal);
   });
   document.getElementById('heroBuyBtn')?.addEventListener('click', () => scrollToSection('#lottery'));
+  document.getElementById('footerWalletLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal(walletModal);
+  });
 
   document.getElementById('disconnectBtn').addEventListener('click', () => {
     wallet.disconnect();
@@ -256,6 +260,7 @@
   window.PartnerNetwork?.init();
   window.LicenseDisplay?.init();
   window.TicketLookup?.init();
+  window.TrustDisplay?.init();
   window.Icons?.hydrate();
   wallet.tryAutoConnect().then(() => updateWalletUI());
 })();
