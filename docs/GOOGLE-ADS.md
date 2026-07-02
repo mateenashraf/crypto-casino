@@ -216,7 +216,7 @@ Weekly $2M · Monthly $5M · Yearly $50M. NeonDraw — instant deposits, fast wi
 
 ### URL settings
 
-- **Final URL:** Your live site (e.g. `https://mateenashraf.github.io/crypto-casino/`)
+- **Final URL:** Your live site (e.g. `https://your-domain.example/`)
 - **Display path:** `Lottery` / `Win-Big`
 
 ---
@@ -283,5 +283,4 @@ Use the **same keywords and ad copy** on:
 | Daily | $2,000 – $3,500 |
 | Weekly | $2,000,000 |
 | Monthly | $5,000,000 |
-| 6-Month | $20,000,000 |
-| Yearly | $50,000,000 |
+| Quarterly | $10,000,000 |
