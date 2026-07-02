@@ -141,6 +141,12 @@ const TicketLookup = (() => {
       showError('Enter a wallet address to search.');
       return;
     }
+    try {
+      wallet().assertSafeAddressInput(raw, 'wallet lookup');
+    } catch (err) {
+      showError(err.message || 'Sensitive wallet data is not allowed here.');
+      return;
+    }
     if (!wallet().isValidAddress(raw)) {
       showError('Invalid Ethereum address. Check the format and try again.');
       return;
