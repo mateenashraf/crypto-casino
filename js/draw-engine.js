@@ -1,11 +1,22 @@
 /**
  * Automatic multi-tier lottery draw engine
- * Daily · Weekly · Monthly · Semi-Annual · Yearly
+ * Daily · Weekly · Monthly · Quarterly
  */
 const DrawEngine = (() => {
   const STORAGE_DRAWS = 'starbitz_draw_state';
   const STORAGE_WINNERS = 'starbitz_draw_winners';
   const STORAGE_TICKETS_BY_DRAW = 'starbitz_tickets_by_draw';
+  const STORAGE_ECONOMICS = 'starbitz_economics_state';
+  const ECONOMICS = {
+    OPERATOR_RETAIN_RATIO: 0.98,
+    GLOBAL_PAYOUT_CAP_RATIO: 0.02,
+    DAILY_PAYOUT_MIN_RATIO: 0.01,
+    DAILY_PAYOUT_MAX_RATIO: 0.03,
+    MAJOR_DRAW_PAYOUT_RATIO: 0.02,
+    FREE_TICKET_USD_VALUE: 1,
+  };
+  const FREE_TICKET_WIN_RATE = 0.14;
+  const FREE_TICKET_QTY = 1;
 
   const DRAW_TIERS = [
     {
@@ -52,41 +63,30 @@ const DrawEngine = (() => {
       },
     },
     {
-      id: 'semi-annual',
-      name: '6-Month Grand',
-      icon: 'gem',
-      prize: 20_000_000,
-      getNextDraw: () => {
-        const n = new Date();
-        const month = n.getMonth();
-        const year = n.getFullYear();
-        const next = month < 6
-          ? new Date(year, 6, 1, 22, 0, 0)
-          : new Date(year + 1, 0, 1, 22, 0, 0);
-        if (next.getTime() <= Date.now()) {
-          return month < 6
-            ? new Date(year + 1, 0, 1, 22, 0, 0).getTime()
-            : new Date(year + 1, 6, 1, 22, 0, 0).getTime();
-        }
-        return next.getTime();
-      },
-    },
-    {
-      id: 'yearly',
-      name: 'Yearly Ultra',
+      id: 'quarterly',
+      name: 'Quarterly Ultra',
       icon: 'crown',
-      prize: 50_000_000,
+      prize: 10_000_000,
       getNextDraw: () => {
         const n = new Date();
-        n.setFullYear(n.getFullYear() + 1, 0, 1);
-        n.setHours(23, 0, 0, 0);
+        const m = n.getMonth();
+        const nextQuarterMonth = Math.floor(m / 3) * 3 + 3;
+        n.setMonth(nextQuarterMonth, 1);
+        n.setHours(22, 30, 0, 0);
         return n.getTime();
       },
     },
   ];
 
   let state = {};
-  let selectedDrawId = 'semi-annual';
+  let economicsState = {
+    dayKey: '',
+    dailyInflowUsd: 0,
+    dailyOutflowUsd: 0,
+    lifetimeInflowUsd: 0,
+    lifetimeOutflowUsd: 0,
+  };
+  let selectedDrawId = 'monthly';
   let tickTimer = null;
 
   function loadState() {
@@ -97,7 +97,7 @@ const DrawEngine = (() => {
     }
     DRAW_TIERS.forEach((tier) => {
       if (!state[tier.id]) {
-        state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: null };
+        state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: null, runCount: 0 };
       }
     });
     saveState();
@@ -105,6 +105,52 @@ const DrawEngine = (() => {
 
   function saveState() {
     localStorage.setItem(STORAGE_DRAWS, JSON.stringify(state));
+  }
+
+  function getUtcDayKey(ts = Date.now()) {
+    return new Date(ts).toISOString().slice(0, 10);
+  }
+
+  function ensureEconomicsWindow(ts = Date.now()) {
+    const dayKey = getUtcDayKey(ts);
+    if (!economicsState.dayKey) {
+      economicsState.dayKey = dayKey;
+      return;
+    }
+    if (economicsState.dayKey !== dayKey) {
+      economicsState.dayKey = dayKey;
+      economicsState.dailyInflowUsd = 0;
+      economicsState.dailyOutflowUsd = 0;
+    }
+  }
+
+  function loadEconomics() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_ECONOMICS) || '{}');
+      // Backward compatibility: older versions used inflowUsd/outflowUsd only.
+      const legacyInflow = Number(parsed.inflowUsd) || 0;
+      const legacyOutflow = Number(parsed.outflowUsd) || 0;
+      economicsState = {
+        dayKey: parsed.dayKey || getUtcDayKey(),
+        dailyInflowUsd: Number(parsed.dailyInflowUsd) || 0,
+        dailyOutflowUsd: Number(parsed.dailyOutflowUsd) || 0,
+        lifetimeInflowUsd: Number(parsed.lifetimeInflowUsd) || legacyInflow,
+        lifetimeOutflowUsd: Number(parsed.lifetimeOutflowUsd) || legacyOutflow,
+      };
+    } catch {
+      economicsState = {
+        dayKey: getUtcDayKey(),
+        dailyInflowUsd: 0,
+        dailyOutflowUsd: 0,
+        lifetimeInflowUsd: 0,
+        lifetimeOutflowUsd: 0,
+      };
+    }
+    ensureEconomicsWindow();
+  }
+
+  function saveEconomics() {
+    localStorage.setItem(STORAGE_ECONOMICS, JSON.stringify(economicsState));
   }
 
   function getWinners() {
@@ -152,18 +198,74 @@ const DrawEngine = (() => {
     return tier.prize;
   }
 
+  function formatWinnerPrize(entry) {
+    if (entry.prizeType === 'free_ticket') return entry.prizeLabel;
+    return formatUsd(entry.prize);
+  }
+
+  function randomRange(min, max) {
+    return min + (Math.random() * (max - min));
+  }
+
+  function getDrawPoolUsd(tickets) {
+    return tickets.reduce((sum, t) => sum + (Number(t.usdPrice) || 0), 0);
+  }
+
   function runDraw(tier) {
+    ensureEconomicsWindow();
     const numbers = winningNumbers();
     const tickets = getTicketsForDraw(tier.id);
     const winner = tickets.length
       ? tickets[Math.floor(Math.random() * tickets.length)]
       : null;
-    const prize = getPrize(tier);
+    const advertisedPrize = getPrize(tier);
+    const drawPoolUsd = getDrawPoolUsd(tickets);
+    const runCount = (state[tier.id]?.runCount || 0) + 1;
+    const dailyInflowAfter = economicsState.dailyInflowUsd + drawPoolUsd;
+    const lifetimeInflowAfter = economicsState.lifetimeInflowUsd + drawPoolUsd;
+    const dailyPayoutCap = dailyInflowAfter * ECONOMICS.GLOBAL_PAYOUT_CAP_RATIO;
+    const lifetimePayoutCap = lifetimeInflowAfter * ECONOMICS.GLOBAL_PAYOUT_CAP_RATIO;
+    const remainingDailyBudget = Math.max(0, dailyPayoutCap - economicsState.dailyOutflowUsd);
+    const remainingLifetimeBudget = Math.max(0, lifetimePayoutCap - economicsState.lifetimeOutflowUsd);
+    const remainingGlobalBudget = Math.min(remainingDailyBudget, remainingLifetimeBudget);
+
+    let payoutUsd = 0;
+    if (winner && drawPoolUsd > 0 && remainingGlobalBudget > 0) {
+      const payoutRatio = tier.id === 'daily'
+        ? randomRange(ECONOMICS.DAILY_PAYOUT_MIN_RATIO, ECONOMICS.DAILY_PAYOUT_MAX_RATIO)
+        : ECONOMICS.MAJOR_DRAW_PAYOUT_RATIO;
+      payoutUsd = Math.min(drawPoolUsd * payoutRatio, remainingGlobalBudget);
+    }
+
+    let prize = Math.max(0, Math.round(payoutUsd));
+    const isFreeTicketWinner = !!winner
+      && Math.random() < FREE_TICKET_WIN_RATE
+      && remainingGlobalBudget >= ECONOMICS.FREE_TICKET_USD_VALUE;
+
+    let accountedPayoutUsd = prize;
+    const prizeLabel = isFreeTicketWinner
+      ? `${FREE_TICKET_QTY} Free Ticket${FREE_TICKET_QTY > 1 ? 's' : ''}`
+      : formatUsd(prize || 0);
+
+    if (isFreeTicketWinner && winner.wallet) {
+      prize = 0;
+      accountedPayoutUsd = ECONOMICS.FREE_TICKET_USD_VALUE * FREE_TICKET_QTY;
+      window.SecureWeb3?.grantFreeTickets(winner.wallet, FREE_TICKET_QTY, {
+        drawId: tier.id,
+        drawName: tier.name,
+      });
+    }
 
     const entry = {
       drawId: tier.id,
       drawName: tier.name,
       prize,
+      advertisedPrize,
+      drawPoolUsd: Math.round(drawPoolUsd),
+      retainedUsd: Math.max(0, Math.round(drawPoolUsd - accountedPayoutUsd)),
+      microWin: false,
+      prizeType: isFreeTicketWinner ? 'free_ticket' : 'cash',
+      prizeLabel,
       numbers,
       winner: winner
         ? { wallet: winner.wallet?.slice(0, 6) + '...' + winner.wallet?.slice(-4), numbers: winner.numbers }
@@ -171,8 +273,13 @@ const DrawEngine = (() => {
       timestamp: Date.now(),
     };
 
+    economicsState.dailyInflowUsd = dailyInflowAfter;
+    economicsState.lifetimeInflowUsd = lifetimeInflowAfter;
+    economicsState.dailyOutflowUsd += accountedPayoutUsd;
+    economicsState.lifetimeOutflowUsd += accountedPayoutUsd;
+    saveEconomics();
     saveWinner(entry);
-    state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: Date.now() };
+    state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: Date.now(), runCount };
     saveState();
 
     window.dispatchEvent(new CustomEvent('draw-completed', { detail: entry }));
@@ -238,7 +345,7 @@ const DrawEngine = (() => {
     }
 
     const sub = document.getElementById('featuredDrawSub');
-    if (sub) sub.textContent = `Prize: ${formatUsd(prize)} · Pick 6 numbers to enter`;
+    if (sub) sub.textContent = `Prize: ${formatUsd(prize)} · Global player payouts are capped at 2% of inflow`;
 
     updateCountdownDisplay(diff);
   }
@@ -310,18 +417,20 @@ const DrawEngine = (() => {
       return;
     }
 
-    const esc = window.SBSecurity.escapeHtml;
-    el.innerHTML = winners.slice(0, 12).map((w) => `
+    el.innerHTML = winners.slice(0, 12).map((w) => {
+      const prizeClass = w.prizeType === 'free_ticket' ? ' winner-prize-ticket' : '';
+      return `
       <div class="winner-row">
-        <div class="winner-prize">${esc(formatUsd(w.prize))}</div>
+        <div class="winner-prize${prizeClass}">${formatWinnerPrize(w)}</div>
         <div class="winner-meta">
-          <strong>${esc(w.drawName)}</strong>
-          <span>Winning: ${esc(w.numbers.join(' · '))}</span>
-          <span class="winner-wallet">${esc(w.winner.wallet)}</span>
+          <strong>${w.drawName}</strong>
+          <span>Winning: ${w.numbers.join(' · ')}</span>
+          <span class="winner-wallet">${w.winner.wallet}</span>
         </div>
-        <div class="winner-time">${esc(new Date(w.timestamp).toLocaleDateString())}</div>
+        <div class="winner-time">${new Date(w.timestamp).toLocaleDateString()}</div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function tick() {
@@ -332,6 +441,8 @@ const DrawEngine = (() => {
 
   function init() {
     loadState();
+    loadEconomics();
+    ensureEconomicsWindow();
     checkDraws();
     renderDrawCards();
     updateFeaturedDraw();
@@ -341,7 +452,12 @@ const DrawEngine = (() => {
 
     window.addEventListener('draw-completed', (e) => {
       const w = e.detail;
-      window.AppUI?.toast(`${w.drawName}: ${formatUsd(w.prize)} won!`, 'success');
+      const msg = w.prizeType === 'free_ticket'
+        ? `${w.drawName}: ${w.prizeLabel} awarded!`
+        : w.prize > 0
+          ? `${w.drawName}: ${formatUsd(w.prize)} won!`
+          : `${w.drawName}: draw completed`;
+      window.AppUI?.toast(msg, 'success');
       renderDrawCards();
       renderWinners();
     });
@@ -354,6 +470,21 @@ const DrawEngine = (() => {
   return {
     init, stop, getTiers: () => DRAW_TIERS, getSelectedDraw, setSelectedDraw,
     registerTicket, getSelectedDrawId: () => selectedDrawId, formatUsd,
+    getEconomics: () => {
+      ensureEconomicsWindow();
+      const dailyCap = economicsState.dailyInflowUsd * ECONOMICS.GLOBAL_PAYOUT_CAP_RATIO;
+      const lifetimeCap = economicsState.lifetimeInflowUsd * ECONOMICS.GLOBAL_PAYOUT_CAP_RATIO;
+      return {
+        ...ECONOMICS,
+        ...economicsState,
+        dailyRetainedUsd: economicsState.dailyInflowUsd - economicsState.dailyOutflowUsd,
+        lifetimeRetainedUsd: economicsState.lifetimeInflowUsd - economicsState.lifetimeOutflowUsd,
+        dailyPayoutCapUsd: dailyCap,
+        lifetimePayoutCapUsd: lifetimeCap,
+        dailyRemainingBudgetUsd: Math.max(0, dailyCap - economicsState.dailyOutflowUsd),
+        lifetimeRemainingBudgetUsd: Math.max(0, lifetimeCap - economicsState.lifetimeOutflowUsd),
+      };
+    },
   };
 })();
 
