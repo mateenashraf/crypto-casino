@@ -16,6 +16,7 @@ const SecureWeb3 = (() => {
     STORAGE_TX: 'starbitz_transactions',
     STORAGE_TICKETS: 'starbitz_lottery_tickets',
     STORAGE_POOL: 'starbitz_pool_contributions',
+    STORAGE_FREE_TICKETS: 'starbitz_free_tickets',
   };
 
   const LOTTERY_ABI = [
@@ -119,7 +120,28 @@ const SecureWeb3 = (() => {
     return isValidAddress(addr) ? ethers.getAddress(addr) : null;
   }
 
+  function looksLikePrivateKey(value) {
+    const v = (value || '').trim();
+    if (!v) return false;
+    if (/^0x[a-fA-F0-9]{64}$/.test(v)) return true;
+    if (/^[a-fA-F0-9]{64}$/.test(v)) return true;
+    return false;
+  }
+
+  function looksLikeSeedPhrase(value) {
+    const words = (value || '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (words.length < 12) return false;
+    return words.every((w) => /^[a-z]+$/.test(w));
+  }
+
+  function assertSafeAddressInput(value, fieldName = 'address') {
+    if (looksLikePrivateKey(value) || looksLikeSeedPhrase(value)) {
+      throw new Error(`Never paste private keys or seed phrases into ${fieldName} fields.`);
+    }
+  }
+
   function getTicketsByAddress(addr) {
+    assertSafeAddressInput(addr, 'wallet lookup');
     const normalized = normalizeAddress(addr);
     if (!normalized) return [];
     const key = normalized.toLowerCase();
@@ -158,6 +180,62 @@ const SecureWeb3 = (() => {
     localStorage.setItem(CONFIG.STORAGE_POOL, total.toFixed(2));
     notify('pool-updated', { total });
     return total;
+  }
+
+  function getFreeTicketBalance(addr) {
+    if (!addr) return 0;
+    return parseInt(getStorage(CONFIG.STORAGE_FREE_TICKETS)[addr.toLowerCase()] || '0', 10);
+  }
+
+  function grantFreeTickets(addr, qty = 1, meta = {}) {
+    if (!addr) return 0;
+    const key = addr.toLowerCase();
+    const credits = getStorage(CONFIG.STORAGE_FREE_TICKETS);
+    const next = (parseInt(credits[key] || '0', 10) + qty);
+    credits[key] = next;
+    setStorage(CONFIG.STORAGE_FREE_TICKETS, credits);
+    notify('free-ticket-granted', { address: addr, qty, balance: next, ...meta });
+    return next;
+  }
+
+  function validateNumbers(numbers) {
+    if (!Array.isArray(numbers) || numbers.length !== 6) {
+      throw new Error('Select exactly 6 numbers');
+    }
+    const unique = new Set(numbers);
+    if (unique.size !== 6) throw new Error('Numbers must be unique');
+    if (numbers.some((n) => n < 1 || n > 49)) throw new Error('Numbers must be 1–49');
+    return [...numbers].sort((a, b) => a - b);
+  }
+
+  function redeemFreeTicket(numbers, drawId) {
+    if (!address) throw new Error('Connect wallet first');
+    const balance = getFreeTicketBalance(address);
+    if (balance < 1) throw new Error('No free tickets available');
+
+    const sorted = validateNumbers(numbers);
+    const ticket = {
+      id: `FT-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      wallet: address,
+      numbers: sorted,
+      amountEth: 0,
+      usdPrice: 0,
+      hash: null,
+      chainId: chainId || 11155111,
+      timestamp: Date.now(),
+      free: true,
+      drawId: drawId || null,
+      prizeSource: 'free_ticket_bonus',
+    };
+
+    const credits = getStorage(CONFIG.STORAGE_FREE_TICKETS);
+    credits[address.toLowerCase()] = balance - 1;
+    setStorage(CONFIG.STORAGE_FREE_TICKETS, credits);
+
+    saveTicket(ticket, true);
+    notify('free-ticket-redeemed', ticket);
+    notify('ticket-purchased', ticket);
+    return ticket;
   }
 
   async function connect() {
@@ -313,6 +391,7 @@ const SecureWeb3 = (() => {
     const casinoBal = getCasinoBalance(address);
     if (amount > casinoBal) throw new Error('Insufficient balance');
 
+    if (toAddress) assertSafeAddressInput(toAddress, 'withdraw destination');
     const dest = toAddress ? ethers.getAddress(toAddress) : address;
     await new Promise((r) => setTimeout(r, 1200));
 
@@ -336,8 +415,10 @@ const SecureWeb3 = (() => {
 
   return {
     connect, disconnect, deposit, withdraw, buyLotteryTicket, buyLotteryTicketBulk,
+    redeemFreeTicket, grantFreeTickets, getFreeTicketBalance,
     getWalletBalance, getCasinoBalance, getTransactions, getAllTickets, getTicketsByAddress,
     getExplorerTxUrl, getExplorerAddressUrl, isValidAddress, normalizeAddress,
+    assertSafeAddressInput,
     getPoolContributions, isConnected: () => !!address,
     getAddress: () => address, getChainId: () => chainId,
     getTreasuryAddress: () => CONFIG.TREASURY_ADDRESS,
