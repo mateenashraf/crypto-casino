@@ -4,14 +4,14 @@
 
 | Resource | URL |
 |----------|-----|
-| **GitHub repo** | https://github.com/mateenashraf/crypto-casino |
+| **GitHub repo** | https://github.com/<your-org-or-user>/<your-repo> |
 | **Local dev** | http://localhost:8080 |
 
 ### Deploy (GitHub Pages)
 
 1. Repo → **Settings** → **Pages**
 2. Source: **Deploy from branch** → `main` → `/ (root)`
-3. Save — site at: `https://mateenashraf.github.io/crypto-casino/`
+3. Save — site at: `https://<your-org-or-user>.github.io/<your-repo>/`
 
 ### Run locally
 
@@ -36,8 +36,7 @@ MetaMask requires **HTTPS** or **localhost** — do not open `index.html` as a f
 | **Daily Draw** | $2,000 – $3,500 (rotates) | Every midnight (local) |
 | **Weekly Mega** | $2,000,000 | Every Sunday, 8:00 PM |
 | **Monthly Jackpot** | $5,000,000 | 1st of each month, 9:00 PM |
-| **6-Month Grand** | $20,000,000 | January 1 & July 1, 10:00 PM |
-| **Yearly Ultra** | $50,000,000 | January 1, 11:00 PM |
+| **Quarterly Ultra** | $10,000,000 | Every 3 months, 10:30 PM |
 
 ### Ticket tiers
 
@@ -95,7 +94,7 @@ Edit `js/wallet.js`:
 
 ```javascript
 ALLOWED_CHAIN_IDS: [11155111, 1],  // Sepolia testnet, Mainnet
-TREASURY_ADDRESS: '0x18EAD9D8fEC234d33a8E8644F12Fb355c6Af6c3E',
+TREASURY_ADDRESS: '<set-your-private-treasury-address>',
 LOTTERY_CONTRACT: null,            // Set after deploying LotteryPool.sol
 MIN_ETH: 0.001,
 MAX_ETH: 2,
