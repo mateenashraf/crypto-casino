@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mateenashraf.github.io/crypto-casino/sitemap.xml
+Sitemap: https://example.com/sitemap.xml
