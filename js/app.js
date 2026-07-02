@@ -73,7 +73,8 @@
       sidebarBal.hidden = false;
       if (ticketCountEl) ticketCountEl.textContent = String(myTickets);
       walletAddr.hidden = false;
-      walletAddr.textContent = addr;
+      walletAddr.textContent = `${wallet.shortenAddress(addr)} (tap to copy)`;
+      walletAddr.title = 'Full wallet address copied to clipboard on click';
       disconnectBtn.hidden = false;
 
       document.getElementById('connectPrompt').hidden = true;
@@ -124,11 +125,10 @@
       return;
     }
 
-    const esc = window.SBSecurity.escapeHtml;
     list.innerHTML = txs.map((tx) => `
       <li>
-        <span class="tx-type-${esc(tx.type === 'lottery' ? 'deposit' : tx.type)}">${esc(tx.type)}</span>
-        <span>${esc(parseFloat(tx.amount).toFixed(4))} ETH</span>
+        <span class="tx-type-${tx.type === 'lottery' ? 'deposit' : tx.type}">${tx.type}</span>
+        <span>${parseFloat(tx.amount).toFixed(4)} ETH</span>
       </li>
     `).join('');
   }
@@ -203,6 +203,7 @@
     const to = document.getElementById('withdrawAddress').value.trim();
     showTxStatus('withdrawStatus', 'Processing...', 'pending');
     try {
+      if (to) wallet.assertSafeAddressInput(to, 'withdraw destination');
       await wallet.withdraw(amount, to || undefined);
       showTxStatus('withdrawStatus', 'Withdrawal sent!', 'success');
       await refreshBalances();
@@ -229,6 +230,17 @@
   document.getElementById('myTicketsLink')?.addEventListener('click', (e) => {
     if (wallet.isConnected()) {
       setTimeout(() => window.TicketLookup?.useConnectedWallet(), 400);
+    }
+  });
+
+  document.getElementById('walletAddress')?.addEventListener('click', async () => {
+    const addr = wallet.getAddress();
+    if (!addr || !navigator.clipboard?.writeText) return;
+    try {
+      await navigator.clipboard.writeText(addr);
+      toast('Full wallet address copied', 'success');
+    } catch {
+      toast('Could not copy wallet address', 'error');
     }
   });
 
