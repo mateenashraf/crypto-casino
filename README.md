@@ -2,7 +2,7 @@
 
 Crypto lottery platform with Web3 wallet payments, automatic draws, and live ticket activity.
 
-**Live repo:** https://github.com/mateenashraf/crypto-casino
+**Live repo:** configure your own private or public repository
 
 ---
 
@@ -32,8 +32,7 @@ If you still see old content: hard refresh with **Cmd+Shift+R** or open an incog
 | Daily | $2,000 – $3,500 |
 | Weekly | $2,000,000 |
 | Monthly | $5,000,000 |
-| 6-Month | $20,000,000 |
-| Yearly | $50,000,000 |
+| Quarterly | $10,000,000 |
 
 ---
 
@@ -82,7 +81,7 @@ crypto-casino/
 ## Deploy to GitHub Pages
 
 Settings → Pages → Branch `main` → `/ (root)`  
-URL: `https://mateenashraf.github.io/crypto-casino/`
+URL: `https://your-domain.example/`
 
 ---
 
