@@ -1,5 +1,5 @@
 /**
- * Las Vegas gaming affiliates — authentic logos via Wikimedia Commons only.
+ * Las Vegas gaming affiliates, authentic logos via Wikimedia Commons only.
  */
 const PartnerNetwork = (() => {
   const VEGAS_PARTNERS = [
@@ -43,7 +43,7 @@ const PartnerNetwork = (() => {
   ];
 
   const BRAND_NAMES = [
-    { name: 'NeonDraw', accent: 'Draw', tagline: 'Current — Vegas neon crypto lottery', current: true },
+    { name: 'NeonDraw', accent: 'Draw', tagline: 'Current, Vegas neon crypto lottery', current: true },
     { name: 'StarBitz', accent: 'Bitz', tagline: 'Previous brand name' },
     { name: 'LuxBit Jackpot', accent: 'Jackpot', tagline: 'Premium luxury lottery feel' },
     { name: 'VegasChain Lotto', accent: 'Lotto', tagline: 'Strip credibility + blockchain' },
@@ -102,7 +102,7 @@ const PartnerNetwork = (() => {
 
     el.querySelectorAll('.brand-name-chip:not(.current)').forEach((chip) => {
       chip.addEventListener('click', () => {
-        window.AppUI?.toast(`Brand preview: ${chip.dataset.brand} — update logo & title to switch`, 'info');
+        window.AppUI?.toast(`Brand preview: ${chip.dataset.brand}. Update logo and title to switch`, 'info');
       });
     });
   }
