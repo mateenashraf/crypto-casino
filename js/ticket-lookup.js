@@ -1,5 +1,5 @@
 /**
- * Wallet address ticket lookup — purchase history with on-chain links
+ * Wallet address ticket lookup, purchase history with on-chain links
  */
 const TicketLookup = (() => {
   const wallet = () => window.SecureWeb3;
@@ -76,7 +76,7 @@ const TicketLookup = (() => {
     const txUrl = group.hash ? w.getExplorerTxUrl(group.hash, group.chainId) : null;
     const txUsd = group.tickets.reduce((s, t) => s + (t.usdPrice || 0), 0);
     const txEth = group.tickets.reduce((s, t) => s + (t.amountEth || 0), 0);
-    const shortHash = group.hash ? `${group.hash.slice(0, 10)}…${group.hash.slice(-8)}` : '—';
+    const shortHash = group.hash ? `${group.hash.slice(0, 10)}…${group.hash.slice(-8)}` : 'N/A';
 
     const ticketRows = group.tickets.map((t) => `
       <div class="lookup-ticket-row">
