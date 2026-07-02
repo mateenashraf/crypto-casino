@@ -3,15 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org; connect-src 'self' https: wss:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'" />
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>NeonDraw — Crypto Lottery | $20M Jackpot</title>
-  <meta name="description" content="NeonDraw — Win up to $50 million. Daily, weekly, and monthly crypto lottery draws. Buy tickets with Bitcoin, Ethereum, USDT & more." />
+  <title>NeonDraw Crypto Lottery | On-Chain Draws, Jackpots & Ticket Lookup</title>
+  <meta name="description" content="NeonDraw is a Web3 crypto lottery with scheduled draws, on-chain payments, transparent ticket tracking, and jackpot tiers from daily prizes to grand jackpots." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="NeonDraw" />
+  <meta name="theme-color" content="#0b0c14" />
+  <link rel="canonical" href="https://mateenashraf.github.io/crypto-casino/" />
+  <link rel="alternate" hreflang="en" href="https://mateenashraf.github.io/crypto-casino/" />
+  <link rel="alternate" hreflang="x-default" href="https://mateenashraf.github.io/crypto-casino/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="NeonDraw" />
+  <meta property="og:title" content="NeonDraw Crypto Lottery | On-Chain Draws & Jackpot Tiers" />
+  <meta property="og:description" content="Join daily, weekly, monthly, and grand crypto lottery draws with on-chain payment flow and transparent ticket activity." />
+  <meta property="og:url" content="https://mateenashraf.github.io/crypto-casino/" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="NeonDraw Crypto Lottery | On-Chain Draws & Jackpot Tiers" />
+  <meta name="twitter:description" content="Web3-powered lottery experience with live draw schedule, ticket lookup, and transparent wallet-based flow." />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "NeonDraw",
+          "url": "https://mateenashraf.github.io/crypto-casino/",
+          "description": "Web3 crypto lottery website with scheduled draw tiers and on-chain payment flow.",
+          "inLanguage": "en"
+        },
+        {
+          "@type": "Organization",
+          "name": "NeonDraw",
+          "url": "https://mateenashraf.github.io/crypto-casino/"
+        },
+        {
+          "@type": "WebApplication",
+          "name": "NeonDraw Crypto Lottery",
+          "url": "https://mateenashraf.github.io/crypto-casino/",
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "1",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How do I buy a crypto lottery ticket on NeonDraw?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Connect a compatible Web3 wallet, choose six numbers, select a ticket amount, and confirm the on-chain transaction."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I verify my ticket purchases?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Use Ticket Lookup to review ticket history and open transaction links on the supported block explorer."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What are the draw types?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "NeonDraw includes daily, weekly, monthly, and quarterly lottery draws with different jackpot tiers."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=neondraw" />
 </head>
@@ -31,6 +108,7 @@
           <a href="#lottery" class="nav-link active">Lottery</a>
           <a href="#how-it-works" class="nav-link">How It Works</a>
           <a href="#winners" class="nav-link">Winners</a>
+          <a href="#faq" class="nav-link">FAQ</a>
           <a href="#promotions" class="nav-link">Promotions</a>
           <a href="#license" class="nav-link">License</a>
         </nav>
@@ -59,6 +137,9 @@
           </a>
           <a href="#winners" class="sidebar-item">
             <span class="sidebar-icon" data-icon="trophy" data-icon-size="18"></span> Past Winners
+          </a>
+          <a href="#faq" class="sidebar-item">
+            <span class="sidebar-icon" data-icon="clipboard-list" data-icon-size="18"></span> FAQ
           </a>
           <a href="#ticket-lookup" class="sidebar-item" id="myTicketsLink">
             <span class="sidebar-icon" data-icon="ticket" data-icon-size="18"></span> My Tickets
@@ -126,9 +207,9 @@
         </section>
 
         <section class="lottery-hero compact-hero" id="lottery">
-          <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>6-Month Grand</span></p>
-          <h1 class="lottery-jackpot" id="lotteryJackpot">$20,000,000</h1>
-          <p class="lottery-sub" id="featuredDrawSub">Prize: $20,000,000 · Pick 6 numbers to enter</p>
+          <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>Monthly Jackpot</span></p>
+          <h1 class="lottery-jackpot" id="lotteryJackpot">$5,000,000</h1>
+          <p class="lottery-sub" id="featuredDrawSub">Prize: $5,000,000 · Pick 6 numbers to enter</p>
           <div class="lottery-countdown">
             <div class="countdown-unit" id="cdDaysWrap"><span id="cdDays">00</span><small>Days</small></div>
             <div class="countdown-unit"><span id="cdHours">00</span><small>Hours</small></div>
@@ -169,6 +250,11 @@
               <p class="field-hint">$1 per ticket · enter any amount to see how many entries you get</p>
             </div>
             <div class="purchase-summary" id="purchaseSummary"></div>
+            <div class="free-ticket-banner" id="freeTicketBanner" hidden>
+              <span class="free-ticket-icon" data-icon="ticket" data-icon-size="18"></span>
+              <span class="free-ticket-text">You have <strong id="freeTicketCount">0</strong> free ticket(s) — redeem with no payment</span>
+              <button type="button" class="btn btn-outline free-ticket-redeem-btn" id="redeemFreeTicketBtn">Redeem Free Entry</button>
+            </div>
             <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Buy Ticket with Crypto</button>
             <div class="tx-status" id="ticketStatus" hidden></div>
             <div class="security-badge">
@@ -187,11 +273,14 @@
         <section class="lottery-panel compact-panel" id="how-it-works">
           <h3>How It Works</h3>
           <ol class="how-list">
-            <li>Select a draw tier above (Daily → Yearly)</li>
+            <li>Select a draw tier above (Daily → Quarterly)</li>
             <li>Pick 6 numbers or Quick Pick</li>
-            <li>Pay with crypto — draws run automatically on schedule</li>
-            <li>Winners selected at random when the countdown hits zero</li>
+            <li>Pay with crypto — or redeem a free ticket if you won one</li>
+            <li>Winners selected at random when the countdown hits zero (global payouts are hard-capped at 2% of total inflow)</li>
           </ol>
+          <p class="activity-disclaimer">
+            Looking for details? Visit <a href="#draws">Draw Schedule</a>, track outcomes in <a href="#winners">Recent Winners</a>, and verify purchases through <a href="#ticket-lookup">Ticket Lookup</a>.
+          </p>
         </section>
 
         <section class="lottery-panel compact-panel" id="winners">
@@ -225,6 +314,16 @@
               <span data-icon="ticket" data-icon-size="28"></span>
               <p>Search a wallet to view ticket history and Etherscan links.</p>
             </div>
+          </div>
+        </section>
+
+        <section class="lottery-panel compact-panel" id="faq">
+          <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> Crypto Lottery FAQ</h3>
+          <div id="faqList">
+            <p><strong>How do I buy a ticket?</strong> Connect your wallet, choose six numbers, select a ticket value, and confirm the on-chain transaction.</p>
+            <p><strong>How do I verify my transaction?</strong> Open <a href="#ticket-lookup">Ticket Lookup</a> to see wallet-linked ticket records and explorer links.</p>
+            <p><strong>What draw tiers are available?</strong> Daily, weekly, monthly, and quarterly jackpot draws.</p>
+            <p><strong>What is the lowest winning product?</strong> A free ticket can be awarded as the lowest winning outcome in regular money draws.</p>
           </div>
         </section>
 
@@ -279,6 +378,7 @@
             <a href="#lottery">Buy Tickets</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#winners">Winners</a>
+            <a href="#faq">FAQ</a>
             <a href="#license">License</a>
             <a href="#">Odds & Prizes</a>
           </div>
@@ -381,8 +481,8 @@
             <label class="field-label" for="withdrawAmount">Amount (ETH)</label>
             <input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.001" class="text-input" />
             <label class="field-label" for="withdrawAddress">Destination Address</label>
-            <input type="text" id="withdrawAddress" placeholder="0x..." class="text-input" />
-            <p class="field-hint">Withdrawals processed instantly to your wallet.</p>
+            <input type="text" id="withdrawAddress" placeholder="0x..." class="text-input" autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <p class="field-hint">Withdrawals processed instantly to your wallet. Never enter a private key or seed phrase.</p>
             <button class="btn btn-primary btn-lg btn-block" id="withdrawBtn">Withdraw</button>
             <div class="tx-status" id="withdrawStatus" hidden></div>
           </div>
@@ -464,16 +564,15 @@
   <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="js/security.js?v=neondraw"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="js/icons.js?v=neondraw"></script>
-  <script src="js/wallet.js?v=neondraw"></script>
-  <script src="js/draw-engine.js?v=neondraw"></script>
-  <script src="js/activity-simulator.js?v=neondraw"></script>
-  <script src="js/lottery.js?v=neondraw"></script>
-  <script src="js/partners.js?v=neondraw"></script>
-  <script src="js/license.js?v=neondraw"></script>
-  <script src="js/ticket-lookup.js?v=neondraw"></script>
-  <script src="js/app.js?v=neondraw"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script defer src="js/icons.js?v=neondraw"></script>
+  <script defer src="js/wallet.js?v=neondraw"></script>
+  <script defer src="js/draw-engine.js?v=neondraw"></script>
+  <script defer src="js/activity-simulator.js?v=neondraw"></script>
+  <script defer src="js/lottery.js?v=neondraw"></script>
+  <script defer src="js/partners.js?v=neondraw"></script>
+  <script defer src="js/license.js?v=neondraw"></script>
+  <script defer src="js/ticket-lookup.js?v=neondraw"></script>
+  <script defer src="js/app.js?v=neondraw"></script>
 </body>
 </html>
