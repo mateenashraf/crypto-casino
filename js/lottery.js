@@ -1,5 +1,5 @@
 /**
- * NeonDraw Crypto Lottery — $20M jackpot, real on-chain ticket purchases
+ * NeonDraw Crypto Lottery, $20M jackpot, real on-chain ticket purchases
  */
 const LotteryApp = (() => {
   const JACKPOT_USD = 20_000_000;
@@ -33,7 +33,7 @@ const LotteryApp = (() => {
       badge: 'SAVE 20%',
       badgeClass: 'save',
       title: '5 Tickets for $4',
-      desc: 'Grab 5 entries for the price of 4 — same numbers, 5× the odds.',
+      desc: 'Grab 5 entries for the price of 4, same numbers, 5× the odds.',
       usd: 4,
       qty: 5,
       unitUsd: 0.8,
@@ -44,7 +44,7 @@ const LotteryApp = (() => {
       badge: 'BONUS',
       badgeClass: 'bonus',
       title: '$100 Power Pack',
-      desc: '$100 ticket plus 10 free $1 bonus entries — 11 shots at the jackpot.',
+      desc: '$100 ticket plus 10 free $1 bonus entries, 11 shots at the jackpot.',
       usd: 100,
       qty: 11,
       unitUsd: 100 / 11,
@@ -65,7 +65,7 @@ const LotteryApp = (() => {
       badge: '10% OFF',
       badgeClass: 'save',
       title: '50+ Bulk Saver',
-      desc: '50 tickets for $45 — automatic 10% bulk discount. Same numbers, massive odds boost.',
+      desc: '50 tickets for $45, automatic 10% bulk discount. Same numbers, massive odds boost.',
       usd: 45,
       qty: 50,
       unitUsd: 0.9,
@@ -76,7 +76,7 @@ const LotteryApp = (() => {
       badge: '2× ENTRIES',
       badgeClass: 'hot',
       title: 'Flash Friday Double',
-      desc: 'Every $50 ticket this Friday includes a matching bonus entry — free.',
+      desc: 'Every $50 ticket this Friday includes a matching bonus entry, free.',
       usd: 50,
       qty: 2,
       unitUsd: 25,
@@ -445,13 +445,27 @@ const LotteryApp = (() => {
       return;
     }
 
-    feed.innerHTML = merged.map((t) => `
+    feed.innerHTML = merged.map((t) => {
+      if (t.type === 'win') {
+        const prizeClass = t.prizeType === 'free_ticket' ? ' amount-ticket' : ' amount-win';
+        const when = new Date(t.timestamp).toLocaleString(undefined, {
+          month: 'short', day: 'numeric', year: 'numeric',
+          hour: 'numeric', minute: '2-digit',
+        });
+        return `
+      <div class="activity-item activity-item-win ${t.simulated ? 'simulated' : 'verified'}">
+        <span class="wallet">${t.wallet}</span>
+        <span class="activity-win-detail">Won ${t.prizeLabel} · ${t.drawName}</span>
+        <span class="amount${prizeClass}">${when}</span>
+      </div>`;
+      }
+      return `
       <div class="activity-item ${t.simulated ? 'simulated' : 'verified'}">
         <span class="wallet">${t.wallet}</span>
         <span>${t.label || t.numbers.join(', ')}</span>
         <span class="amount">${formatUsd(t.usdPrice)}</span>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 
   function onSimulatedActivity() {
@@ -495,7 +509,7 @@ const LotteryApp = (() => {
         window.DrawEngine.registerTicket(drawId, ticket);
       }
 
-      const msg = 'Free ticket redeemed — good luck in the draw!';
+      const msg = 'Free ticket redeemed. Good luck in the draw!';
       if (status) { status.className = 'tx-status success'; status.textContent = msg; }
       window.AppUI?.toast(msg, 'success');
       selectedNumbers = [];
@@ -544,7 +558,7 @@ const LotteryApp = (() => {
 
     await refreshAffordability();
     if (summary.totalEth > walletAfford.eth && walletAfford.eth > 0) {
-      window.AppUI?.toast(`Insufficient balance — max ${walletAfford.tickets} tickets`, 'error');
+      window.AppUI?.toast(`Insufficient balance. Max ${walletAfford.tickets} tickets`, 'error');
       return;
     }
 
