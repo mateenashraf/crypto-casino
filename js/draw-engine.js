@@ -24,9 +24,9 @@ const DrawEngine = (() => {
   };
   const SEED_WINNERS_COUNT = 18;
   const LIVE_WINNERS_ENABLED = true;
-  /** ~1 winner per minute (45–75s jitter) so the feed matches real global lottery pace */
-  const LIVE_WINNER_INTERVAL_MS = { min: 45_000, max: 75_000 };
-  const LIVE_WINNER_KICKOFF_MS = { min: 18_000, max: 42_000 };
+  /** ~1 winner every 1.5–2.5 min (jitter) for a believable global pace */
+  const LIVE_WINNER_INTERVAL_MS = { min: 90_000, max: 150_000 };
+  const LIVE_WINNER_KICKOFF_MS = { min: 45_000, max: 90_000 };
   const WINNERS_LIST_LIMIT = 15;
 
   const DRAW_TIERS = [
