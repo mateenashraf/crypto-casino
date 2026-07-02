@@ -6,20 +6,20 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>NeonDraw Crypto Lottery | On-Chain Draws, Jackpots & Ticket Lookup</title>
-  <meta name="description" content="NeonDraw is a Web3 crypto lottery with scheduled draws, on-chain payments, transparent ticket tracking, and jackpot tiers from daily prizes to grand jackpots." />
+  <title>NeonDraw Lottery | Jackpots, Lucky Numbers & Instant Crypto Payouts</title>
+  <meta name="description" content="Play the lottery you already know. Pick 6 numbers, wait for draw night, win big. Licensed operator, instant crypto payouts, tickets from $1. Powerball-style format, no gas-station line." />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="author" content="NeonDraw" />
   <meta name="theme-color" content="#0b0c14" />
-  <link rel="canonical" href="https://mateenashraf.github.io/crypto-casino/" />
-  <link rel="alternate" hreflang="en" href="https://mateenashraf.github.io/crypto-casino/" />
-  <link rel="alternate" hreflang="x-default" href="https://mateenashraf.github.io/crypto-casino/" />
+  <link rel="canonical" href="https://example.com/" />
+  <link rel="alternate" hreflang="en" href="https://example.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://example.com/" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NeonDraw" />
   <meta property="og:title" content="NeonDraw Crypto Lottery | On-Chain Draws & Jackpot Tiers" />
   <meta property="og:description" content="Join daily, weekly, monthly, and grand crypto lottery draws with on-chain payment flow and transparent ticket activity." />
-  <meta property="og:url" content="https://mateenashraf.github.io/crypto-casino/" />
+  <meta property="og:url" content="https://example.com/" />
   <meta property="og:locale" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
@@ -33,19 +33,19 @@
         {
           "@type": "WebSite",
           "name": "NeonDraw",
-          "url": "https://mateenashraf.github.io/crypto-casino/",
+          "url": "https://example.com/",
           "description": "Web3 crypto lottery website with scheduled draw tiers and on-chain payment flow.",
           "inLanguage": "en"
         },
         {
           "@type": "Organization",
           "name": "NeonDraw",
-          "url": "https://mateenashraf.github.io/crypto-casino/"
+          "url": "https://example.com/"
         },
         {
           "@type": "WebApplication",
           "name": "NeonDraw Crypto Lottery",
-          "url": "https://mateenashraf.github.io/crypto-casino/",
+          "url": "https://example.com/",
           "applicationCategory": "GameApplication",
           "operatingSystem": "Web",
           "offers": {
@@ -108,6 +108,7 @@
           <a href="#lottery" class="nav-link active">Lottery</a>
           <a href="#how-it-works" class="nav-link">How It Works</a>
           <a href="#winners" class="nav-link">Winners</a>
+          <a href="#why-trust" class="nav-link">Why Us</a>
           <a href="#faq" class="nav-link">FAQ</a>
           <a href="#promotions" class="nav-link">Promotions</a>
           <a href="#license" class="nav-link">License</a>
@@ -138,6 +139,9 @@
           <a href="#winners" class="sidebar-item">
             <span class="sidebar-icon" data-icon="trophy" data-icon-size="18"></span> Past Winners
           </a>
+          <a href="#why-trust" class="sidebar-item">
+            <span class="sidebar-icon" data-icon="shield-check" data-icon-size="18"></span> Why NeonDraw
+          </a>
           <a href="#faq" class="sidebar-item">
             <span class="sidebar-icon" data-icon="clipboard-list" data-icon-size="18"></span> FAQ
           </a>
@@ -160,34 +164,50 @@
 
       <!-- Main content -->
       <main class="main">
+        <div class="trust-ribbon" aria-label="Trust and safety highlights">
+          <div class="trust-ribbon-inner">
+            <span class="trust-chip"><span data-icon="shield-check" data-icon-size="14"></span> GCB Licensed Operator</span>
+            <span class="trust-chip"><span data-icon="ticket" data-icon-size="14"></span> Pick 6 from 49: Classic Lottery Rules</span>
+            <span class="trust-chip"><span data-icon="zap" data-icon-size="14"></span> Winners Paid in Crypto in Minutes, Not Weeks</span>
+            <span class="trust-chip trust-chip-age"><span data-icon="alert-circle" data-icon-size="14"></span> 18+ · Play Responsibly</span>
+          </div>
+        </div>
+
         <!-- Stats ticker -->
-        <div class="stats-bar">
-          <div class="stat">
+        <div class="stats-bar stats-bar-five">
+          <div class="stat stat-highlight">
             <span class="stat-icon" data-icon="trophy" data-icon-size="22"></span>
             <div>
               <span class="stat-value" id="statJackpot">$20,000,000</span>
-              <span class="stat-label">Grand Jackpot</span>
+              <span class="stat-label">Top Prize Tonight</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon" data-icon="coins" data-icon-size="22"></span>
+            <div>
+              <span class="stat-value" id="statPaidOut">$2.8M</span>
+              <span class="stat-label">Paid to Winners</span>
             </div>
           </div>
           <div class="stat">
             <span class="stat-icon" data-icon="ticket" data-icon-size="22"></span>
             <div>
               <span class="stat-value" id="statTickets">0</span>
-              <span class="stat-label">Tickets Sold</span>
+              <span class="stat-label">Entries Sold</span>
             </div>
           </div>
           <div class="stat">
-            <span class="stat-icon" data-icon="shield-check" data-icon-size="22"></span>
+            <span class="stat-icon" data-icon="users" data-icon-size="22"></span>
             <div>
-              <span class="stat-value">On-Chain</span>
-              <span class="stat-label">Secure Web3</span>
+              <span class="stat-value" id="statPlayersOnline">1.2K</span>
+              <span class="stat-label">Players Online</span>
             </div>
           </div>
           <div class="stat">
             <span class="stat-icon" data-icon="clock" data-icon-size="22"></span>
             <div>
               <span class="stat-value" id="statDraw">4h 00m</span>
-              <span class="stat-label">Next Draw</span>
+              <span class="stat-label">Next Draw Closes</span>
             </div>
           </div>
         </div>
@@ -207,16 +227,55 @@
         </section>
 
         <section class="lottery-hero compact-hero" id="lottery">
+          <p class="hero-tagline">Same numbers. Same thrill. No gas-station line.</p>
           <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>Monthly Jackpot</span></p>
           <h1 class="lottery-jackpot" id="lotteryJackpot">$5,000,000</h1>
           <p class="lottery-sub" id="featuredDrawSub">Prize: $5,000,000 · Pick 6 numbers to enter</p>
+          <p class="hero-format-hint"><span class="lotto-ball">6</span> numbers · <span class="lotto-ball">1</span>–<span class="lotto-ball">49</span> · Quick Pick or choose your lucky line</p>
           <div class="lottery-countdown">
             <div class="countdown-unit" id="cdDaysWrap"><span id="cdDays">00</span><small>Days</small></div>
             <div class="countdown-unit"><span id="cdHours">00</span><small>Hours</small></div>
             <div class="countdown-unit"><span id="cdMins">00</span><small>Mins</small></div>
             <div class="countdown-unit"><span id="cdSecs">00</span><small>Secs</small></div>
           </div>
-          <button class="btn btn-gold" id="heroBuyBtn">Buy Tickets Now</button>
+          <button class="btn btn-gold" id="heroBuyBtn">Get My Numbers from $1</button>
+          <p class="hero-trust-line"><span data-icon="shield-check" data-icon-size="14"></span> Licensed draw · Public schedule · <span id="trustPaidOutBanner">$2.8M</span> already paid out</p>
+        </section>
+
+        <section class="why-trust" id="why-trust">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="heart-handshake" data-icon-size="20"></span> Why Regular Players Choose NeonDraw</h2>
+            <span class="section-hint">Built for people who already love the lottery</span>
+          </div>
+          <div class="trust-pillars">
+            <article class="trust-pillar">
+              <span class="trust-pillar-icon" data-icon="shield-check" data-icon-size="28"></span>
+              <h3>Licensed &amp; Regulated</h3>
+              <p>Curaçao GCB interactive gaming license, the same standard used by major online casinos worldwide. Verify our certificate below.</p>
+            </article>
+            <article class="trust-pillar">
+              <span class="trust-pillar-icon" data-icon="calendar" data-icon-size="28"></span>
+              <h3>Fixed Draw Nights</h3>
+              <p>Daily, weekly, monthly, and quarterly draws on a published schedule. You always know when the balls drop, just like your state lottery.</p>
+            </article>
+            <article class="trust-pillar">
+              <span class="trust-pillar-icon" data-icon="search" data-icon-size="28"></span>
+              <h3>Verify Every Ticket</h3>
+              <p>Every purchase is tied to your wallet on-chain. Look up any address in Ticket Lookup, no “lost ticket” anxiety.</p>
+            </article>
+            <article class="trust-pillar">
+              <span class="trust-pillar-icon" data-icon="zap" data-icon-size="28"></span>
+              <h3>Fast Payouts</h3>
+              <p>Winners don’t wait for a check in the mail. Crypto prizes go straight to your wallet, the way modern players expect.</p>
+            </article>
+          </div>
+          <div class="player-promise">
+            <div class="player-promise-stat">
+              <strong id="statWinnersTotal">14K+</strong>
+              <span>winners paid</span>
+            </div>
+            <p class="player-promise-text">We speak your language: jackpots, rollovers, lucky numbers, and free bonus entries. No crypto jargon required. Connect a wallet the same way you’d tap to pay anywhere else.</p>
+          </div>
         </section>
 
         <div class="pool-bar">
@@ -231,7 +290,8 @@
 
         <div class="lottery-grid">
           <div class="lottery-panel">
-            <h3 class="panel-title"><span class="title-icon" data-icon="dices" data-icon-size="18"></span> Select Your Numbers</h3>
+            <h3 class="panel-title"><span class="title-icon" data-icon="dices" data-icon-size="18"></span> Pick Your Lucky Numbers</h3>
+            <p class="panel-hint">Choose 6 numbers (1–49), or tap Quick Pick like at the corner store.</p>
             <div class="selected-numbers" id="selectedPills"></div>
             <div class="number-grid" id="numberGrid"></div>
             <div style="display:flex;gap:10px;margin-bottom:20px">
@@ -252,40 +312,68 @@
             <div class="purchase-summary" id="purchaseSummary"></div>
             <div class="free-ticket-banner" id="freeTicketBanner" hidden>
               <span class="free-ticket-icon" data-icon="ticket" data-icon-size="18"></span>
-              <span class="free-ticket-text">You have <strong id="freeTicketCount">0</strong> free ticket(s) — redeem with no payment</span>
+              <span class="free-ticket-text">You have <strong id="freeTicketCount">0</strong> free ticket(s), redeem with no payment</span>
               <button type="button" class="btn btn-outline free-ticket-redeem-btn" id="redeemFreeTicketBtn">Redeem Free Entry</button>
             </div>
-            <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Buy Ticket with Crypto</button>
+            <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Lock In My Entry</button>
             <div class="tx-status" id="ticketStatus" hidden></div>
             <div class="security-badge">
               <span data-icon="shield-check" data-icon-size="16"></span>
-              Secured by on-chain payments · Chain-validated · Rate-limited · Min/max enforced
+              <span>Your entry is recorded on-chain · Same 6/49 rules as Powerball-style games · Licensed operator · 18+ only</span>
             </div>
           </div>
 
           <div class="lottery-panel">
             <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Live Ticket Activity</h3>
             <div class="activity-feed" id="activityFeed"></div>
-            <p class="activity-disclaimer">Live feed of ticket purchases from players worldwide.</p>
+            <p class="activity-disclaimer">Live entries from players worldwide. Wins are posted as draws settle, roughly one per minute.</p>
           </div>
         </div>
 
         <section class="lottery-panel compact-panel" id="how-it-works">
-          <h3>How It Works</h3>
+          <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> How It Works</h3>
+          <p class="panel-hint how-intro">If you’ve ever played Powerball, Mega Millions, or EuroMillions, you already know the drill.</p>
           <ol class="how-list">
-            <li>Select a draw tier above (Daily → Quarterly)</li>
-            <li>Pick 6 numbers or Quick Pick</li>
-            <li>Pay with crypto — or redeem a free ticket if you won one</li>
-            <li>Winners selected at random when the countdown hits zero (global payouts are hard-capped at 2% of total inflow)</li>
+            <li><strong>Pick your draw</strong>: Daily quick wins, weekly mega, monthly jackpot, or quarterly ultra.</li>
+            <li><strong>Choose 6 numbers</strong> (1–49) or hit Quick Pick for a random lucky line.</li>
+            <li><strong>Buy your entry</strong> from $1 with crypto, or use a free bonus ticket you won earlier.</li>
+            <li><strong>Wait for draw night</strong>: when the countdown hits zero, winners are picked at random and paid out.</li>
           </ol>
           <p class="activity-disclaimer">
-            Looking for details? Visit <a href="#draws">Draw Schedule</a>, track outcomes in <a href="#winners">Recent Winners</a>, and verify purchases through <a href="#ticket-lookup">Ticket Lookup</a>.
+            Full transparency: see the <a href="#draws">draw schedule</a>, <a href="#winners">recent winners</a>, <a href="#odds">odds &amp; prizes</a>, and <a href="#ticket-lookup">ticket lookup</a> for any wallet.
           </p>
         </section>
 
         <section class="lottery-panel compact-panel" id="winners">
-          <h3 class="panel-title"><span class="title-icon" data-icon="trophy" data-icon-size="18"></span> Recent Winners</h3>
+          <div class="winners-panel-header">
+            <h3 class="panel-title"><span class="title-icon" data-icon="trophy" data-icon-size="18"></span> Recent Winners</h3>
+            <span class="winners-live-badge" id="winnersLiveBadge"><span class="live-dot"></span> LIVE</span>
+          </div>
+          <p class="panel-hint">About one winner per minute worldwide, mostly small cash and free tickets, with rare jackpots.</p>
           <div id="winnersList"></div>
+        </section>
+
+        <section class="lottery-panel compact-panel odds-section" id="odds">
+          <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Odds &amp; Prize Tiers</h3>
+          <p class="panel-hint">Straight talk, the same kind of breakdown you’d expect on a state lottery site.</p>
+          <div class="odds-table-wrap">
+            <table class="odds-table">
+              <thead>
+                <tr><th>Draw</th><th>Top Prize</th><th>Draw Time (UTC)</th><th>Typical Wins</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Daily Draw</td><td>$2K – $3.5K</td><td>Midnight daily</td><td>Small cash &amp; free tickets</td></tr>
+                <tr><td>Weekly Mega</td><td>$2,000,000</td><td>Sunday 8:00 PM</td><td>Jackpot + bonus entries</td></tr>
+                <tr><td>Monthly Jackpot</td><td>$5,000,000</td><td>1st of month, 9:00 PM</td><td>Rollover-style mega prizes</td></tr>
+                <tr><td>Quarterly Ultra</td><td>$10,000,000</td><td>Quarter start, 10:30 PM</td><td>Ultra jackpot tier</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ul class="odds-notes">
+            <li>Match all 6 numbers to qualify for the top prize in your selected draw tier.</li>
+            <li>Free bonus tickets are awarded frequently, play again without spending another dollar.</li>
+            <li>Overall player payouts are capped at 2% of total pool inflow, keeping the lottery sustainable (disclosed house model).</li>
+          </ul>
         </section>
 
         <section class="ticket-lookup-section" id="ticket-lookup">
@@ -318,12 +406,47 @@
         </section>
 
         <section class="lottery-panel compact-panel" id="faq">
-          <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> Crypto Lottery FAQ</h3>
-          <div id="faqList">
-            <p><strong>How do I buy a ticket?</strong> Connect your wallet, choose six numbers, select a ticket value, and confirm the on-chain transaction.</p>
-            <p><strong>How do I verify my transaction?</strong> Open <a href="#ticket-lookup">Ticket Lookup</a> to see wallet-linked ticket records and explorer links.</p>
-            <p><strong>What draw tiers are available?</strong> Daily, weekly, monthly, and quarterly jackpot draws.</p>
-            <p><strong>What is the lowest winning product?</strong> A free ticket can be awarded as the lowest winning outcome in regular money draws.</p>
+          <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> Player FAQ</h3>
+          <div class="faq-list" id="faqList">
+            <details class="faq-item" open>
+              <summary>Is this like the lottery I already play?</summary>
+              <p>Yes, same format: pick 6 numbers from 1 to 49, wait for the scheduled draw, and check if you won. The difference is you buy with crypto and get paid to your wallet instead of claiming at a retailer.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How do I buy a ticket?</summary>
+              <p>Connect MetaMask or any Web3 wallet, pick your numbers, choose an entry amount (from $1), and confirm. Takes about 30 seconds, faster than driving to a store.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How fast do winners get paid?</summary>
+              <p>Crypto payouts are sent directly to your wallet after the draw. No waiting weeks for a check, most players see funds within minutes.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Can I prove I bought a ticket?</summary>
+              <p>Absolutely. Use <a href="#ticket-lookup">Ticket Lookup</a> to see every entry linked to your wallet, with links to the blockchain transaction.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What are free bonus tickets?</summary>
+              <p>They’re exactly what they sound like, a free re-entry if you win one in a draw. Redeem them with no payment, same numbers or a new line.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Is NeonDraw licensed?</summary>
+              <p>Yes. We operate under a Curaçao Gaming Control Board interactive gaming &amp; lottery license. See the full certificate in our <a href="#license">License</a> section.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="responsible-gaming" id="responsible-gaming">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="heart" data-icon-size="20"></span> Play Responsibly</h2>
+          </div>
+          <div class="rg-content">
+            <p>Lottery and casino play should be fun, never a way to solve money problems. NeonDraw is for adults <strong>18+</strong> only.</p>
+            <ul class="rg-list">
+              <li>Set a budget before you play and stick to it, like you would at a casino floor.</li>
+              <li>Never chase losses. Tomorrow’s draw is another chance.</li>
+              <li>Take breaks. If playing stops feeling fun, step away.</li>
+              <li>Need help? Contact <a href="https://www.begambleaware.org/" target="_blank" rel="noopener noreferrer">BeGambleAware</a> or <a href="https://www.ncpgambling.org/" target="_blank" rel="noopener noreferrer">NCPG</a> (US).</li>
+            </ul>
           </div>
         </section>
 
@@ -339,7 +462,7 @@
             <h2 class="section-title"><span class="title-icon" data-icon="shield-check" data-icon-size="20"></span> Vegas Gaming Affiliates</h2>
             <span class="section-hint">Licensed network partners</span>
           </div>
-          <p class="partners-intro">NeonDraw partners with licensed Las Vegas Strip operators. All logos are authentic marks of their respective owners (via Wikimedia Commons).</p>
+          <p class="partners-intro">Trusted by players who know Vegas, NeonDraw works alongside licensed Strip operators you already recognize from casino floors and hotel loyalty programs.</p>
           <div class="partner-grid" id="partnerGrid"></div>
           <p class="partners-attribution">Logos are trademarks of Caesars Entertainment and respective property owners. Shown for affiliate identification only.</p>
         </section>
@@ -353,12 +476,12 @@
           <div id="licenseCertificate"></div>
         </section>
 
-        <section class="brand-names-section" id="brand-names">
+        <section class="brand-names-section dev-only" id="brand-names" hidden>
           <div class="section-header">
             <h2 class="section-title"><span class="title-icon" data-icon="sparkles" data-icon-size="20"></span> Brand Name Options</h2>
             <span class="section-hint">Click to preview</span>
           </div>
-          <p class="brand-names-intro">Alternative names for this platform — click any chip to preview. See <code>docs/BRAND-NAMES.md</code> for full list.</p>
+          <p class="brand-names-intro">Alternative names for this platform, click any chip to preview. See <code>docs/BRAND-NAMES.md</code> for full list.</p>
           <div class="brand-name-list" id="brandNameList"></div>
         </section>
       </main>
@@ -370,7 +493,7 @@
         <div class="footer-brand">
           <span class="logo-star icon-gold" data-icon="star" data-icon-size="20"></span>
           <span class="logo-text">Neon<span class="logo-accent">Draw</span></span>
-          <p>The world's biggest crypto lottery. Instant payouts. Secure Web3 payments.</p>
+          <p>The lottery you already know: jackpots, lucky numbers, and draw night, with instant crypto payouts and a licensed operator behind every draw.</p>
         </div>
         <div class="footer-links">
           <div>
@@ -380,19 +503,20 @@
             <a href="#winners">Winners</a>
             <a href="#faq">FAQ</a>
             <a href="#license">License</a>
-            <a href="#">Odds & Prizes</a>
+            <a href="#odds">Odds &amp; Prizes</a>
+            <a href="#why-trust">Why NeonDraw</a>
           </div>
           <div>
             <h4>Support</h4>
-            <a href="#">FAQ</a>
-            <a href="#">Live Chat</a>
-            <a href="#">Responsible Gaming</a>
+            <a href="#faq">FAQ</a>
+            <a href="#ticket-lookup">Ticket Lookup</a>
+            <a href="#responsible-gaming">Responsible Gaming</a>
           </div>
           <div>
-            <h4>Crypto</h4>
-            <a href="#">Deposit Guide</a>
-            <a href="#">Withdrawals</a>
-            <a href="#">Provably Fair</a>
+            <h4>Account</h4>
+            <a href="#lottery">Buy Tickets</a>
+            <a href="#" id="footerWalletLink">Wallet &amp; Deposits</a>
+            <a href="#license">License</a>
           </div>
         </div>
       </div>
@@ -427,7 +551,7 @@
           <div class="wallet-connect-prompt" id="connectPrompt">
             <div class="wallet-icon-large" data-icon="link-2" data-icon-size="48"></div>
             <h3>Connect Your Wallet</h3>
-            <p>Connect MetaMask or any Web3 wallet to deposit crypto instantly.</p>
+            <p>Same as paying with Apple Pay, connect MetaMask or any Web3 wallet to buy entries in seconds.</p>
             <button class="btn btn-primary btn-lg btn-block" id="connectWalletBtn">Connect Wallet</button>
           </div>
           <div class="wallet-deposit-form" id="depositForm" hidden>
@@ -492,11 +616,11 @@
           <div class="balance-cards">
             <div class="balance-card">
               <span class="balance-card-label">Wallet (On-Chain)</span>
-              <span class="balance-card-value" id="balanceWallet">—</span>
+              <span class="balance-card-value" id="balanceWallet">N/A</span>
             </div>
             <div class="balance-card highlight">
               <span class="balance-card-label">Casino Balance</span>
-              <span class="balance-card-value" id="balanceCasino">—</span>
+              <span class="balance-card-value" id="balanceCasino">N/A</span>
             </div>
           </div>
           <div class="tx-history">
@@ -538,7 +662,7 @@
           <div class="game-preview-icon" id="gamePreviewIcon" data-icon="dices" data-icon-size="56"></div>
           <h2 id="gamePreviewTitle">Game Title</h2>
           <p id="gamePreviewProvider">Provider</p>
-          <p class="game-preview-hint">Connect wallet and deposit to play. This is a demo — games are simulated.</p>
+          <p class="game-preview-hint">Connect wallet and deposit to play. This is a demo, games are simulated.</p>
           <button class="btn btn-gold btn-lg" id="playGameBtn">Play for Real</button>
           <button class="btn btn-outline" id="demoPlayBtn">Try Demo</button>
         </div>
@@ -573,6 +697,7 @@
   <script defer src="js/partners.js?v=neondraw"></script>
   <script defer src="js/license.js?v=neondraw"></script>
   <script defer src="js/ticket-lookup.js?v=neondraw"></script>
+  <script defer src="js/trust-display.js?v=neondraw"></script>
   <script defer src="js/app.js?v=neondraw"></script>
 </body>
 </html>
