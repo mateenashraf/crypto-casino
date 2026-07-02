@@ -445,12 +445,11 @@ const LotteryApp = (() => {
       return;
     }
 
-    const esc = window.SBSecurity.escapeHtml;
     feed.innerHTML = merged.map((t) => `
       <div class="activity-item ${t.simulated ? 'simulated' : 'verified'}">
-        <span class="wallet">${esc(t.wallet)}</span>
-        <span>${esc(t.label || t.numbers.join(', '))}</span>
-        <span class="amount">${esc(formatUsd(t.usdPrice))}</span>
+        <span class="wallet">${t.wallet}</span>
+        <span>${t.label || t.numbers.join(', ')}</span>
+        <span class="amount">${formatUsd(t.usdPrice)}</span>
       </div>
     `).join('');
   }
@@ -458,6 +457,73 @@ const LotteryApp = (() => {
   function onSimulatedActivity() {
     updateJackpot();
     renderActivityFeed();
+  }
+
+  async function redeemFreeTicket() {
+    const btn = document.getElementById('redeemFreeTicketBtn');
+    const status = document.getElementById('ticketStatus');
+
+    if (!wallet().isConnected()) {
+      window.AppUI?.openWallet();
+      window.AppUI?.toast('Connect wallet to redeem free tickets', 'info');
+      return;
+    }
+
+    if (selectedNumbers.length !== 6) {
+      window.AppUI?.toast('Select 6 numbers first', 'error');
+      return;
+    }
+
+    if (wallet().getFreeTicketBalance(wallet().getAddress()) < 1) {
+      window.AppUI?.toast('No free tickets available', 'info');
+      updateFreeTicketUI();
+      return;
+    }
+
+    btn.disabled = true;
+    if (status) {
+      status.hidden = false;
+      status.className = 'tx-status pending';
+      status.textContent = 'Redeeming free ticket...';
+    }
+
+    try {
+      const drawId = window.DrawEngine?.getSelectedDrawId?.();
+      const ticket = wallet().redeemFreeTicket(selectedNumbers, drawId);
+
+      if (window.DrawEngine && drawId) {
+        window.DrawEngine.registerTicket(drawId, ticket);
+      }
+
+      const msg = 'Free ticket redeemed — good luck in the draw!';
+      if (status) { status.className = 'tx-status success'; status.textContent = msg; }
+      window.AppUI?.toast(msg, 'success');
+      selectedNumbers = [];
+      renderNumberGrid();
+      updateJackpot();
+      renderActivityFeed();
+      updateFreeTicketUI();
+      updatePurchaseUI();
+      window.ActivitySimulator?.renderTicker?.(ticket.id);
+    } catch (err) {
+      const msg = err.message || 'Redemption failed';
+      if (status) { status.className = 'tx-status error'; status.textContent = msg; }
+      window.AppUI?.toast(msg, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function updateFreeTicketUI() {
+    const banner = document.getElementById('freeTicketBanner');
+    const countEl = document.getElementById('freeTicketCount');
+    if (!banner) return;
+
+    const n = wallet().isConnected()
+      ? wallet().getFreeTicketBalance(wallet().getAddress())
+      : 0;
+    banner.hidden = n < 1;
+    if (countEl) countEl.textContent = String(n);
   }
 
   async function buyTicket() {
@@ -535,6 +601,7 @@ const LotteryApp = (() => {
     renderTiers();
     renderOffers();
     updatePurchaseUI();
+    updateFreeTicketUI();
     updateJackpot();
     renderActivityFeed();
     refreshAffordability().then(updatePurchaseUI);
@@ -545,6 +612,7 @@ const LotteryApp = (() => {
       renderNumberGrid();
     });
     document.getElementById('buyTicketBtn')?.addEventListener('click', buyTicket);
+    document.getElementById('redeemFreeTicketBtn')?.addEventListener('click', redeemFreeTicket);
 
     document.getElementById('customAmount')?.addEventListener('input', (e) => {
       customAmountUsd = Math.max(1, parseInt(e.target.value, 10) || 1);
@@ -552,18 +620,26 @@ const LotteryApp = (() => {
       else updatePurchaseUI();
     });
 
-    wallet().on(async (event) => {
+    wallet().on(async (event, data) => {
       if (event === 'connected') {
         await refreshAffordability();
         updatePurchaseUI();
+        updateFreeTicketUI();
       }
       if (event === 'ticket-purchased' || event === 'pool-updated') {
         updateJackpot();
         renderActivityFeed();
       }
+      if (event === 'free-ticket-granted' || event === 'free-ticket-redeemed') {
+        updateFreeTicketUI();
+        if (event === 'free-ticket-granted' && data?.address?.toLowerCase() === wallet().getAddress()?.toLowerCase()) {
+          window.AppUI?.toast(`You won ${data.qty} free ticket${data.qty > 1 ? 's' : ''}! Redeem below.`, 'success');
+        }
+      }
       if (event === 'disconnected') {
         walletAfford = { eth: 0, usd: 0, tickets: 0 };
         updatePurchaseUI();
+        updateFreeTicketUI();
       }
     });
 
@@ -578,7 +654,7 @@ const LotteryApp = (() => {
 
   return {
     init, JACKPOT_USD, formatUsd, onSimulatedActivity, updateJackpot,
-    renderActivityFeed, applyOffer, OFFERS, getPurchaseSummary,
+    renderActivityFeed, applyOffer, OFFERS, getPurchaseSummary, updateFreeTicketUI,
   };
 })();
 
