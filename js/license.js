@@ -1,5 +1,5 @@
 /**
- * Curaçao Gaming Control Board — operating license display (NeonDraw)
+ * Curaçao Gaming Control Board, operating license display (NeonDraw)
  */
 const LicenseDisplay = (() => {
   const LICENSE = {
