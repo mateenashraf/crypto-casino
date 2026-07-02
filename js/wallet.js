@@ -1,12 +1,13 @@
 /**
- * Secure Web3 wallet layer — chain validation, limits, on-chain lottery entries
+ * Secure Web3 wallet layer, chain validation, limits, on-chain lottery entries
  */
 const SecureWeb3 = (() => {
   const CONFIG = {
     // Sepolia testnet (change to 1 for mainnet in production)
     ALLOWED_CHAIN_IDS: [11155111, 1],
     CHAIN_NAMES: { 1: 'Ethereum Mainnet', 11155111: 'Sepolia Testnet' },
-    TREASURY_ADDRESS: '0x18EAD9D8fEC234d33a8E8644F12Fb355c6Af6c3E',
+    // IMPORTANT: set a private treasury address before production deploy.
+    TREASURY_ADDRESS: '',
     // Deploy LotteryPool.sol and set address here for contract-based entries
     LOTTERY_CONTRACT: null,
     MIN_ETH: 0.001,
@@ -278,6 +279,9 @@ const SecureWeb3 = (() => {
     assertChain();
     rateLimit();
     const amount = validateAmount(valueEth);
+    if (!CONFIG.TREASURY_ADDRESS || !isValidAddress(CONFIG.TREASURY_ADDRESS)) {
+      throw new Error('Treasury wallet is not configured. Set TREASURY_ADDRESS in js/wallet.js');
+    }
     const toAddr = ethers.getAddress(to);
 
     if (toAddr.toLowerCase() !== CONFIG.TREASURY_ADDRESS.toLowerCase() && !CONFIG.LOTTERY_CONTRACT) {
