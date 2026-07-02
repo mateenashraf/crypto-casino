@@ -1,5 +1,5 @@
 /**
- * Game catalog — mock data similar to BitStarz game library
+ * Game catalog, mock data similar to BitStarz game library
  */
 const GAME_ICONS = window.Icons?.GAME_ICON_SET || ['dices', 'cherry', 'gem', 'spade', 'dices', 'star', 'flame', 'crown', 'clover', 'target', 'sparkles', 'zap', 'moon', 'zap', 'tent'];
 const PROVIDERS = ['Pragmatic Play', 'Evolution', 'NetEnt', "Play'n GO", 'BGaming', 'Push Gaming', 'Hacksaw', 'Microgaming', 'Relax Gaming', 'Nolimit City'];
