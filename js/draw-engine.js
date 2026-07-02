@@ -15,8 +15,19 @@ const DrawEngine = (() => {
     MAJOR_DRAW_PAYOUT_RATIO: 0.02,
     FREE_TICKET_USD_VALUE: 1,
   };
-  const FREE_TICKET_WIN_RATE = 0.14;
   const FREE_TICKET_QTY = 1;
+  const WINNER_OUTCOME_WEIGHTS = {
+    free_ticket: 0.38,
+    small: 0.50,
+    medium: 0.09,
+    jackpot: { weekly: 0.025, monthly: 0.018, quarterly: 0.012 },
+  };
+  const SEED_WINNERS_COUNT = 18;
+  const LIVE_WINNERS_ENABLED = true;
+  /** ~1 winner per minute (45–75s jitter) so the feed matches real global lottery pace */
+  const LIVE_WINNER_INTERVAL_MS = { min: 45_000, max: 75_000 };
+  const LIVE_WINNER_KICKOFF_MS = { min: 18_000, max: 42_000 };
+  const WINNERS_LIST_LIMIT = 15;
 
   const DRAW_TIERS = [
     {
@@ -88,6 +99,7 @@ const DrawEngine = (() => {
   };
   let selectedDrawId = 'monthly';
   let tickTimer = null;
+  let liveWinnerTimer = null;
 
   function loadState() {
     try {
@@ -199,12 +211,196 @@ const DrawEngine = (() => {
   }
 
   function formatWinnerPrize(entry) {
-    if (entry.prizeType === 'free_ticket') return entry.prizeLabel;
+    if (entry.prizeLabel) return entry.prizeLabel;
+    if (entry.prizeType === 'free_ticket') return '1 Free Ticket';
     return formatUsd(entry.prize);
+  }
+
+  function formatWinnerDateTime(ts) {
+    return new Date(ts).toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   }
 
   function randomRange(min, max) {
     return min + (Math.random() * (max - min));
+  }
+
+  function randomSmallPrize(tier) {
+    const max = tier.id === 'daily' ? 450 : 850;
+    return Math.round(randomRange(2, max));
+  }
+
+  function randomMediumPrize(tier) {
+    if (tier.id === 'daily') return Math.round(randomRange(500, 3500));
+    return Math.round(randomRange(1000, 25000));
+  }
+
+  function rollWinnerOutcome(tier, advertisedPrize) {
+    const r = Math.random();
+    const { free_ticket: freeW, small: smallW, medium: mediumW } = WINNER_OUTCOME_WEIGHTS;
+    const jackpotW = WINNER_OUTCOME_WEIGHTS.jackpot[tier.id] || 0;
+    const freeEnd = freeW;
+    const smallEnd = freeEnd + smallW;
+    const mediumEnd = smallEnd + mediumW;
+    const jackpotEnd = mediumEnd + jackpotW;
+
+    if (r < freeEnd) {
+      return {
+        prizeType: 'free_ticket',
+        prizeLabel: `${FREE_TICKET_QTY} Free Ticket${FREE_TICKET_QTY > 1 ? 's' : ''}`,
+        displayUsd: ECONOMICS.FREE_TICKET_USD_VALUE,
+        isJackpot: false,
+      };
+    }
+    if (r < smallEnd) {
+      const amt = randomSmallPrize(tier);
+      return { prizeType: 'cash', prizeLabel: formatUsd(amt), displayUsd: amt, isJackpot: false };
+    }
+    if (r < mediumEnd) {
+      const amt = randomMediumPrize(tier);
+      return { prizeType: 'cash', prizeLabel: formatUsd(amt), displayUsd: amt, isJackpot: false };
+    }
+    if (jackpotW > 0 && r < jackpotEnd) {
+      return {
+        prizeType: 'cash',
+        prizeLabel: formatUsd(advertisedPrize),
+        displayUsd: advertisedPrize,
+        isJackpot: true,
+      };
+    }
+    const amt = randomSmallPrize(tier);
+    return { prizeType: 'cash', prizeLabel: formatUsd(amt), displayUsd: amt, isJackpot: false };
+  }
+
+  function accountPayoutUsd(tier, outcome, drawPoolUsd, remainingGlobalBudget) {
+    if (remainingGlobalBudget <= 0) return 0;
+    if (outcome.prizeType === 'free_ticket') {
+      const cost = ECONOMICS.FREE_TICKET_USD_VALUE * FREE_TICKET_QTY;
+      return remainingGlobalBudget >= cost ? cost : 0;
+    }
+    if (drawPoolUsd <= 0) return 0;
+    const payoutRatio = tier.id === 'daily'
+      ? randomRange(ECONOMICS.DAILY_PAYOUT_MIN_RATIO, ECONOMICS.DAILY_PAYOUT_MAX_RATIO)
+      : ECONOMICS.MAJOR_DRAW_PAYOUT_RATIO;
+    const poolCap = drawPoolUsd * payoutRatio;
+    return Math.min(outcome.displayUsd, poolCap, remainingGlobalBudget);
+  }
+
+  function seedWinnersIfNeeded() {
+    if (getWinners().length >= 8) return;
+    const seeded = [];
+    const now = Date.now();
+    for (let i = 0; i < SEED_WINNERS_COUNT; i++) {
+      const tier = DRAW_TIERS[Math.floor(Math.random() * DRAW_TIERS.length)];
+      const advertisedPrize = getPrize(tier);
+      const outcome = rollWinnerOutcome(tier, advertisedPrize);
+      const hoursAgo = Math.floor(randomRange(1, 168));
+      const ts = now - hoursAgo * 3600000 - Math.floor(randomRange(0, 3600000));
+      seeded.push({
+        drawId: tier.id,
+        drawName: tier.name,
+        prize: outcome.prizeType === 'free_ticket' ? 0 : Math.round(outcome.displayUsd),
+        advertisedPrize,
+        drawPoolUsd: Math.round(randomRange(120, 4800)),
+        retainedUsd: Math.round(randomRange(80, 4200)),
+        microWin: !outcome.isJackpot,
+        prizeType: outcome.prizeType,
+        prizeLabel: outcome.prizeLabel,
+        numbers: winningNumbers(),
+        winner: { wallet: fakeWinner(), numbers: winningNumbers() },
+        timestamp: ts,
+        seeded: true,
+      });
+    }
+    seeded.sort((a, b) => b.timestamp - a.timestamp);
+    localStorage.setItem(STORAGE_WINNERS, JSON.stringify(seeded));
+  }
+
+  function pickLiveTier() {
+    const roll = Math.random();
+    if (roll < 0.40) return DRAW_TIERS[0];
+    if (roll < 0.70) return DRAW_TIERS[1];
+    if (roll < 0.90) return DRAW_TIERS[2];
+    return DRAW_TIERS[3];
+  }
+
+  function buildLiveWinnerEntry() {
+    const tier = pickLiveTier();
+    const advertisedPrize = getPrize(tier);
+    const outcome = rollWinnerOutcome(tier, advertisedPrize);
+    const numbers = winningNumbers();
+    const drawPoolUsd = Math.round(randomRange(80, 5200));
+    return {
+      drawId: tier.id,
+      drawName: tier.name,
+      prize: outcome.prizeType === 'free_ticket' ? 0 : Math.round(outcome.displayUsd),
+      advertisedPrize,
+      drawPoolUsd,
+      retainedUsd: Math.max(0, drawPoolUsd - Math.round(outcome.displayUsd * 0.02)),
+      microWin: !outcome.isJackpot,
+      prizeType: outcome.prizeType,
+      prizeLabel: outcome.prizeLabel,
+      numbers,
+      winner: { wallet: fakeWinner(), numbers: winningNumbers() },
+      fromRealTicket: false,
+      live: true,
+      source: 'live',
+      timestamp: Date.now(),
+    };
+  }
+
+  function publishWinner(entry) {
+    saveWinner(entry);
+    window.dispatchEvent(new CustomEvent('draw-completed', { detail: entry }));
+    return entry;
+  }
+
+  function emitLiveWinner() {
+    if (!LIVE_WINNERS_ENABLED) return;
+    publishWinner(buildLiveWinnerEntry());
+  }
+
+  function scheduleLiveWinner() {
+    if (!LIVE_WINNERS_ENABLED) return;
+    const delay = LIVE_WINNER_INTERVAL_MS.min
+      + Math.random() * (LIVE_WINNER_INTERVAL_MS.max - LIVE_WINNER_INTERVAL_MS.min);
+    liveWinnerTimer = setTimeout(() => {
+      emitLiveWinner();
+      scheduleLiveWinner();
+    }, delay);
+  }
+
+  function startLiveWinnerFeed() {
+    if (!LIVE_WINNERS_ENABLED) return;
+    const kickoff = LIVE_WINNER_KICKOFF_MS.min
+      + Math.random() * (LIVE_WINNER_KICKOFF_MS.max - LIVE_WINNER_KICKOFF_MS.min);
+    liveWinnerTimer = setTimeout(() => {
+      emitLiveWinner();
+      scheduleLiveWinner();
+    }, kickoff);
+  }
+
+  function handleWinnerPublished(w) {
+    const isJackpot = w.prizeType === 'cash' && w.microWin === false;
+    const showToast = w.fromRealTicket || isJackpot;
+    if (showToast) {
+      const msg = w.prizeLabel
+        ? `${w.drawName}: ${w.prizeLabel} won!`
+        : w.prize > 0
+          ? `${w.drawName}: ${formatUsd(w.prize)} won!`
+          : `${w.drawName}: draw completed`;
+      window.AppUI?.toast(msg, 'success');
+    }
+    renderWinners();
+    highlightLatestWinner();
+    updateWinnersLiveBadge();
+    window.ActivitySimulator?.addWinEvent?.(w);
+    window.TrustDisplay?.render?.();
   }
 
   function getDrawPoolUsd(tickets) {
@@ -229,27 +425,20 @@ const DrawEngine = (() => {
     const remainingLifetimeBudget = Math.max(0, lifetimePayoutCap - economicsState.lifetimeOutflowUsd);
     const remainingGlobalBudget = Math.min(remainingDailyBudget, remainingLifetimeBudget);
 
-    let payoutUsd = 0;
-    if (winner && drawPoolUsd > 0 && remainingGlobalBudget > 0) {
-      const payoutRatio = tier.id === 'daily'
-        ? randomRange(ECONOMICS.DAILY_PAYOUT_MIN_RATIO, ECONOMICS.DAILY_PAYOUT_MAX_RATIO)
-        : ECONOMICS.MAJOR_DRAW_PAYOUT_RATIO;
-      payoutUsd = Math.min(drawPoolUsd * payoutRatio, remainingGlobalBudget);
-    }
+    const outcome = rollWinnerOutcome(tier, advertisedPrize);
+    const hasEligibleWinner = !!winner;
+    let accountedPayoutUsd = hasEligibleWinner
+      ? accountPayoutUsd(tier, outcome, drawPoolUsd, remainingGlobalBudget)
+      : 0;
 
-    let prize = Math.max(0, Math.round(payoutUsd));
-    const isFreeTicketWinner = !!winner
-      && Math.random() < FREE_TICKET_WIN_RATE
-      && remainingGlobalBudget >= ECONOMICS.FREE_TICKET_USD_VALUE;
+    const isFreeTicketWinner = hasEligibleWinner
+      && outcome.prizeType === 'free_ticket'
+      && accountedPayoutUsd > 0;
 
-    let accountedPayoutUsd = prize;
-    const prizeLabel = isFreeTicketWinner
-      ? `${FREE_TICKET_QTY} Free Ticket${FREE_TICKET_QTY > 1 ? 's' : ''}`
-      : formatUsd(prize || 0);
+    let prize = isFreeTicketWinner ? 0 : Math.max(0, Math.round(accountedPayoutUsd));
+    const prizeLabel = outcome.prizeLabel;
 
     if (isFreeTicketWinner && winner.wallet) {
-      prize = 0;
-      accountedPayoutUsd = ECONOMICS.FREE_TICKET_USD_VALUE * FREE_TICKET_QTY;
       window.SecureWeb3?.grantFreeTickets(winner.wallet, FREE_TICKET_QTY, {
         drawId: tier.id,
         drawName: tier.name,
@@ -263,13 +452,15 @@ const DrawEngine = (() => {
       advertisedPrize,
       drawPoolUsd: Math.round(drawPoolUsd),
       retainedUsd: Math.max(0, Math.round(drawPoolUsd - accountedPayoutUsd)),
-      microWin: false,
-      prizeType: isFreeTicketWinner ? 'free_ticket' : 'cash',
+      microWin: !outcome.isJackpot,
+      prizeType: outcome.prizeType,
       prizeLabel,
       numbers,
       winner: winner
         ? { wallet: winner.wallet?.slice(0, 6) + '...' + winner.wallet?.slice(-4), numbers: winner.numbers }
         : { wallet: fakeWinner(), numbers: winningNumbers() },
+      fromRealTicket: !!winner,
+      source: 'scheduled',
       timestamp: Date.now(),
     };
 
@@ -278,11 +469,10 @@ const DrawEngine = (() => {
     economicsState.dailyOutflowUsd += accountedPayoutUsd;
     economicsState.lifetimeOutflowUsd += accountedPayoutUsd;
     saveEconomics();
-    saveWinner(entry);
     state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: Date.now(), runCount };
     saveState();
 
-    window.dispatchEvent(new CustomEvent('draw-completed', { detail: entry }));
+    publishWinner(entry);
     return entry;
   }
 
@@ -345,7 +535,7 @@ const DrawEngine = (() => {
     }
 
     const sub = document.getElementById('featuredDrawSub');
-    if (sub) sub.textContent = `Prize: ${formatUsd(prize)} · Global player payouts are capped at 2% of inflow`;
+    if (sub) sub.textContent = `Top prize ${formatUsd(prize)} · Pick 6 from 49 · Draw closes when countdown hits zero`;
 
     updateCountdownDisplay(diff);
   }
@@ -413,24 +603,39 @@ const DrawEngine = (() => {
 
     const winners = getWinners();
     if (!winners.length) {
-      el.innerHTML = '<p class="empty-winners">Draws run automatically. Winners appear here after each draw.</p>';
+      el.innerHTML = '<p class="empty-winners">Winners roll in live throughout the day. Check back in a moment.</p>';
       return;
     }
 
-    el.innerHTML = winners.slice(0, 12).map((w) => {
-      const prizeClass = w.prizeType === 'free_ticket' ? ' winner-prize-ticket' : '';
+    el.innerHTML = winners.slice(0, WINNERS_LIST_LIMIT).map((w) => {
+      const prizeClass = w.prizeType === 'free_ticket'
+        ? ' winner-prize-ticket'
+        : w.microWin === false ? ' winner-prize-jackpot' : '';
       return `
-      <div class="winner-row">
+      <div class="winner-row" data-winner-ts="${w.timestamp}">
         <div class="winner-prize${prizeClass}">${formatWinnerPrize(w)}</div>
         <div class="winner-meta">
           <strong>${w.drawName}</strong>
           <span>Winning: ${w.numbers.join(' · ')}</span>
           <span class="winner-wallet">${w.winner.wallet}</span>
         </div>
-        <div class="winner-time">${new Date(w.timestamp).toLocaleDateString()}</div>
+        <div class="winner-time">${formatWinnerDateTime(w.timestamp)}</div>
       </div>
     `;
     }).join('');
+  }
+
+  function updateWinnersLiveBadge() {
+    const badge = document.getElementById('winnersLiveBadge');
+    if (badge) badge.hidden = !LIVE_WINNERS_ENABLED;
+  }
+
+  function highlightLatestWinner() {
+    const el = document.getElementById('winnersList');
+    const row = el?.querySelector('.winner-row');
+    if (!row) return;
+    row.classList.add('winner-row-new');
+    setTimeout(() => row.classList.remove('winner-row-new'), 3200);
   }
 
   function tick() {
@@ -443,28 +648,27 @@ const DrawEngine = (() => {
     loadState();
     loadEconomics();
     ensureEconomicsWindow();
+    seedWinnersIfNeeded();
     checkDraws();
     renderDrawCards();
     updateFeaturedDraw();
     renderWinners();
+    updateWinnersLiveBadge();
 
     tickTimer = setInterval(tick, 1000);
 
     window.addEventListener('draw-completed', (e) => {
       const w = e.detail;
-      const msg = w.prizeType === 'free_ticket'
-        ? `${w.drawName}: ${w.prizeLabel} awarded!`
-        : w.prize > 0
-          ? `${w.drawName}: ${formatUsd(w.prize)} won!`
-          : `${w.drawName}: draw completed`;
-      window.AppUI?.toast(msg, 'success');
-      renderDrawCards();
-      renderWinners();
+      if (w.source === 'scheduled') renderDrawCards();
+      handleWinnerPublished(w);
     });
+
+    startLiveWinnerFeed();
   }
 
   function stop() {
     if (tickTimer) clearInterval(tickTimer);
+    if (liveWinnerTimer) clearTimeout(liveWinnerTimer);
   }
 
   return {
