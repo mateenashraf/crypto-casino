@@ -163,7 +163,7 @@
     e.preventDefault();
     openModal(walletModal);
   });
-  document.getElementById('heroBuyBtn')?.addEventListener('click', () => scrollToSection('#lottery'));
+  document.getElementById('heroBuyBtn')?.addEventListener('click', () => scrollToSection('#pick-numbers'));
   document.getElementById('heritageBuyBtn')?.addEventListener('click', () => scrollToSection('#lottery'));
   document.getElementById('footerWalletLink')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -270,6 +270,7 @@
 
   initNavigation();
   document.body.style.overflow = '';
+  window.SlotTicker?.init();
   window.LotteryApp.init();
   window.PartnerNetwork?.init();
   window.LicenseDisplay?.init();
@@ -277,6 +278,8 @@
   window.TrustDisplay?.init();
   window.ProvablyFair?.init();
   window.HistoricGrowth?.init();
+  window.HistoricGrowth?.refresh?.();
+  window.PrizeTierMatrix?.init();
   window.PlayerDashboard?.init();
   window.SlotMachine?.init();
   window.ContactForm?.init();
