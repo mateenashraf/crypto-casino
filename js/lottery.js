@@ -395,13 +395,13 @@ const LotteryApp = (() => {
     const statTickets = document.getElementById('statTickets');
 
     if (fill) fill.style.width = `${Math.max(poolPct, 8)}%`;
-    if (poolAmt) {
-      const retain = window.PoolPolicy?.getRetentionSummary?.(contributions);
-      poolAmt.textContent = retain
-        ? `${formatUsd(contributions)} in play · ${retain.retainPct}% retained`
-        : `${formatUsd(contributions)} in play`;
+
+    if (window.PlatformStats?.renderPlatformMetrics) {
+      window.PlatformStats.renderPlatformMetrics();
+    } else {
+      if (poolAmt) poolAmt.textContent = `${formatUsd(contributions)} in play`;
+      if (statTickets) statTickets.textContent = getDisplayTicketCount().toLocaleString();
     }
-    if (statTickets) statTickets.textContent = getDisplayTicketCount().toLocaleString();
   }
 
   function groupTicketsForDisplay(tickets) {
