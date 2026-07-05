@@ -75,24 +75,14 @@ const ProvablyFair = (() => {
   }
 
   function explainOutcome(won, context = 'lottery') {
-    if (context === 'slot_paid') {
+    if (context === 'slot_paid' || context === 'slot_free') {
       return won
-        ? 'You hit a winning line (25% chance on paid spins). Each spin is independent, past results do not change the next odds.'
-        : 'No match this spin (75% of paid spins). House edge is lower than typical Vegas slots (~8–15%). Your next spin still has a 25% win chance.';
-    }
-    if (context === 'slot_free') {
-      return won
-        ? 'Free spin win (about 10% of all free plays per day). Bonus spins use the same verified random source.'
-        : 'Free spin, no prize (~90% of free plays). Free entries are a courtesy; paid odds remain 25% win on slots.';
-    }
-    if (context === 'lottery') {
-      return won
-        ? 'Matching draw numbers beats long odds (6/49). Your win was paid from the draw pool after the 90% retention rule.'
-        : 'No match this draw. Powerball-style odds are steep: most players win small prizes or free tickets, not the top tier. Every draw uses a published commit hash before numbers are revealed.';
+        ? 'Nice match! Each spin uses verified randomness. Past results do not change the next outcome.'
+        : 'No match this time. Every spin is independent. Try again when you are ready.';
     }
     return won
-      ? 'Outcome verified against the published seed hash before this round closed.'
-      : 'Random loss within published odds. The commit hash for this round was public before the draw.';
+      ? 'Your numbers matched this draw. Prizes come from the published prize pool for that draw tier.'
+      : 'No match this draw. Every scheduled draw uses a published commit hash that is verified after the numbers are revealed.';
   }
 
   function renderPanel() {
