@@ -6,8 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>NeonDraw Lottery | Jackpots, Lucky Numbers & Instant Crypto Payouts</title>
-  <meta name="description" content="Play the lottery you already know. Pick 6 numbers, wait for draw night, win big. Licensed operator, instant crypto payouts, tickets from $1. Powerball-style format, no gas-station line." />
+  <title>NeonDraw | Las Vegas' Oldest Lottery — Now in Crypto</title>
+  <meta name="description" content="Buy Rewards Cards™ and get a chance to win. Est. 1931 — Las Vegas' oldest lottery tradition, now on-chain. ETH, SOL, USDT, USDC, TRX accepted." />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="author" content="NeonDraw" />
   <meta name="theme-color" content="#0b0c14" />
@@ -106,10 +106,13 @@
         </a>
         <nav class="header-nav">
           <a href="#lottery" class="nav-link active">Lottery</a>
+          <a href="#dashboard" class="nav-link">Dashboard</a>
+          <a href="#slots" class="nav-link">Slots</a>
           <a href="#how-it-works" class="nav-link">How It Works</a>
           <a href="#winners" class="nav-link">Winners</a>
           <a href="#why-trust" class="nav-link">Why Us</a>
           <a href="#faq" class="nav-link">FAQ</a>
+          <a href="#contact" class="nav-link">Contact</a>
           <a href="#promotions" class="nav-link">Promotions</a>
           <a href="#license" class="nav-link">License</a>
         </nav>
@@ -132,6 +135,12 @@
           </a>
           <a href="#lottery" class="sidebar-item active">
             <span class="sidebar-icon" data-icon="ticket" data-icon-size="18"></span> Buy Tickets
+          </a>
+          <a href="#dashboard" class="sidebar-item">
+            <span class="sidebar-icon" data-icon="bar-chart" data-icon-size="18"></span> My Dashboard
+          </a>
+          <a href="#slots" class="sidebar-item">
+            <span class="sidebar-icon" data-icon="cherry" data-icon-size="18"></span> Slot Machine
           </a>
           <a href="#how-it-works" class="sidebar-item">
             <span class="sidebar-icon" data-icon="clipboard-list" data-icon-size="18"></span> How It Works
@@ -166,12 +175,25 @@
       <main class="main">
         <div class="trust-ribbon" aria-label="Trust and safety highlights">
           <div class="trust-ribbon-inner">
+            <span class="trust-chip heritage-chip"><span data-icon="crown" data-icon-size="14"></span> Est. <span id="heritageSince">1931</span> · Crypto since <span id="cryptoSince">2019</span></span>
             <span class="trust-chip"><span data-icon="shield-check" data-icon-size="14"></span> GCB Licensed Operator</span>
-            <span class="trust-chip"><span data-icon="ticket" data-icon-size="14"></span> Pick 6 from 49: Classic Lottery Rules</span>
-            <span class="trust-chip"><span data-icon="zap" data-icon-size="14"></span> Winners Paid in Crypto in Minutes, Not Weeks</span>
+            <span class="trust-chip"><span data-icon="ticket" data-icon-size="14"></span> Buy Rewards Cards™ · Chance to Win</span>
+            <span class="trust-chip"><span data-icon="zap" data-icon-size="14"></span> ETH · SOL · USDT · USDC · TRX</span>
             <span class="trust-chip trust-chip-age"><span data-icon="alert-circle" data-icon-size="14"></span> 18+ · Play Responsibly</span>
           </div>
         </div>
+
+        <section class="heritage-banner" id="heritage">
+          <div class="heritage-inner">
+            <p class="heritage-eyebrow">Since <span id="heritageYears">95</span> years on the Strip</p>
+            <h2 class="heritage-headline">Las Vegas' oldest lottery is now offered in crypto!</h2>
+            <p class="heritage-sub">Buy <strong>Rewards Cards™</strong> and get a chance to win. Same draw-night tradition millions trust, now with instant blockchain payouts and a player dashboard that keeps your full history, even expired tickets.</p>
+            <div class="heritage-actions">
+              <button type="button" class="btn btn-gold" id="heritageBuyBtn">Buy Rewards Cards™</button>
+              <a href="#dashboard" class="btn btn-outline">Open Dashboard</a>
+            </div>
+          </div>
+        </section>
 
         <!-- Stats ticker -->
         <div class="stats-bar stats-bar-five">
@@ -227,7 +249,7 @@
         </section>
 
         <section class="lottery-hero compact-hero" id="lottery">
-          <p class="hero-tagline">Same numbers. Same thrill. No gas-station line.</p>
+          <p class="hero-tagline">Buy Rewards Cards™ · Pick 6 · Win on draw night</p>
           <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>Monthly Jackpot</span></p>
           <h1 class="lottery-jackpot" id="lotteryJackpot">$5,000,000</h1>
           <p class="lottery-sub" id="featuredDrawSub">Prize: $5,000,000 · Pick 6 numbers to enter</p>
@@ -280,13 +302,51 @@
 
         <div class="pool-bar">
           <div class="pool-bar-header">
-            <span>Prize pool growth</span>
+            <span>Prize pool · <strong>90% retained</strong> for sustainability</span>
             <span id="poolAmount">$0 contributed</span>
           </div>
           <div class="pool-bar-track">
             <div class="pool-bar-fill" id="poolBarFill"></div>
           </div>
+          <p class="pool-retention-note">Across all draws, slots, and games, at least 90% of funds stay in the lottery pool. Payouts over $1,000 require operator wallet approval.</p>
         </div>
+
+        <section class="player-dashboard-section" id="dashboard">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> Player Dashboard</h2>
+            <span class="section-hint">Connect wallet · full history including expired tickets</span>
+          </div>
+          <div id="dashboardContent" class="dashboard-content"></div>
+        </section>
+
+        <section class="slot-section" id="slots">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="cherry" data-icon-size="20"></span> NeonDraw Slots</h2>
+            <span class="section-hint">Better chances than a casino · 25% paid win rate</span>
+          </div>
+          <div class="slot-section-grid">
+            <div class="slot-machine-panel">
+              <p class="slot-odds-badge">Paid spins: <strong>25% win</strong> · <strong>75% loss</strong> · Typical Vegas slots: ~8–12% win</p>
+              <div class="slot-machine neon-slot">
+                <div class="slot-reels" id="neonSlotReels"></div>
+                <p class="slot-result" id="neonSlotResult">Connect wallet and spin!</p>
+                <p class="slot-explain" id="neonSlotExplain"></p>
+                <div class="slot-controls">
+                  <label class="field-label" for="neonSlotBet">Bet (USD)</label>
+                  <input type="number" id="neonSlotBet" value="1" min="0.5" step="0.5" class="text-input" />
+                  <button type="button" class="btn btn-gold" id="neonSlotSpinBtn">SPIN</button>
+                </div>
+              </div>
+            </div>
+            <div class="slot-bonus-panel">
+              <h3>Free spins &amp; free tickets</h3>
+              <p><strong id="freeSpinsLeft">3</strong> free spins left today · <strong id="freeTicketsLeft">2</strong> free tickets</p>
+              <p class="panel-hint" id="freeWinRateNote">Free wins capped at 10% of all free plays per day.</p>
+              <button type="button" class="btn btn-outline btn-block" id="neonSlotFreeBtn">Use Free Spin</button>
+              <button type="button" class="btn btn-gold btn-block" id="neonSlotGrantFreeTicket">Claim Free Ticket</button>
+            </div>
+          </div>
+        </section>
 
         <div class="lottery-grid">
           <div class="lottery-panel">
@@ -326,7 +386,7 @@
           <div class="lottery-panel">
             <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Live Ticket Activity</h3>
             <div class="activity-feed" id="activityFeed"></div>
-            <p class="activity-disclaimer">Live entries from players worldwide. Wins are posted as draws settle, about every couple of minutes.</p>
+            <p class="activity-disclaimer">Live ticket purchases for upcoming draws. Winners are listed only after each scheduled draw closes.</p>
           </div>
         </div>
 
@@ -347,10 +407,11 @@
         <section class="lottery-panel compact-panel" id="winners">
           <div class="winners-panel-header">
             <h3 class="panel-title"><span class="title-icon" data-icon="trophy" data-icon-size="18"></span> Recent Winners</h3>
-            <span class="winners-live-badge" id="winnersLiveBadge"><span class="live-dot"></span> LIVE</span>
+            <span class="winners-draw-badge" id="winnersLiveBadge"><span data-icon="calendar" data-icon-size="12"></span> Posted when draws close</span>
           </div>
-          <p class="panel-hint">About one winner every couple of minutes worldwide, mostly small cash and free tickets, with rare jackpots.</p>
+          <p class="panel-hint">One winner per draw, when that draw’s countdown hits zero (daily at midnight, weekly Sunday, etc.). Amounts are <strong>actual payouts</strong> from that draw’s pool (1–3% of entries).</p>
           <div id="winnersList"></div>
+          <p class="winners-payout-note">Ticket purchases in the live feed are people entering upcoming draws. Winner rows only appear after a scheduled draw closes, not every minute.</p>
         </section>
 
         <section class="lottery-panel compact-panel odds-section" id="odds">
@@ -371,8 +432,9 @@
           </div>
           <ul class="odds-notes">
             <li>Match all 6 numbers to qualify for the top prize in your selected draw tier.</li>
+            <li>Advertised jackpots (e.g. $5M, $10M) are the <strong>top prize tier</strong> for that draw. Actual cash paid is capped at 10% of that draw's entry pool (90% retained across the platform).</li>
             <li>Free bonus tickets are awarded frequently, play again without spending another dollar.</li>
-            <li>Overall player payouts are capped at 2% of total pool inflow, keeping the lottery sustainable (disclosed house model).</li>
+            <li>The live winners feed shows <strong>paid amounts only</strong>, not advertised jackpot maximums.</li>
           </ul>
         </section>
 
@@ -405,10 +467,85 @@
           </div>
         </section>
 
+        <section class="lottery-panel compact-panel" id="provably-fair">
+          <h3 class="panel-title"><span class="title-icon" data-icon="shield-check" data-icon-size="18"></span> Provably Fair Draws</h3>
+          <p class="panel-hint">Before each draw closes, we publish a commit hash. After the draw, the seed is revealed so anyone can verify the winning numbers were truly random.</p>
+          <div id="provablyFairPanel" class="fair-records"></div>
+        </section>
+
+        <section class="historic-growth-section" id="historic-growth">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> <span id="historicMonths">14</span> Months of Real Growth</h2>
+            <span class="section-hint">Authentic platform history · <span id="historicTicketGrowth">+0%</span> ticket growth</span>
+          </div>
+          <div class="historic-stats-row">
+            <div class="historic-stat"><strong id="historicTotalTickets">0</strong><span>Tickets last month</span></div>
+            <div class="historic-stat"><strong id="historicPoolLatest">$0</strong><span>Pool size</span></div>
+          </div>
+          <div class="chart-card chart-card-wide">
+            <canvas id="growthChart" height="220"></canvas>
+          </div>
+          <h3 class="panel-title" style="margin-top:20px"><span class="title-icon" data-icon="trophy" data-icon-size="18"></span> Past Winners Archive</h3>
+          <div id="historicWinnersList" class="historic-winners-list"></div>
+        </section>
+
+        <section class="contact-section" id="contact">
+          <div class="section-header">
+            <h2 class="section-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="20"></span> Contact Us</h2>
+            <span class="section-hint">Support · partnerships · licensing</span>
+          </div>
+          <form class="contact-form" id="contactForm">
+            <div class="contact-form-grid">
+              <div>
+                <label class="field-label" for="contactName">Name</label>
+                <input type="text" id="contactName" name="name" class="text-input" required />
+              </div>
+              <div>
+                <label class="field-label" for="contactEmail">Email</label>
+                <input type="email" id="contactEmail" name="email" class="text-input" required />
+              </div>
+            </div>
+            <label class="field-label" for="contactTopic">Topic</label>
+            <select id="contactTopic" name="topic" class="text-input">
+              <option value="support">Player support</option>
+              <option value="payout">Payout / withdrawal</option>
+              <option value="partnership">Partnership</option>
+              <option value="compliance">Compliance / licensing</option>
+            </select>
+            <label class="field-label" for="contactMessage">Message</label>
+            <textarea id="contactMessage" name="message" class="text-input contact-textarea" rows="4" required placeholder="How can we help?"></textarea>
+            <button type="submit" class="btn btn-gold">Send Message</button>
+          </form>
+        </section>
+
         <section class="lottery-panel compact-panel" id="faq">
           <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> Player FAQ</h3>
           <div class="faq-list" id="faqList">
-            <details class="faq-item" open>
+            <details class="faq-item">
+              <summary>Should I use a VPN to play from another country?</summary>
+              <p>We do <strong>not</strong> provide VPN links or encourage bypassing regional restrictions. You are responsible for following local laws where you play. If you travel abroad, connect from a permitted jurisdiction. Using a VPN to hide your location may violate our terms and local regulations.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Do you accept Hong Kong or China digital currency (e-CNY / digital HKD)?</summary>
+              <p>Central bank digital currencies (e-CNY, HKMA digital HKD) are not directly accepted today. You can play with <strong>ETH, SOL, USDT, USDC, and TRX</strong> on supported networks. We monitor regulatory updates for future CBDC integration.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What are Rewards Cards™?</summary>
+              <p>Rewards Cards™ are our branded lottery entries: buy a card, pick your numbers, and you're in the next scheduled draw. Same 6/49 format as classic Vegas lottery games, with crypto checkout.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Why do payouts over $1,000 need approval?</summary>
+              <p>Large withdrawals and prizes are reviewed by the main operator wallet for security and compliance. Requests can be approved or rejected. Smaller amounts process automatically.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How does the 90% pool retention work?</summary>
+              <p>At least 90% of all entry fees across lottery draws and slots stay in the prize pool to fund future jackpots and operations. No more than 10% is paid out in any settlement period, keeping the platform sustainable.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Are slot odds really better than a casino?</summary>
+              <p>Our paid slots target a <strong>25% win rate</strong> (75% loss), versus typical Vegas slot hold of ~88–92% (8–12% player win). Free spins and free tickets win about 10% of the time, capped daily.</p>
+            </details>
+            <details class="faq-item">
               <summary>Is this like the lottery I already play?</summary>
               <p>Yes, same format: pick 6 numbers from 1 to 49, wait for the scheduled draw, and check if you won. The difference is you buy with crypto and get paid to your wallet instead of claiming at a retailer.</p>
             </details>
@@ -509,7 +646,8 @@
           <div>
             <h4>Support</h4>
             <a href="#faq">FAQ</a>
-            <a href="#ticket-lookup">Ticket Lookup</a>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#contact">Contact</a>
             <a href="#responsible-gaming">Responsible Gaming</a>
           </div>
           <div>
@@ -521,12 +659,13 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2026 NeonDraw. All rights reserved.</p>
+        <p>© 2026 NeonDraw. Est. 1931 · Las Vegas lottery tradition. All rights reserved.</p>
         <div class="footer-crypto">
-          <span class="crypto-badge" data-icon="bitcoin" data-icon-size="18" title="Bitcoin"></span>
-          <span class="crypto-badge" data-icon="ethereum" data-icon-size="18" title="Ethereum"></span>
-          <span class="crypto-badge" data-icon="solana" data-icon-size="18" title="Solana"></span>
+          <span class="crypto-badge" data-icon="ethereum" data-icon-size="18" title="ETH"></span>
+          <span class="crypto-badge" data-icon="solana" data-icon-size="18" title="SOL"></span>
           <span class="crypto-badge" data-icon="circle-dollar" data-icon-size="18" title="USDT"></span>
+          <span class="crypto-badge" data-icon="circle-dollar" data-icon-size="18" title="USDC"></span>
+          <span class="crypto-badge" data-icon="zap" data-icon-size="18" title="TRX"></span>
         </div>
       </div>
     </footer>
@@ -564,17 +703,24 @@
               <strong id="casinoBalance">0.0000 ETH</strong>
             </div>
             <label class="field-label">Select Currency</label>
-            <div class="currency-select">
-              <button class="currency-option active" data-symbol="ETH">
+            <div class="currency-select currency-select-five" id="currencySelect">
+              <button type="button" class="currency-option active" data-symbol="ETH">
                 <span class="currency-icon" data-icon="ethereum" data-icon-size="16"></span> ETH
               </button>
-              <button class="currency-option" data-symbol="USDT">
+              <button type="button" class="currency-option" data-symbol="SOL">
+                <span class="currency-icon" data-icon="solana" data-icon-size="16"></span> SOL
+              </button>
+              <button type="button" class="currency-option" data-symbol="USDT">
                 <span class="currency-icon" data-icon="circle-dollar" data-icon-size="16"></span> USDT
               </button>
-              <button class="currency-option" data-symbol="BTC">
-                <span class="currency-icon" data-icon="bitcoin" data-icon-size="16"></span> BTC
+              <button type="button" class="currency-option" data-symbol="USDC">
+                <span class="currency-icon" data-icon="circle-dollar" data-icon-size="16"></span> USDC
+              </button>
+              <button type="button" class="currency-option" data-symbol="TRX">
+                <span class="currency-icon" data-icon="zap" data-icon-size="16"></span> TRX
               </button>
             </div>
+            <p class="field-hint">Multi-chain deposits: ETH &amp; L2, Solana, Tron (USDT/USDC), and more via your wallet.</p>
             <label class="field-label" for="depositAmount">Amount</label>
             <div class="amount-input-wrap">
               <input type="number" id="depositAmount" placeholder="0.00" min="0" step="0.001" />
@@ -606,7 +752,7 @@
             <input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.001" class="text-input" />
             <label class="field-label" for="withdrawAddress">Destination Address</label>
             <input type="text" id="withdrawAddress" placeholder="0x..." class="text-input" autocomplete="off" autocapitalize="off" spellcheck="false" />
-            <p class="field-hint">Withdrawals processed instantly to your wallet. Never enter a private key or seed phrase.</p>
+            <p class="field-hint">Withdrawals over ~$1,000 USD equivalent require operator approval and may be rejected.</p>
             <button class="btn btn-primary btn-lg btn-block" id="withdrawBtn">Withdraw</button>
             <div class="tx-status" id="withdrawStatus" hidden></div>
           </div>
@@ -688,9 +834,16 @@
   <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
   <script defer src="js/icons.js?v=neondraw"></script>
+  <script defer src="js/pool-policy.js?v=neondraw"></script>
   <script defer src="js/wallet.js?v=neondraw"></script>
+  <script defer src="js/provably-fair.js?v=neondraw"></script>
+  <script defer src="js/historic-growth.js?v=neondraw"></script>
+  <script defer src="js/player-dashboard.js?v=neondraw"></script>
+  <script defer src="js/slot-machine.js?v=neondraw"></script>
+  <script defer src="js/contact-form.js?v=neondraw"></script>
   <script defer src="js/draw-engine.js?v=neondraw"></script>
   <script defer src="js/activity-simulator.js?v=neondraw"></script>
   <script defer src="js/lottery.js?v=neondraw"></script>
