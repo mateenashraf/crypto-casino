@@ -56,8 +56,9 @@ const ActivitySimulator = (() => {
       type: 'win',
       wallet: entry.winner.wallet,
       drawName: entry.drawName,
-      prizeLabel: entry.prizeLabel || entry.prize,
+      prizeLabel: entry.prizeLabel || formatUsd(entry.prize || 0),
       prizeType: entry.prizeType,
+      jackpotTierWin: !!entry.jackpotTierWin,
       numbers: entry.numbers,
       simulated: !entry.fromRealTicket,
       timestamp: entry.timestamp,
@@ -168,7 +169,7 @@ const ActivitySimulator = (() => {
         month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
       });
       return `<span class="ticker-item ticker-item-win${isNew ? ' ticker-item-new' : ''}${isYou ? ' ticker-item-you' : ''}">
-        <strong>${e.wallet}</strong>${youTag} won <span class="ticker-amount${prizeClass}">${e.prizeLabel}</span> · ${e.drawName}
+        <strong>${e.wallet}</strong>${youTag} won <span class="ticker-amount${prizeClass}">${e.prizeLabel}</span>${e.jackpotTierWin ? ' <span class="ticker-tier-tag">top tier</span>' : ''} · ${e.drawName}
         <span class="ticker-when">${when}</span>
       </span>`;
     }
@@ -219,6 +220,7 @@ const ActivitySimulator = (() => {
         drawName: entry.drawName,
         prizeLabel: entry.prizeLabel || formatUsd(entry.prize || 0),
         prizeType: entry.prizeType || 'cash',
+        jackpotTierWin: !!entry.jackpotTierWin,
         numbers: entry.numbers,
         simulated: true,
         timestamp: entry.timestamp,
