@@ -394,14 +394,7 @@
                       <div class="slot-reels-frame" id="neonSlotReels"></div>
                     </div>
                   </div>
-                  <div class="slot-paytable" aria-hidden="true">
-                    <span title="Cherry">🍒</span>
-                    <span title="Lemon">🍋</span>
-                    <span title="Star">⭐</span>
-                    <span title="Diamond">💎</span>
-                    <span title="Crown">👑</span>
-                    <span title="Lucky 7">7️⃣</span>
-                  </div>
+                  <div class="slot-paytable" id="slotPaytable"></div>
                   <div class="slot-cabinet-display">
                     <p class="slot-result" id="neonSlotResult">Connect wallet and spin!</p>
                     <p class="slot-explain" id="neonSlotExplain"></p>
@@ -411,20 +404,62 @@
                       <label class="field-label" for="neonSlotBet">Bet (USD)</label>
                       <input type="number" id="neonSlotBet" value="1" min="0.5" step="0.5" class="text-input slot-bet-input" />
                     </div>
-                    <button type="button" class="slot-lever" id="neonSlotSpinBtn" aria-label="Spin">
-                      <span class="slot-lever-knob"></span>
-                      <span class="slot-lever-arm"></span>
-                    </button>
+                    <div class="slot-lever-mount">
+                      <div class="slot-lever-base" aria-hidden="true">
+                        <span class="slot-lever-base-plate"></span>
+                        <span class="slot-lever-base-bolt slot-lever-base-bolt-left"></span>
+                        <span class="slot-lever-base-bolt slot-lever-base-bolt-right"></span>
+                      </div>
+                      <button type="button" class="slot-lever" id="neonSlotSpinBtn" aria-label="Pull lever to spin" style="--lever-pull: 0">
+                        <span class="slot-lever-arm-group">
+                          <span class="slot-lever-arm"></span>
+                          <span class="slot-lever-knob"></span>
+                        </span>
+                      </button>
+                      <span class="slot-lever-hint">Pull down</span>
+                    </div>
                     <button type="button" class="btn btn-gold slot-spin-btn" id="neonSlotSpinBtnAlt">SPIN</button>
                   </div>
                 </div>
               </div>
-              <div class="slot-bonus-panel">
-                <h3>Free spins &amp; free tickets</h3>
-                <p><strong id="freeSpinsLeft">3</strong> free spins left today · <strong id="freeTicketsLeft">2</strong> free tickets</p>
-                <button type="button" class="btn btn-outline btn-block" id="neonSlotFreeBtn">Use Free Spin</button>
-                <button type="button" class="btn btn-gold btn-block" id="neonSlotGrantFreeTicket">Claim Free Ticket</button>
-              </div>
+              <aside class="slot-bonus-panel" aria-labelledby="slotBonusTitle">
+                <div class="slot-bonus-header">
+                  <h3 class="slot-bonus-title" id="slotBonusTitle">
+                    <span class="title-icon" data-icon="gift" data-icon-size="18"></span>
+                    Free spins &amp; free tickets
+                  </h3>
+                  <p class="slot-bonus-intro">Daily bonuses on the casino floor. Lottery tickets you claim go to your wallet upstairs.</p>
+                </div>
+                <div class="slot-bonus-grid">
+                  <article class="slot-bonus-card slot-bonus-spins">
+                    <div class="slot-bonus-card-head">
+                      <span class="slot-bonus-icon" data-icon="cherry" data-icon-size="20"></span>
+                      <div>
+                        <h4 class="slot-bonus-card-title">Free spins</h4>
+                        <p class="slot-bonus-stat"><strong id="freeSpinsLeft">3</strong> of 3 left today</p>
+                      </div>
+                    </div>
+                    <p class="slot-bonus-hint">Spin without placing a bet. Match three symbols to win.</p>
+                    <button type="button" class="btn btn-outline btn-block slot-bonus-btn" id="neonSlotFreeBtn">Use Free Spin</button>
+                  </article>
+                  <article class="slot-bonus-card slot-bonus-tickets">
+                    <div class="slot-bonus-card-head">
+                      <span class="slot-bonus-icon" data-icon="ticket" data-icon-size="20"></span>
+                      <div>
+                        <h4 class="slot-bonus-card-title">Lottery tickets</h4>
+                        <p class="slot-bonus-stat"><strong id="freeTicketsLeft">2</strong> daily claims left</p>
+                      </div>
+                    </div>
+                    <p class="slot-bonus-hint">Claim into your wallet, then redeem on the number picker with no payment.</p>
+                    <button type="button" class="btn btn-gold btn-block slot-bonus-btn" id="neonSlotGrantFreeTicket">Claim Free Ticket</button>
+                  </article>
+                </div>
+                <div class="slot-bonus-wallet" id="slotBonusWalletRow" hidden>
+                  <span class="slot-bonus-wallet-icon" data-icon="ticket" data-icon-size="16"></span>
+                  <span class="slot-bonus-wallet-text">In wallet: <strong id="slotWalletFreeTickets">0</strong> free ticket(s)</span>
+                  <a href="#lottery" class="slot-bonus-link">Redeem in lottery →</a>
+                </div>
+              </aside>
             </div>
           </section>
         </section>
@@ -543,7 +578,7 @@
                   </div>
                 </li>
               </ol>
-              <p class="how-game-foot">Symbols: 🍒 🍋 ⭐ 💎 👑 7️⃣ · wins appear on the <strong>SLOTS LIVE</strong> ticker and in your <a href="#dashboard">dashboard</a>.</p>
+              <p class="how-game-foot">Symbols: cherry · orange · bell · crown · lucky 7 · wins appear on the <strong>SLOTS LIVE</strong> ticker and in your <a href="#dashboard">dashboard</a>.</p>
             </article>
           </div>
         </section>
@@ -1011,6 +1046,7 @@
   <script defer src="js/provably-fair.js?v=neondraw"></script>
   <script defer src="js/historic-growth.js?v=neondraw"></script>
   <script defer src="js/player-dashboard.js?v=neondraw"></script>
+  <script defer src="js/slot-symbols.js?v=neondraw"></script>
   <script defer src="js/slot-machine.js?v=neondraw"></script>
   <script defer src="js/contact-form.js?v=neondraw"></script>
   <script defer src="js/prize-tier-matrix.js?v=neondraw"></script>
