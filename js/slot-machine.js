@@ -11,16 +11,15 @@ const SlotMachine = (() => {
   const SYMBOL_HEIGHT = 92;
   const STRIP_LENGTH = 30;
 
-  const SYMBOLS = [
-    { id: 'cherry', emoji: '🍒', label: 'Cherry', color: '#ff4d6d', bg: 'linear-gradient(160deg, #3d1020 0%, #1a0a12 100%)' },
-    { id: 'lemon', emoji: '🍋', label: 'Lemon', color: '#ffd93d', bg: 'linear-gradient(160deg, #3d3510 0%, #1a1808 100%)' },
-    { id: 'star', emoji: '⭐', label: 'Star', color: '#ffc94d', bg: 'linear-gradient(160deg, #3d2e10 0%, #1a1408 100%)' },
-    { id: 'gem', emoji: '💎', label: 'Diamond', color: '#5eead4', bg: 'linear-gradient(160deg, #103d38 0%, #081a18 100%)' },
-    { id: 'crown', emoji: '👑', label: 'Crown', color: '#f5b731', bg: 'linear-gradient(160deg, #3d3010 0%, #1a1608 100%)' },
-    { id: 'seven', emoji: '7️⃣', label: 'Lucky 7', color: '#a78bfa', bg: 'linear-gradient(160deg, #2a1848 0%, #120a24 100%)' },
+  const SYMBOLS = window.SlotSymbols?.getCatalog?.() || [
+    { id: 'cherry', label: 'Cherry', color: '#ff4d6d', bg: 'linear-gradient(160deg, #4a1028 0%, #1a0810 100%)' },
+    { id: 'orange', label: 'Orange', color: '#ff9f43', bg: 'linear-gradient(160deg, #3d2810 0%, #1a1208 100%)' },
+    { id: 'bell', label: 'Bell', color: '#f5b731', bg: 'linear-gradient(160deg, #3d3010 0%, #1a1608 100%)' },
+    { id: 'crown', label: 'Crown', color: '#ffc940', bg: 'linear-gradient(160deg, #3d3010 0%, #1a1408 100%)' },
+    { id: 'seven', label: 'Lucky 7', color: '#ff3344', bg: 'linear-gradient(160deg, #3d1018 0%, #140810 100%)' },
   ];
 
-  const PAYOUT_MULT = { cherry: 2, lemon: 2, star: 5, gem: 8, crown: 15, seven: 25 };
+  const PAYOUT_MULT = { cherry: 2, orange: 3, bell: 5, crown: 15, seven: 25 };
 
   let spinning = false;
   let marqueeTimer = null;
@@ -83,9 +82,11 @@ const SlotMachine = (() => {
   }
 
   function renderSymbolCell(sym) {
+    const art = window.SlotSymbols?.render?.(sym.id)
+      || `<span class="slot-art">${sym.emoji || '?'}</span>`;
     return `
       <div class="slot-symbol" data-symbol="${sym.id}" style="--sym-color:${sym.color};--sym-bg:${sym.bg}">
-        <span class="slot-emoji" role="img" aria-label="${sym.label}">${sym.emoji}</span>
+        ${art}
         <span class="slot-symbol-glow"></span>
       </div>`;
   }
@@ -99,7 +100,7 @@ const SlotMachine = (() => {
     return cells.map(renderSymbolCell).join('');
   }
 
-  function buildReelsHTML(finals = ['cherry', 'lemon', 'star']) {
+  function buildReelsHTML(finals = ['cherry', 'orange', 'seven']) {
     return finals.map((sym, i) => `
       <div class="slot-reel-col" data-reel="${i}">
         <div class="slot-reel-viewport">
@@ -142,11 +143,95 @@ const SlotMachine = (() => {
     if (state) cab.classList.add(state);
   }
 
-  function pullLever() {
+  function pullLever(animate = true) {
     const lever = document.querySelector('.slot-lever');
     if (!lever) return;
-    lever.classList.add('pulled');
-    setTimeout(() => lever.classList.remove('pulled'), 600);
+    if (animate) {
+      lever.classList.add('pulled');
+      setLeverPull(1, false);
+      setTimeout(() => {
+        lever.classList.remove('pulled');
+        setLeverPull(0, true);
+      }, 520);
+    }
+  }
+
+  function setLeverPull(ratio, transition = true) {
+    const lever = document.querySelector('.slot-lever');
+    if (!lever) return;
+    const clamped = Math.max(0, Math.min(1, ratio));
+    lever.style.setProperty('--lever-pull', String(clamped));
+    lever.classList.toggle('is-dragging', clamped > 0 && transition === false);
+    if (transition) {
+      lever.classList.add('lever-spring');
+      lever.addEventListener('transitionend', () => lever.classList.remove('lever-spring'), { once: true });
+    }
+  }
+
+  function bindLeverDrag() {
+    const lever = document.getElementById('neonSlotSpinBtn');
+    const mount = document.querySelector('.slot-lever-mount');
+    if (!lever || !mount) return;
+
+    const PULL_THRESHOLD = 0.62;
+    const MAX_PULL_PX = 52;
+    let dragging = false;
+    let startY = 0;
+    let triggered = false;
+
+    const getPullFromEvent = (clientY) => {
+      const rect = mount.getBoundingClientRect();
+      const pivotY = rect.top + 18;
+      return Math.max(0, Math.min(1, (clientY - pivotY) / MAX_PULL_PX));
+    };
+
+    const finishDrag = (shouldSpin) => {
+      if (!dragging) return;
+      dragging = false;
+      lever.classList.remove('is-dragging');
+      if (shouldSpin && !triggered && !spinning) {
+        triggered = true;
+        const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
+        play({ free: false, betUsd: bet });
+      }
+      setLeverPull(0, true);
+      setTimeout(() => { triggered = false; }, 300);
+    };
+
+    lever.addEventListener('pointerdown', (e) => {
+      if (spinning || lever.disabled || lever.classList.contains('disabled')) return;
+      dragging = true;
+      triggered = false;
+      startY = e.clientY;
+      lever.setPointerCapture(e.pointerId);
+      lever.classList.add('is-dragging');
+      e.preventDefault();
+    });
+
+    lever.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      setLeverPull(getPullFromEvent(e.clientY), false);
+    });
+
+    lever.addEventListener('pointerup', (e) => {
+      if (!dragging) return;
+      const pull = getPullFromEvent(e.clientY);
+      finishDrag(pull >= PULL_THRESHOLD);
+      lever.releasePointerCapture(e.pointerId);
+    });
+
+    lever.addEventListener('pointercancel', () => finishDrag(false));
+
+    lever.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (!spinning && !lever.disabled) {
+          pullLever(true);
+          const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
+          play({ free: false, betUsd: bet });
+        }
+      }
+    });
   }
 
   function animateReels(finalIds, onDone) {
@@ -192,11 +277,15 @@ const SlotMachine = (() => {
   }
 
   function setSpinEnabled(enabled) {
-    ['neonSlotSpinBtn', 'neonSlotSpinBtnAlt', 'neonSlotFreeBtn'].forEach((id) => {
+    ['neonSlotSpinBtnAlt', 'neonSlotFreeBtn'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.disabled = !enabled;
     });
-    document.querySelector('.slot-lever')?.classList.toggle('disabled', !enabled);
+    const lever = document.querySelector('.slot-lever');
+    if (lever) {
+      lever.disabled = !enabled;
+      lever.classList.toggle('disabled', !enabled);
+    }
   }
 
   function celebrateWin(won) {
@@ -281,8 +370,9 @@ const SlotMachine = (() => {
 
     animateReels(reels, () => {
       const sym = getSymbol(reels[0]);
+      const symLabel = sym.label || sym.id;
       const msg = won
-        ? `JACKPOT! ${sym.emoji} ${sym.label} ×3 — +$${payoutUsd.toFixed(2)}${free ? ' + free ticket' : ''}`
+        ? `JACKPOT! ${symLabel} ×3 — +$${payoutUsd.toFixed(2)}${free ? ' + free ticket' : ''}`
         : 'Try again — no match this spin';
       if (resultEl) {
         resultEl.textContent = msg;
@@ -303,23 +393,48 @@ const SlotMachine = (() => {
   function updateFreeUI() {
     const freeState = loadFreeDaily();
     const spinsLeft = Math.max(0, FREE_SPINS_PER_DAY - freeState.freeSpinsUsed);
+    const claimsLeft = Math.max(0, FREE_TICKETS_PER_DAY - freeState.freeTicketsUsed);
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     set('freeSpinsLeft', String(spinsLeft));
-    set('freeTicketsLeft', String(Math.max(0, FREE_TICKETS_PER_DAY - freeState.freeTicketsUsed)));
+    set('freeTicketsLeft', String(claimsLeft));
+
+    const freeBtn = document.getElementById('neonSlotFreeBtn');
+    const claimBtn = document.getElementById('neonSlotGrantFreeTicket');
+    if (freeBtn) {
+      freeBtn.disabled = spinsLeft <= 0;
+      freeBtn.textContent = spinsLeft > 0 ? 'Use Free Spin' : 'No spins left today';
+    }
+    if (claimBtn) {
+      claimBtn.disabled = claimsLeft <= 0;
+      claimBtn.textContent = claimsLeft > 0 ? 'Claim Free Ticket' : 'All claimed today';
+    }
+
+    const wallet = window.SecureWeb3?.getAddress?.();
+    const balance = wallet ? (window.SecureWeb3?.getFreeTicketBalance?.(wallet) || 0) : 0;
+    set('slotWalletFreeTickets', String(balance));
+    const walletRow = document.getElementById('slotBonusWalletRow');
+    if (walletRow) walletRow.hidden = !wallet || balance < 1;
   }
 
   function bindSpin() {
     const handler = () => {
       const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
+      pullLever(true);
       play({ free: false, betUsd: bet });
     };
-    document.getElementById('neonSlotSpinBtn')?.addEventListener('click', handler);
     document.getElementById('neonSlotSpinBtnAlt')?.addEventListener('click', handler);
   }
 
   function init() {
     updateFreeUI();
     bindSpin();
+    bindLeverDrag();
+    renderPaytable();
+    window.SecureWeb3?.on?.((event) => {
+      if (['connected', 'disconnected', 'free-ticket-granted', 'free-ticket-redeemed'].includes(event)) {
+        updateFreeUI();
+      }
+    });
     document.getElementById('neonSlotFreeBtn')?.addEventListener('click', () => play({ free: true }));
     document.getElementById('neonSlotGrantFreeTicket')?.addEventListener('click', () => {
       const wallet = window.SecureWeb3?.getAddress?.();
@@ -338,10 +453,17 @@ const SlotMachine = (() => {
 
     const reelsWrap = document.getElementById('neonSlotReels');
     if (reelsWrap) {
-      reelsWrap.innerHTML = buildReelsHTML(['cherry', 'star', 'crown']);
+      reelsWrap.innerHTML = buildReelsHTML(['cherry', 'orange', 'seven']);
     }
     buildLights();
     startMarquee();
+  }
+
+  function renderPaytable() {
+    const el = document.getElementById('slotPaytable') || document.querySelector('.slot-paytable');
+    if (el && window.SlotSymbols?.paytableHtml) {
+      el.innerHTML = window.SlotSymbols.paytableHtml();
+    }
   }
 
   return { init, play, updateFreeUI };
