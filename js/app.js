@@ -5,6 +5,9 @@
   const wallet = window.SecureWeb3;
   const walletModal = document.getElementById('walletModal');
   const toastContainer = document.getElementById('toastContainer');
+  const walletAddr = document.getElementById('walletAddress');
+  const disconnectBtn = document.getElementById('disconnectBtn');
+  let selectedCurrency = 'ETH';
 
   function toast(message, type = 'info') {
     const el = document.createElement('div');
@@ -161,6 +164,7 @@
     openModal(walletModal);
   });
   document.getElementById('heroBuyBtn')?.addEventListener('click', () => scrollToSection('#lottery'));
+  document.getElementById('heritageBuyBtn')?.addEventListener('click', () => scrollToSection('#lottery'));
   document.getElementById('footerWalletLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     openModal(walletModal);
@@ -187,12 +191,21 @@
     });
   });
 
+  document.querySelectorAll('#currencySelect .currency-option').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#currencySelect .currency-option').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedCurrency = btn.dataset.symbol || 'ETH';
+      toast(`Selected ${selectedCurrency} for deposit`, 'info');
+    });
+  });
+
   document.getElementById('depositBtn')?.addEventListener('click', async () => {
     const amount = parseFloat(document.getElementById('depositAmount').value);
     showTxStatus('depositStatus', 'Confirm in wallet...', 'pending');
     try {
       await wallet.deposit(amount);
-      showTxStatus('depositStatus', 'Deposit confirmed!', 'success');
+      showTxStatus('depositStatus', `Deposit confirmed (${selectedCurrency})!`, 'success');
       await refreshBalances();
       renderTxHistory();
       toast('Deposit successful', 'success');
@@ -251,6 +264,7 @@
   wallet.on((event) => {
     if (['connected', 'disconnected', 'ticket-purchased', 'deposit-success'].includes(event)) {
       updateWalletUI();
+      window.PlayerDashboard?.refresh?.();
     }
   });
 
@@ -261,6 +275,11 @@
   window.LicenseDisplay?.init();
   window.TicketLookup?.init();
   window.TrustDisplay?.init();
+  window.ProvablyFair?.init();
+  window.HistoricGrowth?.init();
+  window.PlayerDashboard?.init();
+  window.SlotMachine?.init();
+  window.ContactForm?.init();
   window.Icons?.hydrate();
   wallet.tryAutoConnect().then(() => updateWalletUI());
 })();
