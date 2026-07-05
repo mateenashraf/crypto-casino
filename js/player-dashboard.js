@@ -169,7 +169,7 @@ const PlayerDashboard = (() => {
     el.innerHTML = `
       <h4>Understanding your results</h4>
       <p>${window.ProvablyFair?.explainOutcome?.(netPositive, 'lottery') || ''}</p>
-      <p class="panel-hint">Every draw publishes a commit hash before numbers are revealed. Slot paid spins: 25% win rate. Free spins/tickets: ~10% win rate daily cap.</p>
+      <p class="panel-hint">Every draw publishes a commit hash before numbers are revealed, so anyone can verify results were random.</p>
     `;
   }
 
