@@ -214,7 +214,8 @@ const DrawEngine = (() => {
 
   function computePaidUsd(tier, outcome, drawPoolUsd, remainingGlobalBudget = Number.POSITIVE_INFINITY) {
     if (outcome.prizeType === 'free_ticket') {
-      const cost = ECONOMICS.FREE_TICKET_USD_VALUE * FREE_TICKET_QTY;
+      const qty = outcome.freeQty || FREE_TICKET_QTY;
+      const cost = ECONOMICS.FREE_TICKET_USD_VALUE * qty;
       return remainingGlobalBudget >= cost ? cost : 0;
     }
     if (drawPoolUsd <= 0) return 0;
@@ -243,7 +244,9 @@ const DrawEngine = (() => {
       : computePaidUsd(tier, outcome, drawPoolUsd);
     const isFreeTicket = outcome.prizeType === 'free_ticket';
     const prize = isFreeTicket ? 0 : Math.max(0, Math.round(paidUsd));
-    const accounted = isFreeTicket ? ECONOMICS.FREE_TICKET_USD_VALUE * FREE_TICKET_QTY : paidUsd;
+    const accounted = isFreeTicket
+      ? ECONOMICS.FREE_TICKET_USD_VALUE * (outcome.freeQty || FREE_TICKET_QTY)
+      : paidUsd;
 
     return {
       drawId: tier.id,
@@ -255,6 +258,7 @@ const DrawEngine = (() => {
       retainedUsd: Math.max(0, Math.round(drawPoolUsd - accounted)),
       jackpotTierWin: outcome.isJackpot && !isFreeTicket,
       microWin: !outcome.isJackpot,
+      matchCount: outcome.matchCount ?? null,
       prizeType: outcome.prizeType,
       prizeLabel: isFreeTicket ? outcome.prizeLabel : formatUsd(prize),
       numbers,
@@ -458,9 +462,6 @@ const DrawEngine = (() => {
     ensureEconomicsWindow();
     const numbers = winningNumbers();
     const tickets = getTicketsForDraw(tier.id);
-    const winner = tickets.length
-      ? tickets[Math.floor(Math.random() * tickets.length)]
-      : null;
     const advertisedPrize = getPrize(tier);
     const realPoolUsd = getDrawPoolUsd(tickets);
     const drawPoolUsd = getEffectiveDrawPoolUsd(tier.id, tickets);
@@ -473,18 +474,32 @@ const DrawEngine = (() => {
     const remainingLifetimeBudget = Math.max(0, lifetimePayoutCap - economicsState.lifetimeOutflowUsd);
     const remainingGlobalBudget = Math.min(remainingDailyBudget, remainingLifetimeBudget);
 
-    const outcome = rollWinnerOutcome(tier, advertisedPrize);
-    const hasEligibleWinner = !!winner;
+    const bestMatch = window.PrizeTierMatrix?.pickBestTicketByMatches?.(tickets, numbers);
+    const winner = bestMatch?.ticket || (tickets.length
+      ? tickets[Math.floor(Math.random() * tickets.length)]
+      : null);
+    const matchCount = bestMatch?.matches
+      ?? (winner?.numbers ? window.PrizeTierMatrix?.countMatches?.(winner.numbers, numbers) : 0);
+
+    let outcome = window.PrizeTierMatrix?.resolveOutcome?.(tier.id, matchCount, advertisedPrize, drawPoolUsd);
+    if (!outcome || outcome.prizeType === 'none') {
+      outcome = bestMatch
+        ? { prizeType: 'none', prizeLabel: 'No prize', displayUsd: 0, isJackpot: false, matchCount, freeQty: 0 }
+        : rollWinnerOutcome(tier, advertisedPrize);
+    }
+
+    const hasEligibleWinner = !!winner && outcome.prizeType !== 'none';
     let accountedPayoutUsd = hasEligibleWinner
       ? accountPayoutUsd(tier, outcome, drawPoolUsd, remainingGlobalBudget)
       : 0;
 
+    const freeQty = outcome.freeQty || FREE_TICKET_QTY;
     const isFreeTicketWinner = hasEligibleWinner
       && outcome.prizeType === 'free_ticket'
       && accountedPayoutUsd > 0;
 
     if (isFreeTicketWinner && winner.wallet) {
-      window.SecureWeb3?.grantFreeTickets(winner.wallet, FREE_TICKET_QTY, {
+      window.SecureWeb3?.grantFreeTickets(winner.wallet, freeQty, {
         drawId: tier.id,
         drawName: tier.name,
       });
@@ -513,7 +528,7 @@ const DrawEngine = (() => {
     economicsState.lifetimeInflowUsd = lifetimeInflowAfter;
     if (hasEligibleWinner) {
       const outflow = isFreeTicketWinner
-        ? ECONOMICS.FREE_TICKET_USD_VALUE * FREE_TICKET_QTY
+        ? ECONOMICS.FREE_TICKET_USD_VALUE * freeQty
         : accountedPayoutUsd;
       if (outflow > 0 && winner?.wallet && window.PoolPolicy?.processDrawPayout) {
         const approval = window.PoolPolicy.processDrawPayout(outflow, winner.wallet, {
@@ -673,7 +688,9 @@ const DrawEngine = (() => {
         : w.jackpotTierWin ? ' winner-prize-jackpot' : '';
       const tierNote = w.jackpotTierWin
         ? `<span class="winner-tier-note">Top prize tier · ${formatUsd(w.advertisedPrize)} advertised max</span>`
-        : '';
+        : w.matchCount >= 2
+          ? `<span class="winner-tier-note">${w.matchCount} of 6 matched</span>`
+          : '';
       return `
       <div class="winner-row" data-winner-ts="${w.timestamp}">
         <div class="winner-prize${prizeClass}">${formatWinnerPrize(w)}</div>
