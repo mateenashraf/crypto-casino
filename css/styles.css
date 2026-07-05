@@ -21,7 +21,11 @@
   --radius-sm: 8px;
   --header-h: 64px;
   --sidebar-w: 220px;
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --font: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0.01em;
+  --leading-body: 1.62;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,17 +33,22 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  text-size-adjust: 100%;
 }
 
 body {
   font-family: var(--font);
   background: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-normal);
   min-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 [id] {
@@ -97,8 +106,9 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 800;
-  font-size: 1.35rem;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: var(--tracking-tight);
   flex-shrink: 0;
 }
 .logo-star { color: var(--accent-gold); display: inline-flex; align-items: center; }
@@ -140,7 +150,11 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
 }
+.section-title { font-size: 1.15rem; }
+.panel-title { font-size: 1rem; font-weight: 600; }
 .title-icon {
   display: inline-flex;
   align-items: center;
@@ -2039,28 +2053,30 @@ input { font-family: inherit; }
 }
 .lottery-jackpot {
   font-size: clamp(1.75rem, 5vw, 3rem);
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
   background: var(--gradient-gold);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.1;
+  line-height: 1.12;
   margin-bottom: 12px;
 }
 .lottery-jackpot-label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: var(--accent-gold);
   margin-bottom: 6px;
 }
-.lottery-sub { color: var(--text-secondary); margin-bottom: 10px; font-size: 0.9rem; }
+.lottery-sub { color: var(--text-secondary); margin-bottom: 10px; font-size: 0.88rem; font-weight: 400; }
 .hero-tagline {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 10px;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--tracking-normal);
 }
 .hero-format-hint {
   font-size: 0.8rem;
@@ -2840,21 +2856,101 @@ input { font-family: inherit; }
 }
 
 .panel-hint {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   margin: -8px 0 14px;
-  line-height: 1.5;
+  line-height: 1.58;
+  font-weight: 400;
 }
-.how-intro { margin-top: 0; }
+.how-intro { margin-top: 0; font-size: 0.88rem; }
 .how-it-works-section { overflow: hidden; }
+
+.how-start-card {
+  margin-bottom: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.how-block-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.how-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.how-steps-compact { gap: 10px; }
+.how-step {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.how-step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.how-game-lottery .how-step-num {
+  background: rgba(245, 183, 49, 0.12);
+  border-color: rgba(245, 183, 49, 0.28);
+  color: var(--accent-gold);
+}
+.how-game-slots .how-step-num {
+  background: rgba(124, 92, 252, 0.14);
+  border-color: rgba(124, 92, 252, 0.3);
+  color: #c4b5fd;
+}
+.how-step-body strong {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  letter-spacing: var(--tracking-tight);
+}
+.how-step-body p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+.how-step-body em {
+  font-style: normal;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.how-step-body a { color: var(--accent-gold); text-decoration: underline; text-underline-offset: 2px; }
+
 .how-games-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin-bottom: 16px;
 }
 .how-game-card {
-  padding: 16px;
+  padding: 16px 18px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--bg-elevated);
@@ -2862,18 +2958,20 @@ input { font-family: inherit; }
 }
 .how-game-lottery {
   border-color: rgba(245, 183, 49, 0.22);
-  background: linear-gradient(160deg, rgba(245, 183, 49, 0.06) 0%, var(--bg-elevated) 55%);
+  background: linear-gradient(165deg, rgba(245, 183, 49, 0.05) 0%, var(--bg-elevated) 50%);
 }
 .how-game-slots {
   border-color: rgba(124, 92, 252, 0.25);
-  background: linear-gradient(160deg, rgba(124, 92, 252, 0.08) 0%, var(--bg-elevated) 55%);
+  background: linear-gradient(165deg, rgba(124, 92, 252, 0.07) 0%, var(--bg-elevated) 50%);
 }
 .how-game-header {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 10px 12px;
   align-items: start;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .how-game-icon {
   display: flex;
@@ -2887,22 +2985,25 @@ input { font-family: inherit; }
 }
 .how-game-title {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
 }
 .how-game-tagline {
   margin: 4px 0 0;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.45;
+  font-weight: 400;
 }
 .how-game-jump {
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--accent-gold);
   text-decoration: none;
   white-space: nowrap;
-  padding: 4px 10px;
+  padding: 5px 11px;
   border-radius: 999px;
   border: 1px solid rgba(245, 183, 49, 0.35);
   background: rgba(245, 183, 49, 0.08);
@@ -2913,53 +3014,56 @@ input { font-family: inherit; }
   border-color: rgba(124, 92, 252, 0.4);
   background: rgba(124, 92, 252, 0.12);
 }
-.how-game-jump:hover { opacity: 0.9; }
-.how-game-card .how-list {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 0.8rem;
-  line-height: 1.65;
-}
-.how-game-foot {
-  margin: 0;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  line-height: 1.55;
-  padding-top: 8px;
+.how-game-jump:hover { opacity: 0.88; }
+
+.how-draws-quick {
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
-.how-game-foot a { color: var(--accent-gold); }
-.how-shared-steps {
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--border);
-  background: var(--bg-card);
-}
-.how-shared-title {
-  margin: 0 0 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
+.how-draws-quick-title {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
-.how-shared-list {
+.how-draws-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
+  flex-direction: column;
+  gap: 6px;
 }
-.how-shared-list li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
+.how-draws-list li {
+  font-size: 0.76rem;
   color: var(--text-secondary);
   line-height: 1.45;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
 }
-.how-shared-list a { color: var(--accent-gold); }
+.how-draw-name {
+  flex-shrink: 0;
+  min-width: 4.5rem;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-gold);
+}
+
+.how-game-foot {
+  margin: 14px 0 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.how-game-foot a { color: var(--accent-gold); }
 
 @media (max-width: 900px) {
   .how-games-grid { grid-template-columns: 1fr; }
@@ -3056,9 +3160,8 @@ input { font-family: inherit; }
   align-items: start;
 }
 .match-tier-table-wrap { min-width: 0; }
-.match-tier-table td:nth-child(2) { color: var(--text-muted); font-weight: 500; font-size: 0.76rem; }
-.match-tier-table td:nth-child(3) { font-weight: 600; }
-.match-tier-table td:nth-child(4) { color: var(--accent-purple); font-weight: 700; font-size: 0.78rem; }
+.match-tier-table td:nth-child(2) { font-weight: 600; }
+.match-tier-table td:nth-child(3) { color: var(--accent-purple); font-weight: 600; font-size: 0.78rem; }
 .match-ball-count {
   display: inline-block;
   padding: 2px 8px;
