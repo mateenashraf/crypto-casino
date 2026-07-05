@@ -1,147 +1,124 @@
 /**
- * 14 months of authentic-looking platform growth + historic winners archive
+ * 14 months of platform growth — aligned with live stats bar & pool figures
  */
 const HistoricGrowth = (() => {
-  const STORAGE = 'starbitz_historic_14mo';
-  const MONTHS = 14;
+  let chartInstance = null;
 
-  function seededRandom(seed) {
-    let x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  }
-
-  function monthKey(year, month) {
-    return `${year}-${String(month + 1).padStart(2, '0')}`;
-  }
-
-  function buildMonthSeries() {
-    const end = new Date();
-    const series = [];
-    let tickets = 820;
-    let poolUsd = 12400;
-    let winnersPaid = 890;
-    let players = 340;
-
-    for (let i = MONTHS - 1; i >= 0; i--) {
-      const d = new Date(end.getFullYear(), end.getMonth() - i, 1);
-      const key = monthKey(d.getFullYear(), d.getMonth());
-      const seed = d.getFullYear() * 100 + d.getMonth();
-      const growth = 1.06 + seededRandom(seed) * 0.14;
-      const season = [0.92, 0.95, 1.02, 1.05, 1.08, 1.12, 1.15, 1.1, 1.06, 1.04, 1.18, 1.22][d.getMonth()];
-
-      tickets = Math.round(tickets * growth * season);
-      poolUsd = Math.round(poolUsd * growth * season * 1.02);
-      winnersPaid = Math.round(winnersPaid * (1.04 + seededRandom(seed + 1) * 0.08));
-      players = Math.round(players * (1.05 + seededRandom(seed + 2) * 0.06));
-
-      series.push({
-        key,
-        label: d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
-        tickets,
-        poolUsd,
-        winnersPaid,
-        players,
-        drawWinners: Math.max(12, Math.round(tickets / 180)),
-      });
-    }
-    return series;
-  }
-
-  function buildHistoricWinners(series) {
-    const winners = [];
-    const tiers = ['Daily Draw', 'Weekly Mega', 'Monthly Jackpot', 'Quarterly Ultra'];
-    const names = ['M.K.', 'J.R.', 'A.L.', 'S.P.', 'D.W.', 'L.C.', 'R.T.', 'N.H.', 'V.G.', 'E.B.'];
-
-    series.forEach((month, mi) => {
-      const count = Math.min(8, 3 + Math.floor(mi / 2));
-      for (let j = 0; j < count; j++) {
-        const seed = mi * 100 + j;
-        const tier = tiers[j % tiers.length];
-        const poolShare = 0.01 + seededRandom(seed) * 0.02;
-        const paid = Math.round(month.poolUsd * poolShare / count);
-        const [y, m] = month.key.split('-').map(Number);
-        const day = 1 + Math.floor(seededRandom(seed + 3) * 27);
-        const ts = new Date(y, m - 1, day, 20, 0, 0).getTime();
-
-        winners.push({
-          id: `H-${month.key}-${j}`,
-          drawName: tier,
-          prize: paid,
-          paidUsd: paid,
-          prizeLabel: '$' + paid.toLocaleString(),
-          winner: { wallet: `0x${Math.floor(seededRandom(seed + 4) * 1e8).toString(16).padStart(8, '0')}…${Math.floor(seededRandom(seed + 5) * 1e4).toString(16).padStart(4, '0')}` },
-          numbers: Array.from({ length: 6 }, (_, k) => 1 + Math.floor(seededRandom(seed + 10 + k) * 49)),
-          timestamp: ts,
-          historic: true,
-        });
-      }
-    });
-    return winners.sort((a, b) => b.timestamp - a.timestamp);
-  }
-
-  function ensureData() {
-    const existing = localStorage.getItem(STORAGE);
-    if (existing) {
-      try { return JSON.parse(existing); } catch { /* rebuild */ }
-    }
-    const series = buildMonthSeries();
-    const winners = buildHistoricWinners(series);
-    const data = { series, winners, generatedAt: Date.now() };
-    localStorage.setItem(STORAGE, JSON.stringify(data));
-    return data;
-  }
-
-  function getData() {
-    return ensureData();
+  function getSeriesBundle() {
+    const metrics = window.PlatformStats.getLiveMetrics();
+    const series = window.PlatformStats.buildMonthSeries(metrics);
+    const winners = window.PlatformStats.buildHistoricWinners(series);
+    return { metrics, series, winners };
   }
 
   function renderGrowthChart(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return null;
-    const { series } = getData();
 
-    return new Chart(canvas, {
+    const { series } = getSeriesBundle();
+
+    if (chartInstance) {
+      chartInstance.destroy();
+      chartInstance = null;
+    }
+
+    chartInstance = new Chart(canvas, {
       type: 'line',
       data: {
         labels: series.map((s) => s.label),
         datasets: [
           {
-            label: 'Tickets sold',
+            label: 'Total entries sold',
             data: series.map((s) => s.tickets),
             borderColor: '#a78bfa',
-            backgroundColor: 'rgba(167,139,250,0.12)',
+            backgroundColor: 'rgba(167,139,250,0.14)',
             fill: true,
             tension: 0.35,
+            pointRadius: 3,
+            pointHoverRadius: 5,
             yAxisID: 'y',
           },
           {
-            label: 'Pool ($)',
+            label: 'Pool in play ($)',
             data: series.map((s) => s.poolUsd),
-            borderColor: '#fbbf24',
+            borderColor: '#f5b731',
+            backgroundColor: 'rgba(245,183,49,0.08)',
             tension: 0.35,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            yAxisID: 'y1',
+          },
+          {
+            label: 'Paid to winners ($)',
+            data: series.map((s) => s.paidUsd),
+            borderColor: '#34d399',
+            backgroundColor: 'rgba(52,211,153,0.06)',
+            tension: 0.35,
+            pointRadius: 2,
+            pointHoverRadius: 4,
+            borderDash: [4, 3],
             yAxisID: 'y1',
           },
         ],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: true,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { labels: { color: '#94a3b8', boxWidth: 12 } },
+          legend: {
+            labels: { color: '#94a3b8', boxWidth: 12, padding: 14 },
+          },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const v = ctx.parsed.y;
+                if (ctx.datasetIndex >= 1) {
+                  return `${ctx.dataset.label}: ${window.PlatformStats.formatUsd(v)}`;
+                }
+                return `${ctx.dataset.label}: ${v.toLocaleString()}`;
+              },
+            },
+          },
         },
         scales: {
-          x: { ticks: { color: '#64748b', maxRotation: 45 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { position: 'left', ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.06)' } },
-          y1: { position: 'right', ticks: { color: '#fbbf24' }, grid: { drawOnChartArea: false } },
+          x: {
+            ticks: { color: '#64748b', maxRotation: 45, font: { size: 10 } },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+          },
+          y: {
+            position: 'left',
+            title: { display: true, text: 'Entries', color: '#a78bfa', font: { size: 11 } },
+            ticks: {
+              color: '#94a3b8',
+              callback: (v) => v.toLocaleString(),
+            },
+            grid: { color: 'rgba(255,255,255,0.06)' },
+          },
+          y1: {
+            position: 'right',
+            title: { display: true, text: 'Pool & payouts ($)', color: '#f5b731', font: { size: 11 } },
+            ticks: {
+              color: '#f5b731',
+              callback: (v) => {
+                if (v >= 1_000_000) return '$' + (v / 1_000_000).toFixed(1) + 'M';
+                if (v >= 1000) return '$' + Math.round(v / 1000) + 'K';
+                return '$' + v;
+              },
+            },
+            grid: { drawOnChartArea: false },
+          },
         },
       },
     });
+
+    return chartInstance;
   }
 
-  function renderHistoricWinners(containerId, limit = 20) {
+  function renderHistoricWinners(containerId, limit = 24) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    const { winners } = getData();
+    const { winners } = getSeriesBundle();
     el.innerHTML = winners.slice(0, limit).map((w) => `
       <div class="winner-row historic-winner-row">
         <div class="winner-prize">${w.prizeLabel}</div>
@@ -155,26 +132,35 @@ const HistoricGrowth = (() => {
   }
 
   function renderStats() {
-    const { series } = getData();
-    const latest = series[series.length - 1];
-    const first = series[0];
-    const growthPct = Math.round(((latest.tickets - first.tickets) / first.tickets) * 100);
+    window.PlatformStats.renderPlatformMetrics();
+  }
 
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    set('historicMonths', String(MONTHS));
-    set('historicTicketGrowth', `+${growthPct}%`);
-    set('historicTotalTickets', latest.tickets.toLocaleString());
-    set('historicPoolLatest', '$' + latest.poolUsd.toLocaleString());
+  function refresh() {
+    renderStats();
+    renderHistoricWinners('historicWinnersList', 24);
+    if (chartInstance) {
+      const { series } = getSeriesBundle();
+      chartInstance.data.labels = series.map((s) => s.label);
+      chartInstance.data.datasets[0].data = series.map((s) => s.tickets);
+      chartInstance.data.datasets[1].data = series.map((s) => s.poolUsd);
+      if (chartInstance.data.datasets[2]) {
+        chartInstance.data.datasets[2].data = series.map((s) => s.paidUsd);
+      }
+      chartInstance.update('none');
+    }
   }
 
   function init() {
-    ensureData();
     renderStats();
     renderHistoricWinners('historicWinnersList', 24);
     renderGrowthChart('growthChart');
+
+    window.addEventListener('lottery-activity', () => refresh());
+    window.addEventListener('draw-completed', () => refresh());
+    window.addEventListener('pool-updated', () => refresh());
   }
 
-  return { init, getData, renderGrowthChart, renderHistoricWinners, renderStats };
+  return { init, refresh, getSeriesBundle, renderStats, renderGrowthChart };
 })();
 
 window.HistoricGrowth = HistoricGrowth;
