@@ -89,7 +89,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=neondraw" />
 </head>
 <body>
@@ -108,7 +108,7 @@
           <a href="#lottery" class="nav-link active">Lottery</a>
           <a href="#dashboard" class="nav-link">Dashboard</a>
           <a href="#slots" class="nav-link">Slots</a>
-          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#how-it-works" class="nav-link">How to Play</a>
           <a href="#winners" class="nav-link">Winners</a>
           <a href="#why-trust" class="nav-link">Why Us</a>
           <a href="#faq" class="nav-link">FAQ</a>
@@ -143,7 +143,7 @@
             <span class="sidebar-icon" data-icon="cherry" data-icon-size="18"></span> Slot Machine
           </a>
           <a href="#how-it-works" class="sidebar-item">
-            <span class="sidebar-icon" data-icon="clipboard-list" data-icon-size="18"></span> How It Works
+            <span class="sidebar-icon" data-icon="clipboard-list" data-icon-size="18"></span> How to Play
           </a>
           <a href="#winners" class="sidebar-item">
             <span class="sidebar-icon" data-icon="trophy" data-icon-size="18"></span> Past Winners
@@ -430,8 +430,28 @@
         </section>
 
         <section class="lottery-panel compact-panel how-it-works-section" id="how-it-works">
-          <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> How It Works</h3>
-          <p class="panel-hint how-intro">NeonDraw is two games on one wallet: a scheduled <strong>6/49 lottery</strong> upstairs and instant <strong>Vegas slots</strong> on the casino floor. Connect once, deposit once, play either.</p>
+          <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> How to Play</h3>
+          <p class="panel-hint how-intro">Two games, one wallet. Connect once, then choose the lottery upstairs or slots on the casino floor.</p>
+
+          <article class="how-start-card">
+            <h4 class="how-block-title"><span data-icon="wallet" data-icon-size="16"></span> Before you play</h4>
+            <ol class="how-steps">
+              <li class="how-step">
+                <span class="how-step-num" aria-hidden="true">1</span>
+                <div class="how-step-body">
+                  <strong>Connect wallet</strong>
+                  <p>Tap <em>Connect Wallet</em> (top right). MetaMask or any Web3 wallet works.</p>
+                </div>
+              </li>
+              <li class="how-step">
+                <span class="how-step-num" aria-hidden="true">2</span>
+                <div class="how-step-body">
+                  <strong>Deposit (for slots)</strong>
+                  <p>Open your wallet modal → Deposit. Lottery entries can also be bought directly when picking numbers.</p>
+                </div>
+              </li>
+            </ol>
+          </article>
 
           <div class="how-games-grid">
             <article class="how-game-card how-game-lottery">
@@ -439,17 +459,49 @@
                 <span class="how-game-icon" data-icon="ticket" data-icon-size="22"></span>
                 <div>
                   <h4 class="how-game-title">Lottery · Rewards Cards™</h4>
-                  <p class="how-game-tagline">Pick 6 · wait for draw night · match-tier prizes</p>
+                  <p class="how-game-tagline">Scheduled draws · pick 6 numbers · prizes by match tier</p>
                 </div>
-                <a href="#lottery" class="how-game-jump">Play lottery</a>
+                <a href="#lottery" class="how-game-jump">Go to lottery</a>
               </header>
-              <ol class="how-list">
-                <li><strong>Choose a draw</strong> — Daily, Weekly Mega, Monthly Jackpot, or Quarterly Ultra (<a href="#draws">schedule</a>).</li>
-                <li><strong>Pick 6 numbers</strong> (1–49) or tap Quick Pick for a random line.</li>
-                <li><strong>Buy your entry</strong> from $1 with crypto, or redeem a free ticket from a past win.</li>
-                <li><strong>Draw night</strong> — when the countdown hits zero, winning numbers are drawn and prizes go out by <a href="#odds">match tier</a> (6 down to 2 numbers).</li>
+              <ol class="how-steps how-steps-compact">
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">1</span>
+                  <div class="how-step-body">
+                    <strong>Pick a draw</strong>
+                    <p>Daily, Weekly Mega, Monthly Jackpot, or Quarterly Ultra — see the <a href="#draws">draw schedule</a>.</p>
+                  </div>
+                </li>
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">2</span>
+                  <div class="how-step-body">
+                    <strong>Choose 6 numbers</strong>
+                    <p>Tap balls 1–49 or use <em>Quick Pick</em> for a random line.</p>
+                  </div>
+                </li>
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">3</span>
+                  <div class="how-step-body">
+                    <strong>Buy or redeem</strong>
+                    <p>Pay from $1 with crypto, or tap <em>Redeem Free Entry</em> if you have a free ticket.</p>
+                  </div>
+                </li>
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">4</span>
+                  <div class="how-step-body">
+                    <strong>Wait for draw night</strong>
+                    <p>When the countdown hits zero, numbers are drawn. More matches = bigger prizes — see <a href="#odds">prize tiers</a>.</p>
+                  </div>
+                </li>
               </ol>
-              <p class="how-game-foot">Jackpots, free tickets, and cash tiers · tracked in your <a href="#dashboard">Player Dashboard</a> · verify any entry in <a href="#ticket-lookup">Ticket Lookup</a>.</p>
+              <div class="how-draws-quick">
+                <p class="how-draws-quick-title">All four draws · same steps</p>
+                <ul class="how-draws-list">
+                  <li><span class="how-draw-name">Daily</span> Closes midnight UTC · top prize up to $3.5K</li>
+                  <li><span class="how-draw-name">Weekly</span> Closes Sunday 8:00 PM UTC · $2M mega</li>
+                  <li><span class="how-draw-name">Monthly</span> Closes 1st of month, 9:00 PM UTC · $5M jackpot</li>
+                  <li><span class="how-draw-name">Quarterly</span> Closes quarter start, 10:30 PM UTC · $10M ultra</li>
+                </ul>
+              </div>
             </article>
 
             <article class="how-game-card how-game-slots">
@@ -457,27 +509,42 @@
                 <span class="how-game-icon" data-icon="cherry" data-icon-size="22"></span>
                 <div>
                   <h4 class="how-game-title">NeonDraw Slots</h4>
-                  <p class="how-game-tagline">Spin the reels · match 3 symbols · instant results</p>
+                  <p class="how-game-tagline">Instant spins · match 3 symbols · results in seconds</p>
                 </div>
-                <a href="#slots" class="how-game-jump">Play slots</a>
+                <a href="#slots" class="how-game-jump">Go to slots</a>
               </header>
-              <ol class="how-list">
-                <li><strong>Connect &amp; deposit</strong> — fund your casino balance from the wallet modal (ETH, SOL, USDT, USDC, TRX).</li>
-                <li><strong>Set your bet</strong> and pull the lever or tap SPIN on the <a href="#slots">slot cabinet</a>.</li>
-                <li><strong>Match 3 symbols</strong> on the payline (🍒 🍋 ⭐ 💎 👑 7️⃣) to win an instant payout to your balance.</li>
-                <li><strong>Daily extras</strong> — use free spins and claim bonus free lottery tickets from the slots panel when available.</li>
+              <ol class="how-steps how-steps-compact">
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">1</span>
+                  <div class="how-step-body">
+                    <strong>Fund your balance</strong>
+                    <p>Deposit ETH, SOL, USDT, USDC, or TRX via the wallet modal.</p>
+                  </div>
+                </li>
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">2</span>
+                  <div class="how-step-body">
+                    <strong>Set your bet</strong>
+                    <p>Enter a USD amount on the slot cabinet (from $0.50).</p>
+                  </div>
+                </li>
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">3</span>
+                  <div class="how-step-body">
+                    <strong>Spin</strong>
+                    <p>Pull the lever or tap <em>SPIN</em>. Three matching symbols on the payline wins instantly.</p>
+                  </div>
+                </li>
+                <li class="how-step">
+                  <span class="how-step-num" aria-hidden="true">4</span>
+                  <div class="how-step-body">
+                    <strong>Collect &amp; extras</strong>
+                    <p>Wins credit to your casino balance. Use daily free spins and claim bonus lottery tickets in the panel beside the reels.</p>
+                  </div>
+                </li>
               </ol>
-              <p class="how-game-foot">Instant wins show on the <strong>SLOTS LIVE</strong> ticker · slot history rolls into the same dashboard as lottery entries.</p>
+              <p class="how-game-foot">Symbols: 🍒 🍋 ⭐ 💎 👑 7️⃣ · wins appear on the <strong>SLOTS LIVE</strong> ticker and in your <a href="#dashboard">dashboard</a>.</p>
             </article>
-          </div>
-
-          <div class="how-shared-steps">
-            <h4 class="how-shared-title">Both games · same account</h4>
-            <ul class="how-shared-list">
-              <li><span data-icon="wallet" data-icon-size="14"></span> One wallet connection for lottery buys, deposits, and slot bets</li>
-              <li><span data-icon="bar-chart" data-icon-size="14"></span> Wins, losses, and net earnings in <a href="#dashboard">My Dashboard</a></li>
-              <li><span data-icon="shield-check" data-icon-size="14"></span> Licensed operator · provably fair draws · 18+ only</li>
-            </ul>
           </div>
         </section>
 
@@ -492,8 +559,8 @@
         </section>
 
         <section class="lottery-panel compact-panel odds-section" id="odds">
-          <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Odds &amp; Prize Tiers</h3>
-          <p class="panel-hint">Pick 6 numbers from 1–49. Prizes depend on how many match the drawn line — same format as classic Vegas &amp; state lotteries.</p>
+          <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Prize Tiers</h3>
+          <p class="panel-hint">Pick 6 numbers from 1–49. What you win depends on how many match the drawn line for your selected draw.</p>
 
           <div class="match-tier-block">
             <div class="match-tier-header">
@@ -512,7 +579,6 @@
                   <thead>
                     <tr>
                       <th>Numbers matched</th>
-                      <th>Approx. odds</th>
                       <th>What you win</th>
                       <th>Pool share</th>
                     </tr>
@@ -521,11 +587,11 @@
                 </table>
               </div>
               <div class="match-tier-chart-wrap">
-                <p class="match-tier-chart-title">Payout pool split by match tier</p>
+                <p class="match-tier-chart-title">Prizes by match tier</p>
                 <canvas id="matchTierChart" height="220"></canvas>
               </div>
             </div>
-            <p class="match-tier-footnote">Pool share shows how that draw’s payout budget is weighted across tiers. Actual cash paid is capped by the live prize pool and published rules. Free tickets redeem on the number picker with no payment.</p>
+            <p class="match-tier-footnote">Pool share is how that draw’s prize budget is split across tiers. Actual cash paid depends on entries sold and live pool rules. Free tickets redeem on the number picker with no payment.</p>
           </div>
 
           <div class="odds-table-wrap">
@@ -738,11 +804,11 @@
           <div>
             <h4>Lottery</h4>
             <a href="#lottery">Buy Tickets</a>
-            <a href="#how-it-works">How It Works</a>
+            <a href="#how-it-works">How to Play</a>
             <a href="#winners">Winners</a>
             <a href="#faq">FAQ</a>
             <a href="#license">License</a>
-            <a href="#odds">Odds &amp; Prizes</a>
+            <a href="#odds">Prizes</a>
             <a href="#why-trust">Why NeonDraw</a>
           </div>
           <div>
