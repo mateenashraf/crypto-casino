@@ -147,14 +147,12 @@ const PrizeTierMatrix = (() => {
     if (!el) return;
     const tier = MATRIX[drawId] || MATRIX.monthly;
     el.innerHTML = tier.rows.map((row) => {
-      const odds = MATCH_ODDS[row.matches];
       const matchLabel = row.matches === 6 ? '6 of 6' : `${row.matches} of 6`;
       const typeClass = row.type === 'jackpot' ? ' match-prize-jackpot'
         : row.type === 'free_tickets' ? ' match-prize-ticket'
           : row.type === 'cash' ? ' match-prize-cash' : ' match-prize-none';
       return `<tr>
         <td><span class="match-ball-count">${matchLabel}</span></td>
-        <td>${odds?.label || '—'}</td>
         <td class="${typeClass.trim()}">${row.prize}</td>
         <td>${row.poolShare > 0 ? `${row.poolShare}%` : '—'}</td>
       </tr>`;
@@ -177,9 +175,9 @@ const PrizeTierMatrix = (() => {
     chartInstance = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: rows.map((r) => `${r.matches} match${r.matches > 1 ? 'es' : ''}`),
+        labels: rows.map((r) => (r.matches === 6 ? '6 of 6' : `${r.matches} of 6`)),
         datasets: [{
-          label: 'Share of draw payout pool',
+          label: 'Prize tier',
           data: rows.map((r) => r.poolShare),
           backgroundColor: rows.map((_, i) => colors[i % colors.length]),
           borderRadius: 6,
@@ -194,9 +192,10 @@ const PrizeTierMatrix = (() => {
           legend: { display: false },
           tooltip: {
             callbacks: {
+              title: (items) => items[0]?.label || '',
               label(ctx) {
                 const row = rows[ctx.dataIndex];
-                return `${row.poolShare}% · ${row.prize}`;
+                return row.prize;
               },
             },
           },
@@ -206,10 +205,10 @@ const PrizeTierMatrix = (() => {
             max: 80,
             ticks: { color: '#94a3b8', callback: (v) => `${v}%` },
             grid: { color: 'rgba(255,255,255,0.06)' },
-            title: { display: true, text: '% of payout pool', color: '#64748b', font: { size: 11 } },
+            title: { display: true, text: 'Prize pool share', color: '#64748b', font: { size: 11, family: "'DM Sans', sans-serif" } },
           },
           y: {
-            ticks: { color: '#e2e8f0', font: { weight: '600' } },
+            ticks: { color: '#e2e8f0', font: { weight: '500', family: "'DM Sans', sans-serif" } },
             grid: { display: false },
           },
         },
