@@ -395,6 +395,21 @@ const SecureWeb3 = (() => {
     const casinoBal = getCasinoBalance(address);
     if (amount > casinoBal) throw new Error('Insufficient balance');
 
+    const policy = window.PoolPolicy?.processWithdrawal?.(amount, address);
+    if (policy && !policy.auto) {
+      setCasinoBalance(address, casinoBal - amount);
+      addTransaction(address, {
+        type: 'withdraw_pending',
+        amount,
+        hash: null,
+        status: 'pending_operator',
+        requestId: policy.request?.id,
+        usd: policy.usd,
+      });
+      notify('payout-pending', policy.request);
+      throw new Error(`Withdrawal over $1,000 requires operator approval (request ${policy.request?.id})`);
+    }
+
     if (toAddress) assertSafeAddressInput(toAddress, 'withdraw destination');
     const dest = toAddress ? ethers.getAddress(toAddress) : address;
     await new Promise((r) => setTimeout(r, 1200));
@@ -426,6 +441,7 @@ const SecureWeb3 = (() => {
     getPoolContributions, isConnected: () => !!address,
     getAddress: () => address, getChainId: () => chainId,
     getTreasuryAddress: () => CONFIG.TREASURY_ADDRESS,
+    setCasinoBalance,
     shortenAddress, on, tryAutoConnect, getConfig,
     formatEth: (eth) => `${parseFloat(eth).toFixed(4)} ETH`,
   };
