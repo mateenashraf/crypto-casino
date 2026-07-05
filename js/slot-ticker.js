@@ -6,13 +6,12 @@ const SlotTicker = (() => {
   const INTERVAL_MS = { min: 3500, max: 11_000 };
   const BETS = [0.5, 1, 2, 5, 10, 25];
 
-  const SYMBOLS = [
-    { id: 'cherry', emoji: '🍒', label: 'Cherry', mult: 2 },
-    { id: 'lemon', emoji: '🍋', label: 'Lemon', mult: 2 },
-    { id: 'star', emoji: '⭐', label: 'Star', mult: 5 },
-    { id: 'gem', emoji: '💎', label: 'Diamond', mult: 8 },
-    { id: 'crown', emoji: '👑', label: 'Crown', mult: 15 },
-    { id: 'seven', emoji: '7️⃣', label: 'Lucky 7', mult: 25 },
+  const SYMBOLS = window.SlotSymbols?.getCatalog?.() || [
+    { id: 'cherry', label: 'Cherry', mult: 2 },
+    { id: 'orange', label: 'Orange', mult: 3 },
+    { id: 'bell', label: 'Bell', mult: 5 },
+    { id: 'crown', label: 'Crown', mult: 15 },
+    { id: 'seven', label: 'Lucky 7', mult: 25 },
   ];
 
   let feedItems = [];
@@ -45,7 +44,6 @@ const SlotTicker = (() => {
       type: 'slot_win',
       wallet,
       symbol: sym.id,
-      symbolEmoji: sym.emoji,
       symbolLabel: sym.label,
       betUsd: Number(betUsd) || 0,
       payoutUsd: Number(payoutUsd) || 0,
@@ -81,7 +79,7 @@ const SlotTicker = (() => {
   function addWin({ wallet, reels, betUsd, payoutUsd, won, free }) {
     if (!won || !wallet) return null;
 
-    const symbolId = Array.isArray(reels) && reels[0] ? reels[0] : 'star';
+    const symbolId = Array.isArray(reels) && reels[0] ? reels[0] : 'cherry';
     const event = buildWinEvent({
       wallet: window.SecureWeb3?.shortenAddress?.(wallet) || wallet,
       symbolId,
@@ -108,8 +106,12 @@ const SlotTicker = (() => {
       month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
     });
 
+    const symArt = window.SlotSymbols?.render?.(e.symbol)
+      ? `<span class="ticker-slot-art">${window.SlotSymbols.render(e.symbol)}</span>`
+      : `<span class="ticker-slot-fallback">${e.symbolLabel}</span>`;
+
     return `<span class="ticker-item ticker-item-slot${isNew ? ' ticker-item-new' : ''}${isYou ? ' ticker-item-you' : ''}">
-      <span class="ticker-slot-icon" aria-hidden="true">${e.symbolEmoji}</span>
+      ${symArt}
       <strong>${e.wallet}</strong>${youTag} won <span class="ticker-amount">${e.payoutLabel}</span>${freeTag} · ${e.symbolLabel} ×3
       <span class="ticker-when">${when}</span>
     </span>`;
