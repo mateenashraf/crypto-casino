@@ -39,8 +39,10 @@ const ActivitySimulator = (() => {
   }
 
   function loadPool() {
-    simulatedPool = parseFloat(localStorage.getItem(STORAGE_KEY) || '847293');
-    simulatedTickets = parseInt(localStorage.getItem(STORAGE_KEY + '_count') || '1247', 10);
+    const seedPool = window.PlatformStats?.SEED_SIM_POOL ?? 847_293;
+    const seedTickets = window.PlatformStats?.SEED_SIM_TICKETS ?? 1247;
+    simulatedPool = parseFloat(localStorage.getItem(STORAGE_KEY) || String(seedPool));
+    simulatedTickets = parseInt(localStorage.getItem(STORAGE_KEY + '_count') || String(seedTickets), 10);
   }
 
   function savePool() {
@@ -146,15 +148,20 @@ const ActivitySimulator = (() => {
   }
 
   function getMergedItems() {
+    const slotWins = window.SlotTicker?.getFeedItems?.() || [];
     const byId = new Map();
-    [...getRealEvents(), ...feedItems].forEach((e) => {
+    [...getRealEvents(), ...feedItems, ...slotWins].forEach((e) => {
       const existing = byId.get(e.id);
       if (!existing || e.timestamp >= existing.timestamp) byId.set(e.id, e);
     });
-    return [...byId.values()].sort((a, b) => b.timestamp - a.timestamp).slice(0, 20);
+    return [...byId.values()].sort((a, b) => b.timestamp - a.timestamp).slice(0, 24);
   }
 
   function formatTickerItem(e, highlightId) {
+    if (e.type === 'slot_win' && window.SlotTicker?.formatTickerItem) {
+      return window.SlotTicker.formatTickerItem(e, highlightId);
+    }
+
     const isNew = e.id === highlightId;
     const isYou = !e.simulated
       && window.SecureWeb3?.isConnected?.()
@@ -243,6 +250,10 @@ const ActivitySimulator = (() => {
       onActivity(ev.detail?.id);
     });
 
+    window.addEventListener('slot-win', (ev) => {
+      onActivity(ev.detail?.id);
+    });
+
     window.SecureWeb3?.on?.((event, data) => {
       if (event === 'ticket-purchased' && data?.id) {
         onActivity(data.id);
@@ -250,6 +261,7 @@ const ActivitySimulator = (() => {
     });
 
     renderTicker();
+    window.dispatchEvent(new CustomEvent('pool-updated'));
   }
 
   function stop() {
