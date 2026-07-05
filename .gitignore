@@ -4,3 +4,10 @@
 *.log
 node_modules/
 .cursor/
+blockchain/node_modules/
+blockchain/cache/
+blockchain/artifacts/
+blockchain/typechain-types/
+backend/**/bin/
+backend/**/obj/
+backend/.vs/
