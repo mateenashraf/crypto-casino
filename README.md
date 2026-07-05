@@ -52,8 +52,29 @@ If you still see old content: hard refresh with **Cmd+Shift+R** or open an incog
 
 | Doc | Description |
 |-----|-------------|
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | **Production migration plan (Phase 1+)** |
 | [docs/WEBSITE.md](docs/WEBSITE.md) | Full site docs, deploy, Web3 config, project structure |
 | [docs/GOOGLE-ADS.md](docs/GOOGLE-ADS.md) | **Google Ads funnel, keywords, ad copy, $100/mo budget** |
+
+---
+
+## Production stack (Phase 1)
+
+Incremental refactor; the static MVP above keeps working.
+
+| Path | Stack |
+|------|-------|
+| [blockchain/](blockchain/) | Hardhat, `NeonDrawLottery.sol`, OpenZeppelin |
+| [backend/](backend/) | ASP.NET Core 9, PostgreSQL, `GET /api/draws` |
+
+```bash
+# Contract
+cd blockchain && npm install && npm run compile && npm test
+
+# API (requires .NET 9 SDK)
+cd backend && docker compose up -d
+dotnet run --project src/NeonDraw.Api
+```
 
 ---
 
@@ -69,8 +90,11 @@ crypto-casino/
 │   ├── draw-engine.js         # Auto draws
 │   ├── activity-simulator.js
 │   └── app.js
-├── contracts/LotteryPool.sol
+├── contracts/LotteryPool.sol   # Legacy MVP escrow
+├── blockchain/                 # Hardhat + NeonDrawLottery.sol
+├── backend/                    # ASP.NET Core 9 API
 ├── docs/
+│   ├── ARCHITECTURE.md
 │   ├── WEBSITE.md
 │   └── GOOGLE-ADS.md
 └── scripts/push-to-github.sh
