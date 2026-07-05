@@ -214,7 +214,7 @@
           <div class="stat">
             <span class="stat-icon" data-icon="ticket" data-icon-size="22"></span>
             <div>
-              <span class="stat-value" id="statTickets">0</span>
+              <span class="stat-value" id="statTickets">1,247</span>
               <span class="stat-label">Entries Sold</span>
             </div>
           </div>
@@ -240,28 +240,82 @@
           <div class="live-ticker" id="liveTicker"></div>
         </div>
 
-        <section class="draw-schedule" id="draws">
-          <div class="section-header">
-            <h2 class="section-title"><span class="title-icon" data-icon="calendar" data-icon-size="20"></span> Draw Schedule</h2>
-            <span class="section-hint">Click a draw to enter</span>
-          </div>
-          <div class="draw-cards" id="drawCards"></div>
-        </section>
+        <section class="lottery-play-zone" id="lottery">
+          <section class="draw-schedule draw-schedule-inset" id="draws">
+            <div class="section-header">
+              <h2 class="section-title"><span class="title-icon" data-icon="calendar" data-icon-size="20"></span> Draw Schedule</h2>
+              <span class="section-hint">Click a draw to enter</span>
+            </div>
+            <div class="draw-cards" id="drawCards"></div>
+          </section>
 
-        <section class="lottery-hero compact-hero" id="lottery">
-          <p class="hero-tagline">Buy Rewards Cards™ · Pick 6 · Win on draw night</p>
-          <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>Monthly Jackpot</span></p>
-          <h1 class="lottery-jackpot" id="lotteryJackpot">$5,000,000</h1>
-          <p class="lottery-sub" id="featuredDrawSub">Prize: $5,000,000 · Pick 6 numbers to enter</p>
-          <p class="hero-format-hint"><span class="lotto-ball">6</span> numbers · <span class="lotto-ball">1</span>–<span class="lotto-ball">49</span> · Quick Pick or choose your lucky line</p>
-          <div class="lottery-countdown">
-            <div class="countdown-unit" id="cdDaysWrap"><span id="cdDays">00</span><small>Days</small></div>
-            <div class="countdown-unit"><span id="cdHours">00</span><small>Hours</small></div>
-            <div class="countdown-unit"><span id="cdMins">00</span><small>Mins</small></div>
-            <div class="countdown-unit"><span id="cdSecs">00</span><small>Secs</small></div>
+          <section class="lottery-hero compact-hero lottery-hero-tight">
+            <p class="hero-tagline">Buy Rewards Cards™ · Pick 6 · Win on draw night</p>
+            <p class="lottery-jackpot-label featured-draw-label" id="featuredDrawLabel"><span>Monthly Jackpot</span></p>
+            <h1 class="lottery-jackpot" id="lotteryJackpot">$5,000,000</h1>
+            <p class="lottery-sub" id="featuredDrawSub">Prize: $5,000,000 · Pick 6 numbers to enter</p>
+            <p class="hero-format-hint"><span class="lotto-ball">6</span> numbers · <span class="lotto-ball">1</span>–<span class="lotto-ball">49</span> · Quick Pick or choose your lucky line</p>
+            <div class="lottery-countdown">
+              <div class="countdown-unit" id="cdDaysWrap"><span id="cdDays">00</span><small>Days</small></div>
+              <div class="countdown-unit"><span id="cdHours">00</span><small>Hours</small></div>
+              <div class="countdown-unit"><span id="cdMins">00</span><small>Mins</small></div>
+              <div class="countdown-unit"><span id="cdSecs">00</span><small>Secs</small></div>
+            </div>
+            <button class="btn btn-gold" id="heroBuyBtn">Get My Numbers from $1</button>
+            <p class="hero-trust-line"><span data-icon="shield-check" data-icon-size="14"></span> Licensed draw · Public schedule · <span id="trustPaidOutBanner">$2.8M</span> already paid out</p>
+          </section>
+
+          <div class="pool-bar pool-bar-inset">
+            <div class="pool-bar-header">
+              <span>Prize pool growth</span>
+              <span id="poolAmount">$847,293 in play</span>
+            </div>
+            <div class="pool-bar-track">
+              <div class="pool-bar-fill" id="poolBarFill"></div>
+            </div>
           </div>
-          <button class="btn btn-gold" id="heroBuyBtn">Get My Numbers from $1</button>
-          <p class="hero-trust-line"><span data-icon="shield-check" data-icon-size="14"></span> Licensed draw · Public schedule · <span id="trustPaidOutBanner">$2.8M</span> already paid out</p>
+
+          <div class="lottery-grid lottery-grid-tight" id="pick-numbers">
+            <div class="lottery-panel">
+              <h3 class="panel-title"><span class="title-icon" data-icon="dices" data-icon-size="18"></span> Pick Your Lucky Numbers</h3>
+              <p class="panel-hint">Choose 6 numbers (1–49), or tap Quick Pick like at the corner store.</p>
+              <div class="selected-numbers" id="selectedPills"></div>
+              <div class="number-grid" id="numberGrid"></div>
+              <div class="number-actions">
+                <button class="btn btn-outline" id="quickPickBtn" type="button">Quick Pick</button>
+                <button class="btn btn-ghost" id="clearNumbersBtn" type="button">Clear</button>
+              </div>
+              <h3 class="panel-title"><span class="title-icon" data-icon="coins" data-icon-size="18"></span> Ticket Price</h3>
+              <div class="ticket-tiers" id="ticketTiers"></div>
+              <div class="active-offer-banner" id="activeOfferBanner" hidden></div>
+              <div class="custom-tier-panel" id="customTierPanel" hidden>
+                <label class="field-label" for="customAmount">Custom amount (USD)</label>
+                <div class="custom-amount-wrap">
+                  <span class="custom-amount-prefix">$</span>
+                  <input type="number" id="customAmount" min="1" max="6400" step="1" value="25" placeholder="Enter amount" class="text-input custom-amount-input" />
+                </div>
+                <p class="field-hint">$1 per ticket · enter any amount to see how many entries you get</p>
+              </div>
+              <div class="purchase-summary" id="purchaseSummary"></div>
+              <div class="free-ticket-banner" id="freeTicketBanner" hidden>
+                <span class="free-ticket-icon" data-icon="ticket" data-icon-size="18"></span>
+                <span class="free-ticket-text">You have <strong id="freeTicketCount">0</strong> free ticket(s), redeem with no payment</span>
+                <button type="button" class="btn btn-outline free-ticket-redeem-btn" id="redeemFreeTicketBtn">Redeem Free Entry</button>
+              </div>
+              <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Lock In My Entry</button>
+              <div class="tx-status" id="ticketStatus" hidden></div>
+              <div class="security-badge">
+                <span data-icon="shield-check" data-icon-size="16"></span>
+                <span>Your entry is recorded on-chain · Same 6/49 rules as Powerball-style games · Licensed operator · 18+ only</span>
+              </div>
+            </div>
+
+            <div class="lottery-panel">
+              <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Live Ticket Activity</h3>
+              <div class="activity-feed" id="activityFeed"></div>
+              <p class="activity-disclaimer">Live ticket purchases for upcoming draws. Winners are listed only after each scheduled draw closes.</p>
+            </div>
+          </div>
         </section>
 
         <section class="why-trust" id="why-trust">
@@ -300,17 +354,6 @@
           </div>
         </section>
 
-        <div class="pool-bar">
-          <div class="pool-bar-header">
-            <span>Prize pool · <strong>90% retained</strong> for sustainability</span>
-            <span id="poolAmount">$0 contributed</span>
-          </div>
-          <div class="pool-bar-track">
-            <div class="pool-bar-fill" id="poolBarFill"></div>
-          </div>
-          <p class="pool-retention-note">Across all draws, slots, and games, at least 90% of funds stay in the lottery pool. Payouts over $1,000 require operator wallet approval.</p>
-        </div>
-
         <section class="player-dashboard-section" id="dashboard">
           <div class="section-header">
             <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> Player Dashboard</h2>
@@ -319,89 +362,123 @@
           <div id="dashboardContent" class="dashboard-content"></div>
         </section>
 
-        <section class="slot-section" id="slots">
-          <div class="section-header">
-            <h2 class="section-title"><span class="title-icon" data-icon="cherry" data-icon-size="20"></span> NeonDraw Slots</h2>
-            <span class="section-hint">Better chances than a casino · 25% paid win rate</span>
-          </div>
-          <div class="slot-section-grid">
-            <div class="slot-machine-panel">
-              <p class="slot-odds-badge">Paid spins: <strong>25% win</strong> · <strong>75% loss</strong> · Typical Vegas slots: ~8–12% win</p>
-              <div class="slot-machine neon-slot">
-                <div class="slot-reels" id="neonSlotReels"></div>
-                <p class="slot-result" id="neonSlotResult">Connect wallet and spin!</p>
-                <p class="slot-explain" id="neonSlotExplain"></p>
-                <div class="slot-controls">
-                  <label class="field-label" for="neonSlotBet">Bet (USD)</label>
-                  <input type="number" id="neonSlotBet" value="1" min="0.5" step="0.5" class="text-input" />
-                  <button type="button" class="btn btn-gold" id="neonSlotSpinBtn">SPIN</button>
-                </div>
-              </div>
-            </div>
-            <div class="slot-bonus-panel">
-              <h3>Free spins &amp; free tickets</h3>
-              <p><strong id="freeSpinsLeft">3</strong> free spins left today · <strong id="freeTicketsLeft">2</strong> free tickets</p>
-              <p class="panel-hint" id="freeWinRateNote">Free wins capped at 10% of all free plays per day.</p>
-              <button type="button" class="btn btn-outline btn-block" id="neonSlotFreeBtn">Use Free Spin</button>
-              <button type="button" class="btn btn-gold btn-block" id="neonSlotGrantFreeTicket">Claim Free Ticket</button>
-            </div>
-          </div>
-        </section>
-
-        <div class="lottery-grid">
-          <div class="lottery-panel">
-            <h3 class="panel-title"><span class="title-icon" data-icon="dices" data-icon-size="18"></span> Pick Your Lucky Numbers</h3>
-            <p class="panel-hint">Choose 6 numbers (1–49), or tap Quick Pick like at the corner store.</p>
-            <div class="selected-numbers" id="selectedPills"></div>
-            <div class="number-grid" id="numberGrid"></div>
-            <div style="display:flex;gap:10px;margin-bottom:20px">
-              <button class="btn btn-outline" id="quickPickBtn" type="button">Quick Pick</button>
-              <button class="btn btn-ghost" id="clearNumbersBtn" type="button">Clear</button>
-            </div>
-            <h3 class="panel-title"><span class="title-icon" data-icon="coins" data-icon-size="18"></span> Ticket Price</h3>
-            <div class="ticket-tiers" id="ticketTiers"></div>
-            <div class="active-offer-banner" id="activeOfferBanner" hidden></div>
-            <div class="custom-tier-panel" id="customTierPanel" hidden>
-              <label class="field-label" for="customAmount">Custom amount (USD)</label>
-              <div class="custom-amount-wrap">
-                <span class="custom-amount-prefix">$</span>
-                <input type="number" id="customAmount" min="1" max="6400" step="1" value="25" placeholder="Enter amount" class="text-input custom-amount-input" />
-              </div>
-              <p class="field-hint">$1 per ticket · enter any amount to see how many entries you get</p>
-            </div>
-            <div class="purchase-summary" id="purchaseSummary"></div>
-            <div class="free-ticket-banner" id="freeTicketBanner" hidden>
-              <span class="free-ticket-icon" data-icon="ticket" data-icon-size="18"></span>
-              <span class="free-ticket-text">You have <strong id="freeTicketCount">0</strong> free ticket(s), redeem with no payment</span>
-              <button type="button" class="btn btn-outline free-ticket-redeem-btn" id="redeemFreeTicketBtn">Redeem Free Entry</button>
-            </div>
-            <button class="btn btn-gold btn-lg btn-block" id="buyTicketBtn" type="button">Lock In My Entry</button>
-            <div class="tx-status" id="ticketStatus" hidden></div>
-            <div class="security-badge">
-              <span data-icon="shield-check" data-icon-size="16"></span>
-              <span>Your entry is recorded on-chain · Same 6/49 rules as Powerball-style games · Licensed operator · 18+ only</span>
-            </div>
-          </div>
-
-          <div class="lottery-panel">
-            <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Live Ticket Activity</h3>
-            <div class="activity-feed" id="activityFeed"></div>
-            <p class="activity-disclaimer">Live ticket purchases for upcoming draws. Winners are listed only after each scheduled draw closes.</p>
-          </div>
+        <div class="zone-divider" aria-hidden="true">
+          <span class="zone-divider-line"></span>
+          <span class="zone-divider-label"><span data-icon="cherry" data-icon-size="14"></span> Casino Floor <span data-icon="cherry" data-icon-size="14"></span></span>
+          <span class="zone-divider-line"></span>
         </div>
 
-        <section class="lottery-panel compact-panel" id="how-it-works">
+        <section class="casino-floor-zone" id="slots">
+          <section class="slot-section slot-section-standalone">
+            <div class="section-header">
+              <h2 class="section-title"><span class="title-icon" data-icon="cherry" data-icon-size="20"></span> NeonDraw Slots</h2>
+              <span class="section-hint">Classic Vegas-style slots · connect wallet to play</span>
+            </div>
+            <div class="slot-live-ticker-wrap">
+              <span class="live-dot slot-live-dot"></span>
+              <span class="live-label slot-live-label">SLOTS LIVE</span>
+              <div class="live-ticker slot-live-ticker" id="slotLiveTicker"></div>
+            </div>
+            <div class="slot-section-grid">
+              <div class="slot-machine-panel">
+                <div class="slot-cabinet" id="neonSlotCabinet">
+                  <div class="slot-cabinet-top">
+                    <div class="slot-marquee-wrap">
+                      <span class="slot-marquee" id="slotMarquee">★ NEON DRAW JACKPOT ★</span>
+                    </div>
+                    <div class="slot-lights" aria-hidden="true"></div>
+                  </div>
+                  <div class="slot-window">
+                    <div class="slot-window-inner">
+                      <div class="slot-payline"></div>
+                      <div class="slot-reels-frame" id="neonSlotReels"></div>
+                    </div>
+                  </div>
+                  <div class="slot-paytable" aria-hidden="true">
+                    <span title="Cherry">🍒</span>
+                    <span title="Lemon">🍋</span>
+                    <span title="Star">⭐</span>
+                    <span title="Diamond">💎</span>
+                    <span title="Crown">👑</span>
+                    <span title="Lucky 7">7️⃣</span>
+                  </div>
+                  <div class="slot-cabinet-display">
+                    <p class="slot-result" id="neonSlotResult">Connect wallet and spin!</p>
+                    <p class="slot-explain" id="neonSlotExplain"></p>
+                  </div>
+                  <div class="slot-cabinet-controls">
+                    <div class="slot-bet-row">
+                      <label class="field-label" for="neonSlotBet">Bet (USD)</label>
+                      <input type="number" id="neonSlotBet" value="1" min="0.5" step="0.5" class="text-input slot-bet-input" />
+                    </div>
+                    <button type="button" class="slot-lever" id="neonSlotSpinBtn" aria-label="Spin">
+                      <span class="slot-lever-knob"></span>
+                      <span class="slot-lever-arm"></span>
+                    </button>
+                    <button type="button" class="btn btn-gold slot-spin-btn" id="neonSlotSpinBtnAlt">SPIN</button>
+                  </div>
+                </div>
+              </div>
+              <div class="slot-bonus-panel">
+                <h3>Free spins &amp; free tickets</h3>
+                <p><strong id="freeSpinsLeft">3</strong> free spins left today · <strong id="freeTicketsLeft">2</strong> free tickets</p>
+                <button type="button" class="btn btn-outline btn-block" id="neonSlotFreeBtn">Use Free Spin</button>
+                <button type="button" class="btn btn-gold btn-block" id="neonSlotGrantFreeTicket">Claim Free Ticket</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="lottery-panel compact-panel how-it-works-section" id="how-it-works">
           <h3 class="panel-title"><span class="title-icon" data-icon="clipboard-list" data-icon-size="18"></span> How It Works</h3>
-          <p class="panel-hint how-intro">If you’ve ever played Powerball, Mega Millions, or EuroMillions, you already know the drill.</p>
-          <ol class="how-list">
-            <li><strong>Pick your draw</strong>: Daily quick wins, weekly mega, monthly jackpot, or quarterly ultra.</li>
-            <li><strong>Choose 6 numbers</strong> (1–49) or hit Quick Pick for a random lucky line.</li>
-            <li><strong>Buy your entry</strong> from $1 with crypto, or use a free bonus ticket you won earlier.</li>
-            <li><strong>Wait for draw night</strong>: when the countdown hits zero, winners are picked at random and paid out.</li>
-          </ol>
-          <p class="activity-disclaimer">
-            Full transparency: see the <a href="#draws">draw schedule</a>, <a href="#winners">recent winners</a>, <a href="#odds">odds &amp; prizes</a>, and <a href="#ticket-lookup">ticket lookup</a> for any wallet.
-          </p>
+          <p class="panel-hint how-intro">NeonDraw is two games on one wallet: a scheduled <strong>6/49 lottery</strong> upstairs and instant <strong>Vegas slots</strong> on the casino floor. Connect once, deposit once, play either.</p>
+
+          <div class="how-games-grid">
+            <article class="how-game-card how-game-lottery">
+              <header class="how-game-header">
+                <span class="how-game-icon" data-icon="ticket" data-icon-size="22"></span>
+                <div>
+                  <h4 class="how-game-title">Lottery · Rewards Cards™</h4>
+                  <p class="how-game-tagline">Pick 6 · wait for draw night · match-tier prizes</p>
+                </div>
+                <a href="#lottery" class="how-game-jump">Play lottery</a>
+              </header>
+              <ol class="how-list">
+                <li><strong>Choose a draw</strong> — Daily, Weekly Mega, Monthly Jackpot, or Quarterly Ultra (<a href="#draws">schedule</a>).</li>
+                <li><strong>Pick 6 numbers</strong> (1–49) or tap Quick Pick for a random line.</li>
+                <li><strong>Buy your entry</strong> from $1 with crypto, or redeem a free ticket from a past win.</li>
+                <li><strong>Draw night</strong> — when the countdown hits zero, winning numbers are drawn and prizes go out by <a href="#odds">match tier</a> (6 down to 2 numbers).</li>
+              </ol>
+              <p class="how-game-foot">Jackpots, free tickets, and cash tiers · tracked in your <a href="#dashboard">Player Dashboard</a> · verify any entry in <a href="#ticket-lookup">Ticket Lookup</a>.</p>
+            </article>
+
+            <article class="how-game-card how-game-slots">
+              <header class="how-game-header">
+                <span class="how-game-icon" data-icon="cherry" data-icon-size="22"></span>
+                <div>
+                  <h4 class="how-game-title">NeonDraw Slots</h4>
+                  <p class="how-game-tagline">Spin the reels · match 3 symbols · instant results</p>
+                </div>
+                <a href="#slots" class="how-game-jump">Play slots</a>
+              </header>
+              <ol class="how-list">
+                <li><strong>Connect &amp; deposit</strong> — fund your casino balance from the wallet modal (ETH, SOL, USDT, USDC, TRX).</li>
+                <li><strong>Set your bet</strong> and pull the lever or tap SPIN on the <a href="#slots">slot cabinet</a>.</li>
+                <li><strong>Match 3 symbols</strong> on the payline (🍒 🍋 ⭐ 💎 👑 7️⃣) to win an instant payout to your balance.</li>
+                <li><strong>Daily extras</strong> — use free spins and claim bonus free lottery tickets from the slots panel when available.</li>
+              </ol>
+              <p class="how-game-foot">Instant wins show on the <strong>SLOTS LIVE</strong> ticker · slot history rolls into the same dashboard as lottery entries.</p>
+            </article>
+          </div>
+
+          <div class="how-shared-steps">
+            <h4 class="how-shared-title">Both games · same account</h4>
+            <ul class="how-shared-list">
+              <li><span data-icon="wallet" data-icon-size="14"></span> One wallet connection for lottery buys, deposits, and slot bets</li>
+              <li><span data-icon="bar-chart" data-icon-size="14"></span> Wins, losses, and net earnings in <a href="#dashboard">My Dashboard</a></li>
+              <li><span data-icon="shield-check" data-icon-size="14"></span> Licensed operator · provably fair draws · 18+ only</li>
+            </ul>
+          </div>
         </section>
 
         <section class="lottery-panel compact-panel" id="winners">
@@ -409,32 +486,66 @@
             <h3 class="panel-title"><span class="title-icon" data-icon="trophy" data-icon-size="18"></span> Recent Winners</h3>
             <span class="winners-draw-badge" id="winnersLiveBadge"><span data-icon="calendar" data-icon-size="12"></span> Posted when draws close</span>
           </div>
-          <p class="panel-hint">One winner per draw, when that draw’s countdown hits zero (daily at midnight, weekly Sunday, etc.). Amounts are <strong>actual payouts</strong> from that draw’s pool (1–3% of entries).</p>
+          <p class="panel-hint">One winner per draw, when that draw’s countdown hits zero (daily at midnight, weekly Sunday, etc.). Amounts shown are actual payouts from that draw’s prize pool.</p>
           <div id="winnersList"></div>
           <p class="winners-payout-note">Ticket purchases in the live feed are people entering upcoming draws. Winner rows only appear after a scheduled draw closes, not every minute.</p>
         </section>
 
         <section class="lottery-panel compact-panel odds-section" id="odds">
           <h3 class="panel-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="18"></span> Odds &amp; Prize Tiers</h3>
-          <p class="panel-hint">Straight talk, the same kind of breakdown you’d expect on a state lottery site.</p>
+          <p class="panel-hint">Pick 6 numbers from 1–49. Prizes depend on how many match the drawn line — same format as classic Vegas &amp; state lotteries.</p>
+
+          <div class="match-tier-block">
+            <div class="match-tier-header">
+              <span class="match-tier-label">Match-tier breakdown</span>
+              <span class="match-tier-summary" id="matchTierDrawSummary">Monthly Jackpot · top prize $5,000,000</span>
+            </div>
+            <div class="match-tier-draw-tabs" role="tablist" aria-label="Draw type">
+              <button type="button" class="match-tier-draw-btn" data-draw-id="daily" role="tab">Daily</button>
+              <button type="button" class="match-tier-draw-btn" data-draw-id="weekly" role="tab">Weekly</button>
+              <button type="button" class="match-tier-draw-btn active" data-draw-id="monthly" role="tab">Monthly</button>
+              <button type="button" class="match-tier-draw-btn" data-draw-id="quarterly" role="tab">Quarterly</button>
+            </div>
+            <div class="match-tier-grid">
+              <div class="match-tier-table-wrap">
+                <table class="odds-table match-tier-table">
+                  <thead>
+                    <tr>
+                      <th>Numbers matched</th>
+                      <th>Approx. odds</th>
+                      <th>What you win</th>
+                      <th>Pool share</th>
+                    </tr>
+                  </thead>
+                  <tbody id="matchTierTableBody"></tbody>
+                </table>
+              </div>
+              <div class="match-tier-chart-wrap">
+                <p class="match-tier-chart-title">Payout pool split by match tier</p>
+                <canvas id="matchTierChart" height="220"></canvas>
+              </div>
+            </div>
+            <p class="match-tier-footnote">Pool share shows how that draw’s payout budget is weighted across tiers. Actual cash paid is capped by the live prize pool and published rules. Free tickets redeem on the number picker with no payment.</p>
+          </div>
+
           <div class="odds-table-wrap">
             <table class="odds-table">
               <thead>
-                <tr><th>Draw</th><th>Top Prize</th><th>Draw Time (UTC)</th><th>Typical Wins</th></tr>
+                <tr><th>Draw</th><th>Top Prize</th><th>Draw Time (UTC)</th><th>Schedule</th></tr>
               </thead>
               <tbody>
-                <tr><td>Daily Draw</td><td>$2K – $3.5K</td><td>Midnight daily</td><td>Small cash &amp; free tickets</td></tr>
-                <tr><td>Weekly Mega</td><td>$2,000,000</td><td>Sunday 8:00 PM</td><td>Jackpot + bonus entries</td></tr>
-                <tr><td>Monthly Jackpot</td><td>$5,000,000</td><td>1st of month, 9:00 PM</td><td>Rollover-style mega prizes</td></tr>
-                <tr><td>Quarterly Ultra</td><td>$10,000,000</td><td>Quarter start, 10:30 PM</td><td>Ultra jackpot tier</td></tr>
+                <tr><td>Daily Draw</td><td>$2K – $3.5K</td><td>Midnight daily</td><td>6-match jackpot · 5-match cash · 4–3 free tickets</td></tr>
+                <tr><td>Weekly Mega</td><td>$2,000,000</td><td>Sunday 8:00 PM</td><td>6-match mega · 5-match cash · 4–3 free tickets</td></tr>
+                <tr><td>Monthly Jackpot</td><td>$5,000,000</td><td>1st of month, 9:00 PM</td><td>6-match jackpot · 5-match cash · 4–2 free tickets</td></tr>
+                <tr><td>Quarterly Ultra</td><td>$10,000,000</td><td>Quarter start, 10:30 PM</td><td>6-match ultra · 5-match cash · 4–2 free tickets</td></tr>
               </tbody>
             </table>
           </div>
           <ul class="odds-notes">
-            <li>Match all 6 numbers to qualify for the top prize in your selected draw tier.</li>
-            <li>Advertised jackpots (e.g. $5M, $10M) are the <strong>top prize tier</strong> for that draw. Actual cash paid is capped at 10% of that draw's entry pool (90% retained across the platform).</li>
-            <li>Free bonus tickets are awarded frequently, play again without spending another dollar.</li>
-            <li>The live winners feed shows <strong>paid amounts only</strong>, not advertised jackpot maximums.</li>
+            <li><strong>6 of 6</strong> wins the advertised top prize for that draw (subject to pool caps).</li>
+            <li><strong>5 of 6</strong> pays a cash tier; amount scales with the draw pool for that night.</li>
+            <li><strong>4–3 matches</strong> (and <strong>2 matches</strong> on monthly/quarterly) award free tickets you redeem below.</li>
+            <li>Advertised jackpots are the maximum top tier — actual cash depends on entries sold and pool rules.</li>
           </ul>
         </section>
 
@@ -476,12 +587,15 @@
         <section class="historic-growth-section" id="historic-growth">
           <div class="section-header">
             <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> <span id="historicMonths">14</span> Months of Real Growth</h2>
-            <span class="section-hint">Authentic platform history · <span id="historicTicketGrowth">+0%</span> ticket growth</span>
+            <span class="section-hint">Matches live stats above · <span id="historicTicketGrowth">+0%</span> entry growth</span>
           </div>
           <div class="historic-stats-row">
-            <div class="historic-stat"><strong id="historicTotalTickets">0</strong><span>Tickets last month</span></div>
-            <div class="historic-stat"><strong id="historicPoolLatest">$0</strong><span>Pool size</span></div>
+            <div class="historic-stat"><strong id="historicTotalTickets">1,247</strong><span>Entries sold (total)</span></div>
+            <div class="historic-stat"><strong id="historicPoolLatest">$847,293</strong><span>Pool in play</span></div>
+            <div class="historic-stat"><strong id="historicTotalPaid">$2.8M</strong><span>Paid to winners</span></div>
+            <div class="historic-stat historic-stat-growth"><strong id="historicGrowthSummary">+256% entries · +315% pool</strong><span>14-month trend</span></div>
           </div>
+          <p class="historic-chart-note">Chart end points match the stats bar, prize pool, and paid-out totals above — they update together as entries come in.</p>
           <div class="chart-card chart-card-wide">
             <canvas id="growthChart" height="220"></canvas>
           </div>
@@ -532,18 +646,6 @@
             <details class="faq-item">
               <summary>What are Rewards Cards™?</summary>
               <p>Rewards Cards™ are our branded lottery entries: buy a card, pick your numbers, and you're in the next scheduled draw. Same 6/49 format as classic Vegas lottery games, with crypto checkout.</p>
-            </details>
-            <details class="faq-item">
-              <summary>Why do payouts over $1,000 need approval?</summary>
-              <p>Large withdrawals and prizes are reviewed by the main operator wallet for security and compliance. Requests can be approved or rejected. Smaller amounts process automatically.</p>
-            </details>
-            <details class="faq-item">
-              <summary>How does the 90% pool retention work?</summary>
-              <p>At least 90% of all entry fees across lottery draws and slots stay in the prize pool to fund future jackpots and operations. No more than 10% is paid out in any settlement period, keeping the platform sustainable.</p>
-            </details>
-            <details class="faq-item">
-              <summary>Are slot odds really better than a casino?</summary>
-              <p>Our paid slots target a <strong>25% win rate</strong> (75% loss), versus typical Vegas slot hold of ~88–92% (8–12% player win). Free spins and free tickets win about 10% of the time, capped daily.</p>
             </details>
             <details class="faq-item">
               <summary>Is this like the lottery I already play?</summary>
@@ -837,6 +939,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
   <script defer src="js/icons.js?v=neondraw"></script>
+  <script defer src="js/platform-stats.js?v=neondraw"></script>
   <script defer src="js/pool-policy.js?v=neondraw"></script>
   <script defer src="js/wallet.js?v=neondraw"></script>
   <script defer src="js/provably-fair.js?v=neondraw"></script>
@@ -844,7 +947,9 @@
   <script defer src="js/player-dashboard.js?v=neondraw"></script>
   <script defer src="js/slot-machine.js?v=neondraw"></script>
   <script defer src="js/contact-form.js?v=neondraw"></script>
+  <script defer src="js/prize-tier-matrix.js?v=neondraw"></script>
   <script defer src="js/draw-engine.js?v=neondraw"></script>
+  <script defer src="js/slot-ticker.js?v=neondraw"></script>
   <script defer src="js/activity-simulator.js?v=neondraw"></script>
   <script defer src="js/lottery.js?v=neondraw"></script>
   <script defer src="js/partners.js?v=neondraw"></script>
