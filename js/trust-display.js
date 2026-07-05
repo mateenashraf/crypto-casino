@@ -4,6 +4,8 @@
 const TrustDisplay = (() => {
   const BASE_PAID_OUT_USD = 2_847_500;
   const BASE_WINNERS = 14_280;
+  const HERITAGE_YEAR = 1931;
+  const CRYPTO_SINCE = 2019;
   let playersOnline = 1200 + Math.floor(Math.random() * 800);
   let timer = null;
 
@@ -26,10 +28,7 @@ const TrustDisplay = (() => {
     } catch { /* ignore */ }
     return winners.reduce((sum, w) => {
       if (w.prizeType === 'free_ticket') return sum + 1;
-      const display = w.prizeLabel?.replace(/[^0-9.]/g, '');
-      const parsed = parseFloat(display);
-      if (w.microWin === false && parsed > 100_000) return sum + parsed;
-      return sum + (Number(w.prize) || parsed || 0);
+      return sum + (Number(w.prize) || Number(w.paidUsd) || 0);
     }, 0);
   }
 
@@ -61,6 +60,9 @@ const TrustDisplay = (() => {
     set('statPlayersOnline', formatCount(playersOnline));
     set('statWinnersTotal', formatCount(winnerTotal));
     set('trustPaidOutBanner', formatUsd(paid));
+    set('heritageYears', String(new Date().getFullYear() - HERITAGE_YEAR));
+    set('heritageSince', String(HERITAGE_YEAR));
+    set('cryptoSince', String(CRYPTO_SINCE));
   }
 
   function init() {
