@@ -147,7 +147,7 @@ const PlayerDashboard = (() => {
     const el = document.getElementById('dashTicketList');
     if (!el) return;
     if (!tickets.length) {
-      el.innerHTML = '<p class="panel-hint">No tickets yet. Buy Rewards Cards™ or enter a draw.</p>';
+      el.innerHTML = '<p class="panel-hint">No tickets yet. Buy lottery entries or play slots &amp; roulette.</p>';
       return;
     }
     el.innerHTML = tickets.slice(0, 30).map((t) => {
