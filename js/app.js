@@ -271,6 +271,7 @@
   initNavigation();
   document.body.style.overflow = '';
   window.SlotTicker?.init();
+  window.RouletteTicker?.init();
   window.LotteryApp.init();
   window.PartnerNetwork?.init();
   window.LicenseDisplay?.init();
@@ -282,6 +283,7 @@
   window.PrizeTierMatrix?.init();
   window.PlayerDashboard?.init();
   window.SlotMachine?.init();
+  window.Roulette?.init();
   window.ContactForm?.init();
   window.Icons?.hydrate();
   wallet.tryAutoConnect().then(() => updateWalletUI());
