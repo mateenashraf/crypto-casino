@@ -13,3 +13,13 @@ Static, client-side web app (vanilla HTML/CSS/JS + ethers.js via CDN). No backen
 - Core lottery UI (number grid 1–49, Quick Pick, ticket tiers, scheduled draws, simulated activity feed) works with no wallet. The buy-ticket / on-chain payment flow requires a **MetaMask** extension on **Sepolia** (chainId `11155111`) or Mainnet with test ETH — not testable in a headless/clean browser without that extension.
 - Web3 config (treasury address, optional `LOTTERY_CONTRACT`, allowed chain IDs) is hardcoded in `js/wallet.js` (`CONFIG` object), not in env files.
 - `scripts/push-*.{sh,mjs}` are GitHub deploy helpers only (need `gh` auth or `GITHUB_TOKEN`); not part of running/testing the app.
+
+### C# backend (`backend/`) + separated frontend (`frontend/`)
+
+- The repo is migrating to a separated architecture (see `docs/ARCHITECTURE.md`): an **ASP.NET Core 9 API** in `backend/` (layered Domain/Application/Infrastructure/Api) and a **separated API-client frontend** in `frontend/` (vanilla HTML/CSS/JS that calls the API). The legacy static site (`index.html` + `js/`) still runs independently.
+- **.NET 9 SDK is required and is NOT preinstalled.** Install once without root: `curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 9.0 --install-dir "$HOME/.dotnet"`, then use `~/.dotnet` on `PATH` and set `DOTNET_ROOT=$HOME/.dotnet`.
+- **Local dev needs no PostgreSQL/Docker:** `appsettings.Development.json` sets `Database:Provider=InMemory`, so the API uses an EF Core in-memory store (seeded with sample draws). Production uses Npgsql/Postgres (`Database:Provider=Postgres` + `ConnectionStrings:Default`, or `backend/docker compose up -d`).
+- Run the API: `dotnet run --project backend/src/NeonDraw.Api --urls http://localhost:5080` (Swagger at `/swagger`). Test: `dotnet test backend/NeonDraw.sln`.
+- Endpoints: `GET /api/draws`, `GET /api/draws/{id}`, `POST /api/draws/{id}/settle`, `GET /api/winners`, `POST /api/tickets`, `GET /api/tickets?wallet=0x…`, `GET /api/stats`, `GET /api/pool-policy`, `GET /health`.
+- Serve the frontend separately (CORS is open): e.g. `python3 -m http.server 8090 --directory frontend`, then open `http://localhost:8090`. The API base URL is configurable in the top bar (persisted in `localStorage`), defaulting to `http://localhost:5080`.
+- Draw settlement uses a server-side cryptographic RNG (not client `Math.random()`); production draws should still move to on-chain VRF per `docs/ARCHITECTURE.md`.

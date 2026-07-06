@@ -11,9 +11,15 @@ public class NeonDrawDbContext : DbContext
     public DbSet<Draw> Draws => Set<Draw>();
     public DbSet<Ticket> Tickets => Set<Ticket>();
     public DbSet<TransactionRecord> Transactions => Set<TransactionRecord>();
+    public DbSet<Winner> Winners => Set<Winner>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // The `integer[]` column type is PostgreSQL-specific. The InMemory
+        // provider (used for dev/test) maps int[] natively, so only apply it
+        // when running against Npgsql.
+        var isNpgsql = Database.IsNpgsql();
+
         modelBuilder.Entity<Draw>(entity =>
         {
             entity.HasKey(d => d.Id);
@@ -28,7 +34,7 @@ public class NeonDrawDbContext : DbContext
             entity.HasKey(t => t.Id);
             entity.HasIndex(t => t.OnChainTicketId).IsUnique();
             entity.HasIndex(t => t.WalletAddress);
-            entity.Property(t => t.Numbers).HasColumnType("integer[]");
+            if (isNpgsql) entity.Property(t => t.Numbers).HasColumnType("integer[]");
             entity.Property(t => t.PaidAmountUsd).HasPrecision(18, 2);
             entity.HasOne(t => t.Draw).WithMany(d => d.Tickets).HasForeignKey(t => t.DrawId);
         });
@@ -38,6 +44,15 @@ public class NeonDrawDbContext : DbContext
             entity.HasKey(t => t.Id);
             entity.Property(t => t.AmountEth).HasPrecision(28, 18);
             entity.HasIndex(t => t.TxHash);
+        });
+
+        modelBuilder.Entity<Winner>(entity =>
+        {
+            entity.HasKey(w => w.Id);
+            entity.HasIndex(w => w.DrawId);
+            if (isNpgsql) entity.Property(w => w.WinningNumbers).HasColumnType("integer[]");
+            entity.Property(w => w.PrizeUsd).HasPrecision(18, 2);
+            entity.HasOne(w => w.Draw).WithMany().HasForeignKey(w => w.DrawId);
         });
     }
 
