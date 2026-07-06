@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeonDraw — API Client</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Neon<span>Draw</span> <small>API client</small></div>
+    <div class="api-config">
+      <label for="apiBase">API</label>
+      <input id="apiBase" type="text" spellcheck="false" />
+      <span id="apiHealth" class="health" title="API health">•</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" id="statsBar" aria-live="polite"></section>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Draws</h2>
+        <div id="drawList" class="draw-list">Loading…</div>
+      </section>
+
+      <section class="panel">
+        <h2>Buy a ticket</h2>
+        <p class="hint">Selected draw: <strong id="selectedDrawLabel">none</strong></p>
+        <div id="numberGrid" class="number-grid"></div>
+        <div class="row">
+          <button id="quickPick" class="btn">Quick Pick</button>
+          <button id="clearNums" class="btn ghost">Clear</button>
+          <span id="picked" class="picked"></span>
+        </div>
+        <label class="field">
+          <span>Wallet address</span>
+          <input id="wallet" type="text" placeholder="0x…" spellcheck="false" />
+        </label>
+        <label class="field">
+          <span>Quantity</span>
+          <input id="qty" type="number" min="1" max="100" value="1" />
+        </label>
+        <button id="buyBtn" class="btn gold">Buy ticket(s)</button>
+        <div id="buyStatus" class="status"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Ticket lookup</h2>
+        <label class="field">
+          <span>Wallet address</span>
+          <input id="lookupWallet" type="text" placeholder="0x…" spellcheck="false" />
+        </label>
+        <div class="row">
+          <button id="lookupBtn" class="btn">Look up</button>
+          <button id="lookupMine" class="btn ghost">Use buyer address</button>
+        </div>
+        <div id="lookupResult" class="result"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Winners <button id="refreshWinners" class="btn ghost tiny">refresh</button></h2>
+        <div id="winnersList" class="result">No winners yet.</div>
+        <p class="hint">Pool policy: <span id="poolPolicy"></span></p>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
