@@ -80,6 +80,11 @@ const ProvablyFair = (() => {
         ? 'Nice match! Each spin uses verified randomness. Past results do not change the next outcome.'
         : 'No match this time. Every spin is independent. Try again when you are ready.';
     }
+    if (context === 'roulette') {
+      return won
+        ? 'Your bet matched the winning pocket. Each wheel spin is independent — the ball has no memory.'
+        : 'Ball landed elsewhere this spin. Every spin is a fresh outcome on a fair American wheel.';
+    }
     return won
       ? 'Your numbers matched this draw. Prizes come from the published prize pool for that draw tier.'
       : 'No match this draw. Every scheduled draw uses a published commit hash that is verified after the numbers are revealed.';
