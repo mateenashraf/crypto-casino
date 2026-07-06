@@ -149,8 +149,9 @@ const ActivitySimulator = (() => {
 
   function getMergedItems() {
     const slotWins = window.SlotTicker?.getFeedItems?.() || [];
+    const rouletteWins = window.RouletteTicker?.getFeedItems?.() || [];
     const byId = new Map();
-    [...getRealEvents(), ...feedItems, ...slotWins].forEach((e) => {
+    [...getRealEvents(), ...feedItems, ...slotWins, ...rouletteWins].forEach((e) => {
       const existing = byId.get(e.id);
       if (!existing || e.timestamp >= existing.timestamp) byId.set(e.id, e);
     });
@@ -160,6 +161,9 @@ const ActivitySimulator = (() => {
   function formatTickerItem(e, highlightId) {
     if (e.type === 'slot_win' && window.SlotTicker?.formatTickerItem) {
       return window.SlotTicker.formatTickerItem(e, highlightId);
+    }
+    if (e.type === 'roulette_win' && window.RouletteTicker?.formatTickerItem) {
+      return window.RouletteTicker.formatTickerItem(e, highlightId);
     }
 
     const isNew = e.id === highlightId;
@@ -251,6 +255,10 @@ const ActivitySimulator = (() => {
     });
 
     window.addEventListener('slot-win', (ev) => {
+      onActivity(ev.detail?.id);
+    });
+
+    window.addEventListener('roulette-win', (ev) => {
       onActivity(ev.detail?.id);
     });
 
