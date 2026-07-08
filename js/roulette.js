@@ -2,7 +2,11 @@
  * NeonDraw Roulette — American wheel (0, 00, 1–36) · Vegas casino floor
  */
 const Roulette = (() => {
-  const STORAGE = 'starbitz_roulette_history';
+  const STORAGE = 'roulette_history';
+  const STORAGE_FREE = 'roulette_free_daily';
+  const FREE_SPINS_PER_DAY = 3;
+  const FREE_WIN_RATE = 0.12;
+  const FREE_VIRTUAL_BET_USD = 1;
   const WHEEL_ORDER = [
     '0', '28', '9', '26', '30', '11', '7', '20', '32', '17', '5', '22', '34', '15', '3', '24', '36', '13', '1',
     '00', '27', '10', '25', '29', '12', '8', '19', '31', '18', '6', '21', '33', '16', '4', '23', '35', '14', '2',
@@ -47,8 +51,50 @@ const Roulette = (() => {
     return false;
   }
 
+  function todayKey() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function loadFreeDaily() {
+    if (window.NeonDrawDev?.hasUnlimitedSpins?.()) {
+      return {
+        day: todayKey(),
+        freeSpinsUsed: 0,
+        freeWins: 0,
+        freePlays: 0,
+      };
+    }
+    try {
+      const data = SecureStorage.getJSON(STORAGE_FREE, {});
+      if (data.day !== todayKey()) {
+        return { day: todayKey(), freeSpinsUsed: 0, freeWins: 0, freePlays: 0 };
+      }
+      return data;
+    } catch {
+      return { day: todayKey(), freeSpinsUsed: 0, freeWins: 0, freePlays: 0 };
+    }
+  }
+
+  function saveFreeDaily(data) {
+    SecureStorage.setJSON(STORAGE_FREE, { ...data, day: todayKey() });
+  }
+
+  function canFreeWin(freeState) {
+    if (freeState.freePlays === 0) return Math.random() < FREE_WIN_RATE;
+    const currentRate = freeState.freeWins / freeState.freePlays;
+    if (currentRate >= FREE_WIN_RATE) return false;
+    return Math.random() < FREE_WIN_RATE;
+  }
+
   function pickResult() {
     return WHEEL_ORDER[Math.floor(Math.random() * WHEEL_ORDER.length)];
+  }
+
+  function pickResultForBet(betType, forceWin) {
+    if (!forceWin) return pickResult();
+    const winners = WHEEL_ORDER.filter((label) => checkWin(betType, label));
+    if (!winners.length) return pickResult();
+    return winners[Math.floor(Math.random() * winners.length)];
   }
 
   function buildWheelSVG() {
@@ -121,15 +167,15 @@ const Roulette = (() => {
     if (state) cab.classList.add(state);
   }
 
-  function recordPlay(wallet, { betUsd, payoutUsd, won, betType, result }) {
-    const list = JSON.parse(localStorage.getItem(STORAGE) || '[]');
-    list.unshift({ wallet, betUsd, payoutUsd, won, betType, result, timestamp: Date.now() });
-    localStorage.setItem(STORAGE, JSON.stringify(list.slice(0, 500)));
+  function recordPlay(wallet, { betUsd, payoutUsd, won, betType, result, free = false }) {
+    const list = SecureStorage.getJSON(STORAGE, []);
+    list.unshift({ wallet, betUsd, payoutUsd, won, betType, result, free, timestamp: Date.now() });
+    SecureStorage.setJSON(STORAGE, list.slice(0, 500));
     window.dispatchEvent(new CustomEvent('roulette-played', {
-      detail: { won, payoutUsd, betUsd, betType, result, wallet },
+      detail: { won, payoutUsd, betUsd, betType, result, wallet, free },
     }));
     if (won) {
-      window.RouletteTicker?.addWin?.({ wallet, betType, result, betUsd, payoutUsd, won });
+      window.RouletteTicker?.addWin?.({ wallet, betType, result, betUsd, payoutUsd, won, free });
     }
     renderRecentResults();
   }
@@ -137,7 +183,7 @@ const Roulette = (() => {
   function renderRecentResults() {
     const el = document.getElementById('rouletteRecentResults');
     if (!el) return;
-    const list = JSON.parse(localStorage.getItem(STORAGE) || '[]').slice(0, 12);
+    const list = SecureStorage.getJSON(STORAGE, []).slice(0, 12);
     if (!list.length) {
       el.innerHTML = '<span class="roulette-recent-empty">No spins yet</span>';
       return;
@@ -169,7 +215,41 @@ const Roulette = (() => {
     });
   }
 
-  async function spin() {
+  function getFreeSpinsLimit() {
+    return window.NeonDrawDev?.hasUnlimitedSpins?.() ? 9999 : FREE_SPINS_PER_DAY;
+  }
+
+  function getBetUsd() {
+    const raw = parseFloat(document.getElementById('neonRouletteBet')?.value || '');
+    return Number.isFinite(raw) ? raw : null;
+  }
+
+  function canAffordPaidSpin() {
+    const wallet = window.SecureWeb3?.getAddress?.();
+    if (!wallet) return false;
+    const betUsd = getBetUsd();
+    if (betUsd == null) return false;
+    const minBet = window.TicketPricing?.MIN_ROULETTE_BET_USD || 0.5;
+    if (betUsd < minBet) return false;
+    const betEth = betUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
+    const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
+    return betEth <= casinoBal;
+  }
+
+  function updatePlayControls() {
+    const connected = window.SecureWeb3?.isConnected?.();
+    const paidBtn = document.getElementById('neonRouletteSpinBtn');
+    const canPaid = connected && canAffordPaidSpin() && !spinning;
+    if (paidBtn) {
+      paidBtn.disabled = !canPaid;
+      paidBtn.title = canPaid
+        ? ''
+        : 'Deposit to your casino balance to spin for real money';
+    }
+    updateFreeUI();
+  }
+
+  async function spin({ free = false } = {}) {
     if (spinning) return;
     const wallet = window.SecureWeb3?.getAddress?.();
     if (!wallet) {
@@ -178,33 +258,57 @@ const Roulette = (() => {
       return;
     }
 
-    const betUsd = parseFloat(document.getElementById('neonRouletteBet')?.value || '1');
-    if (betUsd < 0.5) {
-      window.AppUI?.toast?.('Minimum bet is $0.50', 'info');
-      return;
-    }
+    const freeState = loadFreeDaily();
+    let betUsd = 0;
+    let forceWin = false;
 
-    const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
-    const betEth = betUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
-    if (betEth > casinoBal) {
-      window.AppUI?.toast?.('Deposit to casino balance first', 'error');
-      return;
+    if (free) {
+      if (freeState.freeSpinsUsed >= getFreeSpinsLimit()) {
+        window.AppUI?.toast?.('No free roulette spins left today', 'info');
+        return;
+      }
+      betUsd = FREE_VIRTUAL_BET_USD;
+      forceWin = canFreeWin(freeState);
+    } else {
+      betUsd = getBetUsd();
+      const minBet = window.TicketPricing?.MIN_ROULETTE_BET_USD || 0.5;
+      if (betUsd == null || betUsd < minBet) {
+        window.AppUI?.toast?.(`Minimum bet is $${minBet}`, 'info');
+        return;
+      }
+      if (!canAffordPaidSpin()) {
+        window.AppUI?.toast?.(
+          `Deposit at least ${window.TicketPricing?.formatUsd?.(window.TicketPricing?.MIN_DEPOSIT_USD || 10) || '$10'} to casino balance first`,
+          'error'
+        );
+        updatePlayControls();
+        return;
+      }
     }
 
     spinning = true;
     setSpinEnabled(false);
     setCabinetState('is-spinning');
 
-    window.SecureWeb3?.setCasinoBalance?.(wallet, casinoBal - betEth);
+    try {
+      if (free) {
+        freeState.freeSpinsUsed += 1;
+        freeState.freePlays += 1;
+        saveFreeDaily(freeState);
+      } else {
+        const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
+        const betEth = betUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
+        window.SecureWeb3?.setCasinoBalance?.(wallet, casinoBal - betEth);
+      }
 
-    const result = pickResult();
+      const result = pickResultForBet(selectedBet, forceWin);
     const slotIndex = WHEEL_ORDER.indexOf(result);
     const targetRot = wheelRotation + rotationForSlot(slotIndex);
 
     const resultEl = document.getElementById('rouletteResult');
     const explainEl = document.getElementById('rouletteExplain');
     if (resultEl) {
-      resultEl.textContent = 'Spinning…';
+      resultEl.textContent = free ? 'Free spin…' : 'Spinning…';
       resultEl.className = 'roulette-result spinning-text';
     }
     if (explainEl) explainEl.textContent = '';
@@ -217,14 +321,32 @@ const Roulette = (() => {
     let payoutUsd = 0;
     const meta = OUTSIDE_BETS.find((b) => b.id === selectedBet);
     if (won) {
-      payoutUsd = betUsd * (1 + (meta?.payout || 1));
-      const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
-      const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette' });
-      if (approval?.auto) {
-        window.SecureWeb3?.setCasinoBalance?.(
-          wallet,
-          (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
-        );
+      if (free) {
+        freeState.freeWins += 1;
+        saveFreeDaily(freeState);
+        payoutUsd = 0.5 + Math.random() * 2;
+        const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
+        const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette_free' });
+        if (approval?.auto) {
+          window.SecureWeb3?.setCasinoBalance?.(
+            wallet,
+            (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
+          );
+        } else if (approval) {
+          window.PoolPolicy?.notifyPayoutProcessing?.(wallet, payoutUsd);
+        }
+      } else {
+        payoutUsd = betUsd * (1 + (meta?.payout || 1));
+        const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
+        const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette' });
+        if (approval?.auto) {
+          window.SecureWeb3?.setCasinoBalance?.(
+            wallet,
+            (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
+          );
+        } else if (approval) {
+          window.PoolPolicy?.notifyPayoutProcessing?.(wallet, payoutUsd);
+        }
       }
     }
 
@@ -232,24 +354,53 @@ const Roulette = (() => {
     const colorClass = slotColor(result);
     if (resultEl) {
       resultEl.innerHTML = won
-        ? `WIN! <span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} · +$${payoutUsd.toFixed(2)}`
-        : `<span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} — no win`;
+        ? `WIN! <span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} · +$${payoutUsd.toFixed(2)}${free ? ' (free spin)' : ''}`
+        : `<span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} — no win${free ? ' (free spin)' : ''}`;
       resultEl.className = `roulette-result ${won ? 'win' : 'loss'}`;
     }
     if (explainEl) {
-      explainEl.textContent = window.ProvablyFair?.explainOutcome?.(won, 'roulette') || '';
+      explainEl.textContent = window.ProvablyFair?.explainOutcome?.(won, free ? 'roulette_free' : 'roulette') || '';
     }
 
     setCabinetState(won ? 'is-win' : 'is-loss');
-    recordPlay(wallet, { betUsd, payoutUsd, won, betType: selectedBet, result });
-    spinning = false;
-    setSpinEnabled(true);
+    recordPlay(wallet, { betUsd: free ? 0 : betUsd, payoutUsd, won, betType: selectedBet, result, free });
+    } finally {
+      spinning = false;
+      setSpinEnabled(true);
+      updatePlayControls();
+      window.AppUI?.refreshBalances?.();
+    }
   }
 
   function setSpinEnabled(enabled) {
     const btn = document.getElementById('neonRouletteSpinBtn');
-    if (btn) btn.disabled = !enabled;
+    const freeBtn = document.getElementById('neonRouletteFreeBtn');
+    const freeState = loadFreeDaily();
+    const spinsLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed);
+    if (freeBtn) freeBtn.disabled = !enabled || spinsLeft <= 0;
     document.querySelectorAll('.roulette-bet-btn').forEach((b) => { b.disabled = !enabled; });
+    if (!enabled) {
+      if (btn) btn.disabled = true;
+      return;
+    }
+    updatePlayControls();
+  }
+
+  function updateFreeUI() {
+    const freeState = loadFreeDaily();
+    const limit = getFreeSpinsLimit();
+    const spinsLeft = Math.max(0, limit - freeState.freeSpinsUsed);
+    const countEl = document.getElementById('freeRouletteSpinsLeft');
+    const freeBtn = document.getElementById('neonRouletteFreeBtn');
+    if (countEl) {
+      countEl.textContent = window.NeonDrawDev?.hasUnlimitedSpins?.()
+        ? '∞'
+        : String(spinsLeft);
+    }
+    if (freeBtn) {
+      freeBtn.disabled = spinsLeft <= 0;
+      freeBtn.textContent = spinsLeft > 0 ? 'Use Free Spin' : 'No spins left today';
+    }
   }
 
   function init() {
@@ -258,14 +409,24 @@ const Roulette = (() => {
 
     bindBets();
     updateBetUI();
+    updateFreeUI();
+    updatePlayControls();
     renderRecentResults();
 
-    document.getElementById('neonRouletteSpinBtn')?.addEventListener('click', spin);
+    document.getElementById('neonRouletteSpinBtn')?.addEventListener('click', () => spin({ free: false }));
+    document.getElementById('neonRouletteFreeBtn')?.addEventListener('click', () => spin({ free: true }));
+    document.getElementById('neonRouletteBet')?.addEventListener('input', () => updatePlayControls());
+
+    window.SecureWeb3?.on?.((event) => {
+      if (['connected', 'disconnected', 'deposit-success', 'withdraw-success'].includes(event)) {
+        updatePlayControls();
+      }
+    });
 
     window.addEventListener('roulette-played', renderRecentResults);
   }
 
-  return { init, spin, WHEEL_ORDER, slotColor, checkWin };
+  return { init, spin, updateFreeUI, updatePlayControls, WHEEL_ORDER, slotColor, checkWin };
 })();
 
 window.Roulette = Roulette;
