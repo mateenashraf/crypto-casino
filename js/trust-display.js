@@ -2,8 +2,13 @@
  * Trust & social-proof stats — uses PlatformStats for consistent numbers
  */
 const TrustDisplay = (() => {
-  let playersOnline = 1200 + Math.floor(Math.random() * 800);
+  const SEED = window.PlatformStats?.SEED_PLAYERS_ONLINE ?? 2840;
+  let playersOnline = SEED + Math.floor(Math.random() * 400);
   let timer = null;
+
+  function getPlayersOnline() {
+    return playersOnline;
+  }
 
   function render() {
     const ps = window.PlatformStats;
@@ -24,8 +29,8 @@ const TrustDisplay = (() => {
   }
 
   function tickPlayersOnline() {
-    const delta = Math.floor(Math.random() * 41) - 18;
-    playersOnline = Math.max(640, Math.min(3200, playersOnline + delta));
+    const delta = Math.floor(Math.random() * 61) - 22;
+    playersOnline = Math.max(2200, Math.min(5800, playersOnline + delta));
     const el = document.getElementById('statPlayersOnline');
     if (el) el.textContent = window.PlatformStats.formatCount(playersOnline);
   }
@@ -51,6 +56,7 @@ const TrustDisplay = (() => {
     init,
     stop,
     render,
+    getPlayersOnline,
     formatUsd: (...args) => window.PlatformStats.formatUsd(...args),
   };
 })();
