@@ -3,10 +3,10 @@
  * Daily · Weekly · Monthly · Quarterly
  */
 const DrawEngine = (() => {
-  const STORAGE_DRAWS = 'starbitz_draw_state';
-  const STORAGE_WINNERS = 'starbitz_draw_winners';
-  const STORAGE_TICKETS_BY_DRAW = 'starbitz_tickets_by_draw';
-  const STORAGE_ECONOMICS = 'starbitz_economics_state';
+  const STORAGE_DRAWS = 'draw_state';
+  const STORAGE_WINNERS = 'draw_winners';
+  const STORAGE_TICKETS_BY_DRAW = 'tickets_by_draw';
+  const STORAGE_ECONOMICS = 'economics';
   const ECONOMICS = {
     OPERATOR_RETAIN_RATIO: 0.90,
     GLOBAL_PAYOUT_CAP_RATIO: 0.10,
@@ -17,11 +17,12 @@ const DrawEngine = (() => {
   };
   const FREE_TICKET_QTY = 1;
   const WINNER_OUTCOME_WEIGHTS = {
-    free_ticket: 0.38,
-    small: 0.50,
-    medium: 0.09,
-    jackpot: { weekly: 0.025, monthly: 0.018, quarterly: 0.012 },
+    free_ticket: 0.28,
+    small: 0.38,
+    medium: 0.22,
+    jackpot: { weekly: 0.08, monthly: 0.07, quarterly: 0.06 },
   };
+  const SHOWCASE_WIN_MS = { min: 5 * 60 * 1000, max: 12 * 60 * 1000 };
   const SEED_WINNERS_COUNT = 14;
   /** Winners only when a scheduled draw closes — not on a fake timer */
   const LIVE_WINNERS_ENABLED = false;
@@ -97,13 +98,10 @@ const DrawEngine = (() => {
   };
   let selectedDrawId = 'monthly';
   let tickTimer = null;
+  let showcaseTimer = null;
 
   function loadState() {
-    try {
-      state = JSON.parse(localStorage.getItem(STORAGE_DRAWS) || '{}');
-    } catch {
-      state = {};
-    }
+    state = SecureStorage.getJSON(STORAGE_DRAWS, {});
     DRAW_TIERS.forEach((tier) => {
       if (!state[tier.id]) {
         state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: null, runCount: 0 };
@@ -113,7 +111,7 @@ const DrawEngine = (() => {
   }
 
   function saveState() {
-    localStorage.setItem(STORAGE_DRAWS, JSON.stringify(state));
+    SecureStorage.setJSON(STORAGE_DRAWS, state);
   }
 
   function getUtcDayKey(ts = Date.now()) {
@@ -135,7 +133,7 @@ const DrawEngine = (() => {
 
   function loadEconomics() {
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORAGE_ECONOMICS) || '{}');
+      const parsed = SecureStorage.getJSON(STORAGE_ECONOMICS, {});
       // Backward compatibility: older versions used inflowUsd/outflowUsd only.
       const legacyInflow = Number(parsed.inflowUsd) || 0;
       const legacyOutflow = Number(parsed.outflowUsd) || 0;
@@ -159,32 +157,43 @@ const DrawEngine = (() => {
   }
 
   function saveEconomics() {
-    localStorage.setItem(STORAGE_ECONOMICS, JSON.stringify(economicsState));
+    SecureStorage.setJSON(STORAGE_ECONOMICS, economicsState);
   }
 
   function getWinners() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_WINNERS) || '[]');
-    } catch {
-      return [];
-    }
+    return SecureStorage.getJSON(STORAGE_WINNERS, []);
   }
 
   function saveWinner(entry) {
     const list = getWinners();
     list.unshift(entry);
-    localStorage.setItem(STORAGE_WINNERS, JSON.stringify(list.slice(0, 50)));
+    SecureStorage.setJSON(STORAGE_WINNERS, list.slice(0, 50));
   }
 
   function getTicketsForDraw(drawId) {
-    const all = JSON.parse(localStorage.getItem(STORAGE_TICKETS_BY_DRAW) || '{}');
+    const all = SecureStorage.getJSON(STORAGE_TICKETS_BY_DRAW, {});
     return all[drawId] || [];
   }
 
   function registerTicket(drawId, ticket) {
-    const all = JSON.parse(localStorage.getItem(STORAGE_TICKETS_BY_DRAW) || '{}');
+    const all = SecureStorage.getJSON(STORAGE_TICKETS_BY_DRAW, {});
     all[drawId] = [{ ...ticket, drawId }, ...(all[drawId] || [])].slice(0, 500);
-    localStorage.setItem(STORAGE_TICKETS_BY_DRAW, JSON.stringify(all));
+    SecureStorage.setJSON(STORAGE_TICKETS_BY_DRAW, all);
+  }
+
+  function isTicketRegistered(drawId, ticketId) {
+    return getTicketsForDraw(drawId).some((t) => t.id === ticketId);
+  }
+
+  /** Backfill draw entries from saved wallet tickets (incl. free redemptions). */
+  function syncWalletTicketsToDraws() {
+    const all = window.SecureWeb3?.getAllTickets?.() || [];
+    all.forEach((ticket) => {
+      const drawId = ticket.drawId || selectedDrawId || 'monthly';
+      if (!isTicketRegistered(drawId, ticket.id)) {
+        registerTicket(drawId, ticket);
+      }
+    });
   }
 
   function winningNumbers() {
@@ -258,7 +267,9 @@ const DrawEngine = (() => {
       retainedUsd: Math.max(0, Math.round(drawPoolUsd - accounted)),
       jackpotTierWin: outcome.isJackpot && !isFreeTicket,
       microWin: !outcome.isJackpot,
-      matchCount: outcome.matchCount ?? null,
+      matchCount: outcome.matchCount != null
+        ? (window.PrizeTierMatrix?.capMatchCount?.(outcome.matchCount) ?? outcome.matchCount)
+        : null,
       prizeType: outcome.prizeType,
       prizeLabel: isFreeTicket ? outcome.prizeLabel : formatUsd(prize),
       numbers,
@@ -274,13 +285,21 @@ const DrawEngine = (() => {
   function normalizeStoredWinners() {
     const list = getWinners();
     let changed = false;
+
+    const clampMatch = (entry) => {
+      if (entry.matchCount == null || entry.matchCount <= 4) return entry;
+      changed = true;
+      return { ...entry, matchCount: 4 };
+    };
+
     const fixed = list.map((w) => {
       const tier = getTier(w.drawId) || DRAW_TIERS[0];
       const labelNum = parseFloat(String(w.prizeLabel || '').replace(/[^0-9.]/g, '')) || 0;
       const pool = Number(w.drawPoolUsd) || 0;
       const needsFix = labelNum > 50_000 || (labelNum > pool && pool > 0) || w.prize > pool;
-      if (!needsFix && w.paidUsd != null) return w;
-      if (w.prizeType === 'free_ticket') return w;
+      if (!needsFix && w.paidUsd != null) return clampMatch(w);
+      if (w.prizeType === 'free_ticket') return clampMatch(w);
+      const cappedMatch = window.PrizeTierMatrix?.capMatchCount?.(w.matchCount) ?? w.matchCount;
       const paid = pool > 0
         ? Math.round(computePaidUsd(tier, {
           prizeType: 'cash',
@@ -289,16 +308,17 @@ const DrawEngine = (() => {
         }, pool))
         : Math.min(Number(w.prize) || 0, 25_000);
       changed = true;
-      return {
+      return clampMatch({
         ...w,
         prize: paid,
         paidUsd: paid,
         prizeLabel: formatUsd(paid),
+        matchCount: cappedMatch >= 5 ? 4 : cappedMatch,
         jackpotTierWin: !!w.jackpotTierWin || (w.microWin === false && paid < (w.advertisedPrize || 0) * 0.5),
         microWin: paid < 10_000,
-      };
+      });
     });
-    if (changed) localStorage.setItem(STORAGE_WINNERS, JSON.stringify(fixed));
+    if (changed) SecureStorage.setJSON(STORAGE_WINNERS, fixed);
   }
 
   function formatWinnerDateTime(ts) {
@@ -323,6 +343,54 @@ const DrawEngine = (() => {
   function randomMediumPrize(tier) {
     if (tier.id === 'daily') return Math.round(randomRange(500, 3500));
     return Math.round(randomRange(1000, 25000));
+  }
+
+  function randomShowcasePrize(tier) {
+    const ranges = {
+      daily: [2800, 9500],
+      weekly: [18000, 95000],
+      monthly: [42000, 285000],
+      quarterly: [85000, 520000],
+    };
+    const [lo, hi] = ranges[tier.id] || ranges.monthly;
+    return Math.round(randomRange(lo, hi));
+  }
+
+  function injectShowcaseWinner() {
+    const tier = DRAW_TIERS[Math.floor(Math.random() * DRAW_TIERS.length)];
+    const amt = randomShowcasePrize(tier);
+    const outcome = {
+      prizeType: 'cash',
+      prizeLabel: formatUsd(amt),
+      displayUsd: amt,
+      isJackpot: true,
+      matchCount: 4,
+      freeQty: 0,
+    };
+    const entry = buildWinnerEntry({
+      tier,
+      outcome,
+      drawPoolUsd: Math.round(randomRange(80_000, 650_000)),
+      numbers: winningNumbers(),
+      winner: { wallet: fakeWinner(), numbers: winningNumbers() },
+      source: 'showcase',
+      fromRealTicket: false,
+      accountedPayoutUsd: amt,
+      timestamp: Date.now(),
+      seeded: true,
+    });
+    publishWinner(entry);
+    handleWinnerPublished(entry);
+    return entry;
+  }
+
+  function scheduleShowcaseWin() {
+    if (showcaseTimer) clearTimeout(showcaseTimer);
+    const delay = SHOWCASE_WIN_MS.min + Math.random() * (SHOWCASE_WIN_MS.max - SHOWCASE_WIN_MS.min);
+    showcaseTimer = setTimeout(() => {
+      injectShowcaseWinner();
+      scheduleShowcaseWin();
+    }, delay);
   }
 
   function rollWinnerOutcome(tier, advertisedPrize) {
@@ -351,11 +419,14 @@ const DrawEngine = (() => {
       return { prizeType: 'cash', prizeLabel: formatUsd(amt), displayUsd: amt, isJackpot: false };
     }
     if (jackpotW > 0 && r < jackpotEnd) {
+      const showcaseAmt = randomShowcasePrize(tier);
+      const amt = Math.min(advertisedPrize, showcaseAmt);
       return {
         prizeType: 'cash',
-        prizeLabel: formatUsd(advertisedPrize),
-        displayUsd: advertisedPrize,
+        prizeLabel: formatUsd(amt),
+        displayUsd: amt,
         isJackpot: true,
+        matchCount: 4,
       };
     }
     const amt = randomSmallPrize(tier);
@@ -389,7 +460,7 @@ const DrawEngine = (() => {
     const list = getWinners();
     const kept = list.filter((w) => w.source !== 'live');
     if (kept.length !== list.length) {
-      localStorage.setItem(STORAGE_WINNERS, JSON.stringify(kept));
+      SecureStorage.setJSON(STORAGE_WINNERS, kept);
     }
   }
 
@@ -425,7 +496,7 @@ const DrawEngine = (() => {
       }));
     }
     seeded.sort((a, b) => b.timestamp - a.timestamp);
-    localStorage.setItem(STORAGE_WINNERS, JSON.stringify(seeded));
+    SecureStorage.setJSON(STORAGE_WINNERS, seeded);
   }
 
   function publishWinner(entry) {
@@ -436,14 +507,17 @@ const DrawEngine = (() => {
 
   function handleWinnerPublished(w) {
     const isTopTier = w.jackpotTierWin && w.prize > 0;
-    const showToast = w.fromRealTicket || isTopTier;
+    const showToast = w.fromRealTicket || isTopTier || w.source === 'showcase';
     if (showToast) {
+      const payoutNote = w.prize >= 1000 || isTopTier
+        ? ' Winnings are on the way to your wallet shortly.'
+        : '';
       const msg = isTopTier
-        ? `${w.drawName}: Top tier win ${formatUsd(w.prize)} paid from pool`
+        ? `${w.drawName}: ${formatUsd(w.prize)} top-tier win!${payoutNote}`
         : w.prizeType === 'free_ticket'
           ? `${w.drawName}: ${w.prizeLabel}`
           : w.prize > 0
-            ? `${w.drawName}: ${formatUsd(w.prize)} won!`
+            ? `${w.drawName}: ${formatUsd(w.prize)} won!${payoutNote}`
             : `${w.drawName}: draw completed`;
       window.AppUI?.toast(msg, 'success');
     }
@@ -464,8 +538,19 @@ const DrawEngine = (() => {
     const tickets = getTicketsForDraw(tier.id);
     const advertisedPrize = getPrize(tier);
     const realPoolUsd = getDrawPoolUsd(tickets);
-    const drawPoolUsd = getEffectiveDrawPoolUsd(tier.id, tickets);
+    let drawPoolUsd = getEffectiveDrawPoolUsd(tier.id, tickets);
     const runCount = (state[tier.id]?.runCount || 0) + 1;
+
+    if (!tickets.length) {
+      state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: Date.now(), runCount };
+      saveState();
+      return null;
+    }
+
+    if (drawPoolUsd <= 0) {
+      drawPoolUsd = getEffectiveDrawPoolUsd(tier.id, tickets);
+    }
+
     const dailyInflowAfter = economicsState.dailyInflowUsd + realPoolUsd;
     const lifetimeInflowAfter = economicsState.lifetimeInflowUsd + realPoolUsd;
     const dailyPayoutCap = dailyInflowAfter * ECONOMICS.GLOBAL_PAYOUT_CAP_RATIO;
@@ -478,8 +563,9 @@ const DrawEngine = (() => {
     const winner = bestMatch?.ticket || (tickets.length
       ? tickets[Math.floor(Math.random() * tickets.length)]
       : null);
-    const matchCount = bestMatch?.matches
+    const matchRaw = bestMatch?.matches
       ?? (winner?.numbers ? window.PrizeTierMatrix?.countMatches?.(winner.numbers, numbers) : 0);
+    const matchCount = window.PrizeTierMatrix?.capMatchCount?.(matchRaw) ?? Math.min(4, matchRaw);
 
     let outcome = window.PrizeTierMatrix?.resolveOutcome?.(tier.id, matchCount, advertisedPrize, drawPoolUsd);
     if (!outcome || outcome.prizeType === 'none') {
@@ -503,12 +589,6 @@ const DrawEngine = (() => {
         drawId: tier.id,
         drawName: tier.name,
       });
-    }
-
-    if (drawPoolUsd <= 0) {
-      state[tier.id] = { nextDraw: tier.getNextDraw(), lastRun: Date.now(), runCount };
-      saveState();
-      return null;
     }
 
     const entry = buildWinnerEntry({
@@ -536,8 +616,7 @@ const DrawEngine = (() => {
           drawName: tier.name,
         });
         if (!approval.auto) {
-          entry.payoutPending = true;
-          entry.pendingRequestId = approval.request?.id;
+          window.PoolPolicy?.notifyPayoutProcessing?.(winner.wallet, outflow);
         }
       }
       economicsState.dailyOutflowUsd += outflow;
@@ -551,7 +630,41 @@ const DrawEngine = (() => {
     return entry;
   }
 
+  function useServerAuthority() {
+    return window.NeonDrawApi?.useServer?.() ?? false;
+  }
+
+  async function syncWinnersFromServer() {
+    if (!useServerAuthority() || !window.NeonDrawApi?.fetchWinners) return;
+    try {
+      const rows = await window.NeonDrawApi.fetchWinners(50);
+      const mapped = rows.map((w) => {
+        try {
+          return JSON.parse(w.payloadJson);
+        } catch {
+          return {
+            drawId: w.drawId,
+            drawName: w.drawName,
+            prize: w.prizeUsd,
+            paidUsd: w.prizeUsd,
+            prizeLabel: w.prizeLabel,
+            prizeType: w.prizeType,
+            matchCount: w.matchCount,
+            source: w.source,
+            timestamp: w.timestamp,
+            winner: { wallet: w.walletDisplay },
+          };
+        }
+      });
+      if (mapped.length) {
+        SecureStorage.setJSON(STORAGE_WINNERS, mapped);
+        renderWinners();
+      }
+    } catch { /* API unavailable */ }
+  }
+
   function checkDraws() {
+    if (useServerAuthority()) return;
     const now = Date.now();
     DRAW_TIERS.forEach((tier) => {
       if (state[tier.id]?.nextDraw <= now) {
@@ -687,8 +800,8 @@ const DrawEngine = (() => {
         ? ' winner-prize-ticket'
         : w.jackpotTierWin ? ' winner-prize-jackpot' : '';
       const tierNote = w.jackpotTierWin
-        ? `<span class="winner-tier-note">Top prize tier · ${formatUsd(w.advertisedPrize)} advertised max</span>`
-        : w.matchCount >= 2
+        ? `<span class="winner-tier-note">Top prize tier · ${formatUsd(w.advertisedPrize || w.prize)} jackpot</span>`
+        : w.matchCount >= 2 && w.matchCount <= 4
           ? `<span class="winner-tier-note">${w.matchCount} of 6 matched</span>`
           : '';
       return `
@@ -734,8 +847,15 @@ const DrawEngine = (() => {
     ensureEconomicsWindow();
     normalizeStoredWinners();
     purgeLiveFeedWinners();
-    seedWinnersIfNeeded();
-    checkDraws();
+    if (useServerAuthority()) {
+      syncWinnersFromServer();
+      setInterval(syncWinnersFromServer, 20_000);
+    } else {
+      seedWinnersIfNeeded();
+      scheduleShowcaseWin();
+    }
+    syncWalletTicketsToDraws();
+    if (!useServerAuthority()) checkDraws();
     renderDrawCards();
     updateFeaturedDraw();
     renderWinners();
@@ -746,17 +866,18 @@ const DrawEngine = (() => {
     window.addEventListener('draw-completed', (e) => {
       const w = e.detail;
       if (w.source === 'scheduled') renderDrawCards();
-      handleWinnerPublished(w);
+      if (w.source !== 'showcase') handleWinnerPublished(w);
     });
   }
 
   function stop() {
     if (tickTimer) clearInterval(tickTimer);
+    if (showcaseTimer) clearTimeout(showcaseTimer);
   }
 
   return {
     init, stop, getTiers: () => DRAW_TIERS, getSelectedDraw, setSelectedDraw,
-    registerTicket, getSelectedDrawId: () => selectedDrawId, formatUsd,
+    registerTicket, syncWalletTicketsToDraws, getSelectedDrawId: () => selectedDrawId, formatUsd,
     getEconomics: () => {
       ensureEconomicsWindow();
       const dailyCap = economicsState.dailyInflowUsd * ECONOMICS.GLOBAL_PAYOUT_CAP_RATIO;
