@@ -11,6 +11,10 @@ public class NeonDrawDbContext : DbContext
     public DbSet<Draw> Draws => Set<Draw>();
     public DbSet<Ticket> Tickets => Set<Ticket>();
     public DbSet<TransactionRecord> Transactions => Set<TransactionRecord>();
+    public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+    public DbSet<PayoutRequest> PayoutRequests => Set<PayoutRequest>();
+    public DbSet<PublishedWinner> PublishedWinners => Set<PublishedWinner>();
+    public DbSet<DrawTierSchedule> DrawTierSchedules => Set<DrawTierSchedule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +42,41 @@ public class NeonDrawDbContext : DbContext
             entity.HasKey(t => t.Id);
             entity.Property(t => t.AmountEth).HasPrecision(28, 18);
             entity.HasIndex(t => t.TxHash);
+        });
+
+        modelBuilder.Entity<ContactMessage>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Name).HasMaxLength(120);
+            entity.Property(c => c.Email).HasMaxLength(254);
+            entity.Property(c => c.Topic).HasMaxLength(80);
+            entity.Property(c => c.Message).HasMaxLength(4000);
+            entity.Property(c => c.WalletAddress).HasMaxLength(64);
+            entity.HasIndex(c => c.CreatedAt);
+        });
+
+        modelBuilder.Entity<PayoutRequest>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.HasIndex(p => p.ExternalId).IsUnique();
+            entity.HasIndex(p => p.Status);
+            entity.HasIndex(p => p.WalletAddress);
+            entity.Property(p => p.UsdAmount).HasPrecision(18, 2);
+            entity.Property(p => p.EthAmount).HasPrecision(28, 18);
+            entity.Property(p => p.WalletAddress).HasMaxLength(64);
+            entity.Property(p => p.Type).HasMaxLength(40);
+        });
+
+        modelBuilder.Entity<PublishedWinner>(entity =>
+        {
+            entity.HasKey(w => w.Id);
+            entity.HasIndex(w => w.PublishedAt);
+            entity.Property(w => w.PrizeUsd).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<DrawTierSchedule>(entity =>
+        {
+            entity.HasKey(s => s.TierId);
         });
     }
 
