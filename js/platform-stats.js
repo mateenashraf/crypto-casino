@@ -5,8 +5,11 @@ const PlatformStats = (() => {
   const MONTHS = 14;
   const LIFETIME_PAID_USD = 2_847_500;
   const LIFETIME_WINNERS = 14_280;
-  const SEED_SIM_TICKETS = 1247;
-  const SEED_SIM_POOL = 847_293;
+  /** Public-facing pool never drops below this — real buys add on top */
+  const DISPLAY_POOL_FLOOR = 1_000_000;
+  const SEED_SIM_TICKETS = 12_847;
+  const SEED_SIM_POOL = 1_284_750;
+  const SEED_PLAYERS_ONLINE = 2_840;
   const HERITAGE_YEAR = 1931;
   const CRYPTO_SINCE = 2019;
   /** Values ~14 months ago as a fraction of today's live totals */
@@ -36,11 +39,7 @@ const PlatformStats = (() => {
   }
 
   function parseWinnerList() {
-    try {
-      return JSON.parse(localStorage.getItem('starbitz_draw_winners') || '[]');
-    } catch {
-      return [];
-    }
+    return SecureStorage.getJSON('draw_winners', []);
   }
 
   function sumLiveWinnerPayouts() {
@@ -50,17 +49,22 @@ const PlatformStats = (() => {
     }, 0);
   }
 
+  function getDisplayPoolUsd() {
+    const simPool = window.ActivitySimulator?.getSimulatedPool?.() ?? SEED_SIM_POOL;
+    const realPool = window.SecureWeb3?.getPoolContributions?.() ?? 0;
+    return Math.max(DISPLAY_POOL_FLOOR, simPool + realPool);
+  }
+
   function getLiveMetrics() {
     const simTickets = window.ActivitySimulator?.getSimulatedTicketCount?.() ?? SEED_SIM_TICKETS;
     const realTickets = window.SecureWeb3?.getAllTickets?.()?.length ?? 0;
-    const simPool = window.ActivitySimulator?.getSimulatedPool?.() ?? SEED_SIM_POOL;
-    const realPool = window.SecureWeb3?.getPoolContributions?.() ?? 0;
 
     return {
       totalTickets: simTickets + realTickets,
-      poolUsd: simPool + realPool,
+      poolUsd: getDisplayPoolUsd(),
       paidUsd: LIFETIME_PAID_USD + sumLiveWinnerPayouts(),
       winners: LIFETIME_WINNERS + parseWinnerList().length,
+      playersOnline: window.TrustDisplay?.getPlayersOnline?.() ?? SEED_PLAYERS_ONLINE,
     };
   }
 
@@ -186,9 +190,10 @@ const PlatformStats = (() => {
     set('trustPaidOutBanner', formatUsd(metrics.paidUsd));
 
     const poolAmt = document.getElementById('poolAmount');
-    if (poolAmt) poolAmt.textContent = `${formatUsd(metrics.poolUsd)} in play`;
+    if (poolAmt) poolAmt.textContent = `${formatUsd(metrics.poolUsd)}+ in play · growing`;
 
-    set('historicMonths', String(MONTHS));
+    set('statPlayersOnline', formatCount(metrics.playersOnline));
+
     set('historicTotalTickets', formatCount(metrics.totalTickets));
     set('historicPoolLatest', formatUsd(metrics.poolUsd));
     set('historicTotalPaid', formatUsd(metrics.paidUsd));
@@ -202,12 +207,15 @@ const PlatformStats = (() => {
     MONTHS,
     LIFETIME_PAID_USD,
     LIFETIME_WINNERS,
+    DISPLAY_POOL_FLOOR,
     SEED_SIM_TICKETS,
     SEED_SIM_POOL,
+    SEED_PLAYERS_ONLINE,
     HERITAGE_YEAR,
     CRYPTO_SINCE,
     formatUsd,
     formatCount,
+    getDisplayPoolUsd,
     getLiveMetrics,
     buildMonthSeries,
     buildHistoricWinners,
