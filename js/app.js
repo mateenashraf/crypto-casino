@@ -32,6 +32,7 @@
     openWallet: () => openModal(walletModal),
     closeWallet: () => closeModal(walletModal),
     scrollToSection,
+    refreshBalances,
   };
 
   const SCROLL_OFFSET = 76;
@@ -87,6 +88,7 @@
 
       refreshBalances();
       renderTxHistory();
+      updateDepositFeeHint();
     } else {
       btnText.textContent = 'Connect Wallet';
       sidebarBal.hidden = true;
@@ -119,6 +121,22 @@
     }
   }
 
+  async function updateDepositFeeHint() {
+    const el = document.getElementById('depositNetworkFeeHint');
+    if (!el || !window.NetworkFee) return;
+    const amount = parseFloat(document.getElementById('depositAmount')?.value || '0');
+    const chainId = wallet.getChainId?.() || 1;
+    let est = null;
+    if (wallet.isConnected() && amount > 0) {
+      try {
+        est = await wallet.estimatePlayerNetworkFee(amount);
+      } catch {
+        est = null;
+      }
+    }
+    el.textContent = window.NetworkFee.renderDepositHint(est, chainId);
+  }
+
   function renderTxHistory() {
     const list = document.getElementById('txHistory');
     const txs = wallet.getTransactions(wallet.getAddress());
@@ -149,6 +167,10 @@
     try {
       await wallet.connect();
       updateWalletUI();
+      window.SlotMachine?.processPendingFreeTicketClaim?.();
+      window.LotteryApp?.updateFreeTicketUI?.();
+      window.DrawEngine?.syncWalletTicketsToDraws?.();
+      updateDepositFeeHint();
       toast('Wallet connected securely', 'success');
     } catch (err) {
       toast(err.message || 'Connection failed', 'error');
@@ -183,11 +205,26 @@
     const bal = await wallet.getWalletBalance();
     const cfg = wallet.getConfig();
     document.getElementById('depositAmount').value = Math.min(bal * 0.95, cfg.MAX_ETH).toFixed(4);
+    updateDepositFeeHint();
   });
 
-  document.querySelectorAll('.quick-amounts button').forEach((btn) => {
+  document.getElementById('depositAmount')?.addEventListener('input', () => {
+    updateDepositFeeHint();
+  });
+
+  document.querySelectorAll('.quick-amounts button[data-usd]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const usd = parseFloat(btn.dataset.usd);
+      const eth = window.TicketPricing?.usdToEth?.(usd) || usd / 3500;
+      document.getElementById('depositAmount').value = eth.toFixed(6);
+      updateDepositFeeHint();
+    });
+  });
+
+  document.querySelectorAll('.quick-amounts button[data-amount]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.getElementById('depositAmount').value = btn.dataset.amount;
+      updateDepositFeeHint();
     });
   });
 
@@ -202,8 +239,10 @@
 
   document.getElementById('depositBtn')?.addEventListener('click', async () => {
     const amount = parseFloat(document.getElementById('depositAmount').value);
-    showTxStatus('depositStatus', 'Confirm in wallet...', 'pending');
+    showTxStatus('depositStatus', 'Confirm in MetaMask — deposit to balance; network fee is separate (blockchain, not NeonDraw)...', 'pending');
     try {
+      const usd = window.TicketPricing?.ethToUsd?.(amount) || amount * 3500;
+      window.TicketPricing?.validateDepositUsd?.(usd);
       await wallet.deposit(amount);
       showTxStatus('depositStatus', `Deposit confirmed (${selectedCurrency})!`, 'success');
       await refreshBalances();
@@ -222,10 +261,12 @@
     try {
       if (to) wallet.assertSafeAddressInput(to, 'withdraw destination');
       await wallet.withdraw(amount, to || undefined);
-      showTxStatus('withdrawStatus', 'Withdrawal sent!', 'success');
+      const msg = window.PoolPolicy?.POLICY?.COPY?.WITHDRAW_PROCESSING
+        || 'Withdrawal sent!';
+      showTxStatus('withdrawStatus', msg, 'success');
       await refreshBalances();
       renderTxHistory();
-      toast('Withdrawal processed', 'success');
+      toast(msg, 'success');
     } catch (err) {
       showTxStatus('withdrawStatus', err.message, 'error');
       toast(err.message, 'error');
@@ -266,9 +307,20 @@
       updateWalletUI();
       window.PlayerDashboard?.refresh?.();
     }
+    if (event === 'connected') {
+      window.SlotMachine?.processPendingFreeTicketClaim?.();
+      window.NeonDrawDev?.applyPendingGrant?.();
+      window.LotteryApp?.updateFreeTicketUI?.();
+      window.DrawEngine?.syncWalletTicketsToDraws?.();
+      updateDepositFeeHint();
+    }
+    if (event === 'free-ticket-granted' || event === 'free-ticket-redeemed') {
+      window.LotteryApp?.updateFreeTicketUI?.();
+    }
   });
 
   initNavigation();
+  window.SecureRuntime?.scrubSensitiveGlobals?.();
   document.body.style.overflow = '';
   window.SlotTicker?.init();
   window.RouletteTicker?.init();
@@ -286,5 +338,12 @@
   window.Roulette?.init();
   window.ContactForm?.init();
   window.Icons?.hydrate();
-  wallet.tryAutoConnect().then(() => updateWalletUI());
+  wallet.tryAutoConnect().then(() => {
+    updateWalletUI();
+    window.SlotMachine?.processPendingFreeTicketClaim?.();
+    window.NeonDrawDev?.applyPendingGrant?.();
+    window.LotteryApp?.updateFreeTicketUI?.();
+    window.DrawEngine?.syncWalletTicketsToDraws?.();
+    updateDepositFeeHint();
+  });
 })();
