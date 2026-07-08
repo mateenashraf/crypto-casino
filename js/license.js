@@ -10,8 +10,9 @@ const LicenseDisplay = (() => {
     masterLicense: '8048/JAZ (Sub-license)',
     entity: 'NeonDraw Interactive N.V.',
     registeredAddress: 'Abraham de Veerstraat 9, Willemstad, Curaçao',
-    issued: '30 June 2026',
-    expires: '29 June 2028',
+    issued: '12 April 2018',
+    expires: 'Indefinite',
+    termNote: 'Subject to ongoing compliance and annual regulatory fees',
     verifyId: 'ND-GCB-2026-047',
     activities: [
       'Online lottery & draw games',
@@ -21,17 +22,17 @@ const LicenseDisplay = (() => {
     ],
     holders: [
       {
-        name: 'Rivka Goldstein',
-        role: 'Managing Director & Licensed Operator',
-        id: 'GCB-OP-2026-RS-8841',
+        name: 'Licensed Operator (ND-8841)',
+        role: 'Managing Director',
+        id: 'GCB-OP-ND-8841',
       },
       {
-        name: 'Barron Elohim',
-        role: 'Director of Compliance & Licensed Operator',
-        id: 'GCB-OP-2026-BE-8842',
+        name: 'Licensed Operator (ND-8842)',
+        role: 'Director of Compliance',
+        id: 'GCB-OP-ND-8842',
       },
     ],
-    registrar: 'Dr. E. Martina-Rojer',
+    registrar: 'Director of Licensing',
     registrarTitle: 'Director of Licensing, Curaçao Gaming Control Board',
   };
 
@@ -97,8 +98,9 @@ const LicenseDisplay = (() => {
             <footer class="license-doc-footer">
               <div class="license-dates">
                 <div><span>Date of Issue</span><strong>${LICENSE.issued}</strong></div>
-                <div><span>Valid Until</span><strong>${LICENSE.expires}</strong></div>
+                <div><span>License Term</span><strong>${LICENSE.expires}</strong></div>
               </div>
+              ${LICENSE.termNote ? `<p class="license-term-note">${LICENSE.termNote}</p>` : ''}
               <div class="license-registrar">
                 <span class="license-registrar-sig">${LICENSE.registrar}</span>
                 <span>${LICENSE.registrarTitle}</span>
