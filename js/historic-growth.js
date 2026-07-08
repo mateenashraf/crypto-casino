@@ -1,5 +1,5 @@
 /**
- * 14 months of platform growth — aligned with live stats bar & pool figures
+ * Platform history charts — aligned with live stats bar & pool figures
  */
 const HistoricGrowth = (() => {
   let chartInstance = null;
