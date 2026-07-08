@@ -2,7 +2,7 @@
  * Commit-reveal draw transparency + probability explainers
  */
 const ProvablyFair = (() => {
-  const STORAGE = 'starbitz_fair_draws';
+  const STORAGE = 'fair_draws';
 
   function sha256Hex(input) {
     if (window.crypto?.subtle) {
@@ -26,11 +26,11 @@ const ProvablyFair = (() => {
   }
 
   function loadDraws() {
-    try { return JSON.parse(localStorage.getItem(STORAGE) || '[]'); } catch { return []; }
+    return SecureStorage.getJSON(STORAGE, []);
   }
 
   function saveDraws(list) {
-    localStorage.setItem(STORAGE, JSON.stringify(list.slice(0, 40)));
+    SecureStorage.setJSON(STORAGE, list.slice(0, 40));
   }
 
   async function createDrawCommit(drawId, tierName) {
@@ -80,9 +80,9 @@ const ProvablyFair = (() => {
         ? 'Nice match! Each spin uses verified randomness. Past results do not change the next outcome.'
         : 'No match this time. Every spin is independent. Try again when you are ready.';
     }
-    if (context === 'roulette') {
+    if (context === 'roulette' || context === 'roulette_free') {
       return won
-        ? 'Your bet matched the winning pocket. Each wheel spin is independent — the ball has no memory.'
+        ? `${context === 'roulette_free' ? 'Free spin win! ' : ''}Your bet matched the winning pocket. Each wheel spin is independent — the ball has no memory.`
         : 'Ball landed elsewhere this spin. Every spin is a fresh outcome on a fair American wheel.';
     }
     return won
