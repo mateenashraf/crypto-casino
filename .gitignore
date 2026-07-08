@@ -11,3 +11,4 @@ blockchain/typechain-types/
 backend/**/bin/
 backend/**/obj/
 backend/.vs/
+dist/
