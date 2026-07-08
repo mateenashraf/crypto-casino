@@ -6,18 +6,17 @@ const SecureWeb3 = (() => {
     // Sepolia testnet (change to 1 for mainnet in production)
     ALLOWED_CHAIN_IDS: [11155111, 1],
     CHAIN_NAMES: { 1: 'Ethereum Mainnet', 11155111: 'Sepolia Testnet' },
-    // IMPORTANT: set a private treasury address before production deploy.
-    TREASURY_ADDRESS: '',
+    TREASURY_ADDRESS: (typeof window !== 'undefined' && window.__ND_CFG__?.treasury) || '',
     // Deploy LotteryPool.sol and set address here for contract-based entries
     LOTTERY_CONTRACT: null,
     MIN_ETH: 0.001,
     MAX_ETH: 2,
     DEPOSIT_COOLDOWN_MS: 8000,
-    STORAGE_BALANCES: 'starbitz_balances',
-    STORAGE_TX: 'starbitz_transactions',
-    STORAGE_TICKETS: 'starbitz_lottery_tickets',
-    STORAGE_POOL: 'starbitz_pool_contributions',
-    STORAGE_FREE_TICKETS: 'starbitz_free_tickets',
+    STORAGE_BALANCES: 'balances',
+    STORAGE_TX: 'transactions',
+    STORAGE_TICKETS: 'tickets',
+    STORAGE_POOL: 'pool',
+    STORAGE_FREE_TICKETS: 'free_tickets',
   };
 
   const LOTTERY_ABI = [
@@ -49,9 +48,16 @@ const SecureWeb3 = (() => {
     }
   }
 
-  function validateAmount(amountEth) {
+  function validateAmount(amountEth, purpose = 'default') {
     const n = parseFloat(amountEth);
     if (!Number.isFinite(n) || n <= 0) throw new Error('Invalid amount');
+    const tp = window.TicketPricing;
+    if (purpose === 'deposit' && tp?.validateDepositEth) {
+      return tp.validateDepositEth(n, chainId);
+    }
+    if (purpose === 'lottery' && tp?.validateLotteryEth) {
+      return tp.validateLotteryEth(n);
+    }
     if (n < CONFIG.MIN_ETH) throw new Error(`Minimum: ${CONFIG.MIN_ETH} ETH`);
     if (n > CONFIG.MAX_ETH) throw new Error(`Maximum: ${CONFIG.MAX_ETH} ETH per transaction`);
     return n;
@@ -71,11 +77,11 @@ const SecureWeb3 = (() => {
   }
 
   function getStorage(key) {
-    try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; }
+    return SecureStorage.getJSON(key, {});
   }
 
   function setStorage(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+    SecureStorage.setJSON(key, data);
   }
 
   function getCasinoBalance(addr) {
@@ -106,7 +112,7 @@ const SecureWeb3 = (() => {
   };
 
   function getAllTickets() {
-    try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_TICKETS) || '[]'); } catch { return []; }
+    return SecureStorage.getJSON(CONFIG.STORAGE_TICKETS, []);
   }
 
   function isValidAddress(addr) {
@@ -162,23 +168,23 @@ const SecureWeb3 = (() => {
   function saveTicket(ticket, silent = false) {
     const tickets = getAllTickets();
     tickets.unshift(ticket);
-    localStorage.setItem(CONFIG.STORAGE_TICKETS, JSON.stringify(tickets.slice(0, 200)));
+    SecureStorage.setJSON(CONFIG.STORAGE_TICKETS, tickets.slice(0, 200));
     if (!silent) notify('ticket-purchased', ticket);
   }
 
   function saveTicketsBulk(newTickets) {
     const tickets = getAllTickets();
     tickets.unshift(...newTickets);
-    localStorage.setItem(CONFIG.STORAGE_TICKETS, JSON.stringify(tickets.slice(0, 200)));
+    SecureStorage.setJSON(CONFIG.STORAGE_TICKETS, tickets.slice(0, 200));
   }
 
   function getPoolContributions() {
-    return parseFloat(localStorage.getItem(CONFIG.STORAGE_POOL) || '0');
+    return parseFloat(SecureStorage.getRaw(CONFIG.STORAGE_POOL) || '0');
   }
 
   function addPoolContribution(usdAmount) {
     const total = getPoolContributions() + usdAmount;
-    localStorage.setItem(CONFIG.STORAGE_POOL, total.toFixed(2));
+    SecureStorage.setRaw(CONFIG.STORAGE_POOL, total.toFixed(2));
     notify('pool-updated', { total });
     return total;
   }
@@ -269,18 +275,52 @@ const SecureWeb3 = (() => {
     notify('disconnected', {});
   }
 
+  async function estimatePlayerNetworkFee(valueEth) {
+    if (!provider || !address) return null;
+    try {
+      const ethUsd = window.TicketPricing?.getEthUsd?.() || 3500;
+      const value = ethers.parseEther(String(valueEth));
+      const dest = (CONFIG.TREASURY_ADDRESS && isValidAddress(CONFIG.TREASURY_ADDRESS))
+        ? CONFIG.TREASURY_ADDRESS
+        : address;
+
+      let gasLimit;
+      try {
+        gasLimit = await provider.estimateGas({ from: address, to: dest, value });
+      } catch {
+        gasLimit = 21000n;
+      }
+
+      const feeData = await provider.getFeeData();
+      const price = feeData.maxFeePerGas || feeData.gasPrice;
+      if (!price) return null;
+
+      const feeWei = gasLimit * price;
+      const feeEth = parseFloat(ethers.formatEther(feeWei));
+      return {
+        feeEth,
+        feeUsd: parseFloat((feeEth * ethUsd).toFixed(2)),
+        live: true,
+      };
+    } catch {
+      return null;
+    }
+  }
+
   async function getWalletBalance() {
     if (!provider || !address) return 0;
     const bal = await provider.getBalance(address);
     return parseFloat(ethers.formatEther(bal));
   }
 
-  async function sendSecureTransaction(to, valueEth) {
+  async function sendSecureTransaction(to, valueEth, options = {}) {
     assertChain();
     rateLimit();
-    const amount = validateAmount(valueEth);
+    const amount = options.validated
+      ? parseFloat(valueEth)
+      : validateAmount(valueEth, options.purpose || 'default');
     if (!CONFIG.TREASURY_ADDRESS || !isValidAddress(CONFIG.TREASURY_ADDRESS)) {
-      throw new Error('Treasury wallet is not configured. Set TREASURY_ADDRESS in js/wallet.js');
+      throw new Error('Deposits are temporarily unavailable. Please try again later.');
     }
     const toAddr = ethers.getAddress(to);
 
@@ -308,7 +348,7 @@ const SecureWeb3 = (() => {
     return tickets[0];
   }
 
-  async function buyLotteryTicketBulk(totalEth, numbers, usdTotal, quantity, unitUsd) {
+  async function buyLotteryTicketBulk(checkoutEth, numbers, poolUsd, quantity, unitPoolUsd) {
     if (!signer || !address) throw new Error('Connect wallet first');
     if (!Array.isArray(numbers) || numbers.length !== 6) {
       throw new Error('Select exactly 6 numbers');
@@ -318,7 +358,10 @@ const SecureWeb3 = (() => {
     const unique = new Set(numbers);
     if (unique.size !== 6) throw new Error('Numbers must be unique');
     if (numbers.some((n) => n < 1 || n > 49)) throw new Error('Numbers must be 1–49');
-    if (usdTotal <= 0) throw new Error('Invalid ticket amount');
+    if (poolUsd <= 0) throw new Error('Invalid pool amount');
+
+    const poolPerTicket = unitPoolUsd || poolUsd / qty;
+    validateAmount(checkoutEth, 'lottery');
 
     let receipt;
     const dest = CONFIG.LOTTERY_CONTRACT || CONFIG.TREASURY_ADDRESS;
@@ -326,20 +369,18 @@ const SecureWeb3 = (() => {
     if (CONFIG.LOTTERY_CONTRACT) {
       assertChain();
       rateLimit();
-      validateAmount(totalEth);
       const contract = new ethers.Contract(CONFIG.LOTTERY_CONTRACT, LOTTERY_ABI, signer);
       const tx = await contract.buyTicket(numbers, {
-        value: ethers.parseEther(totalEth.toString()),
+        value: ethers.parseEther(checkoutEth.toString()),
       });
       notify('tx-pending', { hash: tx.hash });
       receipt = await tx.wait();
     } else {
-      receipt = await sendSecureTransaction(dest, totalEth);
+      receipt = await sendSecureTransaction(dest, checkoutEth);
     }
 
     const sorted = [...numbers].sort((a, b) => a - b);
-    const perTicketUsd = unitUsd || usdTotal / qty;
-    const perTicketEth = totalEth / qty;
+    const perTicketEth = checkoutEth / qty;
     const baseTime = Date.now();
     const tickets = [];
 
@@ -349,7 +390,7 @@ const SecureWeb3 = (() => {
         wallet: address,
         numbers: sorted,
         amountEth: parseFloat(perTicketEth.toFixed(6)),
-        usdPrice: parseFloat(perTicketUsd.toFixed(2)),
+        usdPrice: parseFloat(poolPerTicket.toFixed(2)),
         hash: receipt.hash,
         chainId,
         timestamp: baseTime + i,
@@ -359,20 +400,22 @@ const SecureWeb3 = (() => {
     }
 
     saveTicketsBulk(tickets);
-    addPoolContribution(usdTotal);
+    addPoolContribution(poolUsd);
     addTransaction(address, {
       type: 'lottery',
-      amount: totalEth,
+      amount: checkoutEth,
       hash: receipt.hash,
       ticketId: tickets[0].id,
       quantity: qty,
-      usdTotal,
+      usdTotal: poolUsd,
+      checkoutUsd: poolUsd,
     });
 
     const summary = {
       ...tickets[tickets.length - 1],
       quantity: qty,
-      usdTotal,
+      usdTotal: poolUsd,
+      poolUsd,
       tickets,
     };
     notify('ticket-success', summary);
@@ -381,11 +424,12 @@ const SecureWeb3 = (() => {
   }
 
   async function deposit(amountEth) {
-    const receipt = await sendSecureTransaction(CONFIG.TREASURY_ADDRESS, amountEth);
+    const amount = validateAmount(amountEth, 'deposit');
+    const receipt = await sendSecureTransaction(CONFIG.TREASURY_ADDRESS, amount, { validated: true });
     const current = getCasinoBalance(address);
-    setCasinoBalance(address, current + amountEth);
-    addTransaction(address, { type: 'deposit', amount: amountEth, hash: receipt.hash, status: 'confirmed' });
-    notify('deposit-success', { amount: amountEth, hash: receipt.hash });
+    setCasinoBalance(address, current + amount);
+    addTransaction(address, { type: 'deposit', amount, hash: receipt.hash, status: 'confirmed' });
+    notify('deposit-success', { amount, hash: receipt.hash });
     return receipt;
   }
 
@@ -399,15 +443,23 @@ const SecureWeb3 = (() => {
     if (policy && !policy.auto) {
       setCasinoBalance(address, casinoBal - amount);
       addTransaction(address, {
-        type: 'withdraw_pending',
+        type: 'withdraw',
         amount,
         hash: null,
-        status: 'pending_operator',
+        status: 'processing',
         requestId: policy.request?.id,
         usd: policy.usd,
       });
-      notify('payout-pending', policy.request);
-      throw new Error(`Withdrawal over $1,000 requires operator approval (request ${policy.request?.id})`);
+      notify('withdraw-success', {
+        amount,
+        processing: true,
+        message: window.PoolPolicy?.POLICY?.COPY?.WITHDRAW_PROCESSING,
+      });
+      return {
+        hash: null,
+        processing: true,
+        message: window.PoolPolicy?.POLICY?.COPY?.WITHDRAW_PROCESSING,
+      };
     }
 
     if (toAddress) assertSafeAddressInput(toAddress, 'withdraw destination');
@@ -437,6 +489,7 @@ const SecureWeb3 = (() => {
     redeemFreeTicket, grantFreeTickets, getFreeTicketBalance,
     getWalletBalance, getCasinoBalance, getTransactions, getAllTickets, getTicketsByAddress,
     getExplorerTxUrl, getExplorerAddressUrl, isValidAddress, normalizeAddress,
+    estimatePlayerNetworkFee,
     assertSafeAddressInput,
     getPoolContributions, isConnected: () => !!address,
     getAddress: () => address, getChainId: () => chainId,
