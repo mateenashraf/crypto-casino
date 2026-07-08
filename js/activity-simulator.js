@@ -3,10 +3,11 @@
  */
 const ActivitySimulator = (() => {
   const LIVE_FEED_ENABLED = true;
-  const STORAGE_KEY = 'starbitz_live_pool';
+  const STORAGE_KEY = 'live_pool';
+  const STORAGE_COUNT = 'live_pool_count';
   const TICKET_AMOUNTS = [1, 5, 10, 50, 100, 300, 500];
-  /** Ticket buys outpace wins (~4–8/min) so the feed feels busy but believable */
-  const INTERVAL_MS = { min: 5000, max: 14_000 };
+  /** Ticket buys outpace wins (~5–10/min) so the feed feels busy */
+  const INTERVAL_MS = { min: 3500, max: 11_000 };
 
   let simulatedPool = 0;
   let simulatedTickets = 0;
@@ -39,15 +40,31 @@ const ActivitySimulator = (() => {
   }
 
   function loadPool() {
-    const seedPool = window.PlatformStats?.SEED_SIM_POOL ?? 847_293;
-    const seedTickets = window.PlatformStats?.SEED_SIM_TICKETS ?? 1247;
-    simulatedPool = parseFloat(localStorage.getItem(STORAGE_KEY) || String(seedPool));
-    simulatedTickets = parseInt(localStorage.getItem(STORAGE_KEY + '_count') || String(seedTickets), 10);
+    const floor = window.PlatformStats?.DISPLAY_POOL_FLOOR ?? 1_000_000;
+    const seedPool = window.PlatformStats?.SEED_SIM_POOL ?? 1_284_750;
+    const seedTickets = window.PlatformStats?.SEED_SIM_TICKETS ?? 12_847;
+    simulatedPool = parseFloat(SecureStorage.getRaw(STORAGE_KEY) || String(seedPool));
+    simulatedTickets = parseInt(SecureStorage.getRaw(STORAGE_COUNT) || String(seedTickets), 10);
+    if (simulatedPool < floor) {
+      simulatedPool = seedPool;
+      savePool();
+    }
+    if (simulatedTickets < 1000) {
+      simulatedTickets = seedTickets;
+      savePool();
+    }
+  }
+
+  function recordRealPurchase({ usdAmount = 0, quantity = 1 } = {}) {
+    const qty = Math.max(1, Math.floor(quantity));
+    simulatedTickets += qty;
+    savePool();
+    window.dispatchEvent(new CustomEvent('pool-updated', { detail: { realUsd: usdAmount, quantity: qty } }));
   }
 
   function savePool() {
-    localStorage.setItem(STORAGE_KEY, simulatedPool.toFixed(2));
-    localStorage.setItem(STORAGE_KEY + '_count', String(simulatedTickets));
+    SecureStorage.setRaw(STORAGE_KEY, simulatedPool.toFixed(2));
+    SecureStorage.setRaw(STORAGE_COUNT, String(simulatedTickets));
   }
 
   function addWinEvent(entry) {
@@ -219,10 +236,7 @@ const ActivitySimulator = (() => {
   }
 
   function seedWinEventsFromWinners() {
-    let winners = [];
-    try {
-      winners = JSON.parse(localStorage.getItem('starbitz_draw_winners') || '[]');
-    } catch { /* ignore */ }
+    let winners = SecureStorage.getJSON('draw_winners', []);
     winners.slice(0, 5).forEach((entry) => {
       feedItems.push({
         id: `win-${entry.timestamp}-${entry.drawId}`,
@@ -245,7 +259,7 @@ const ActivitySimulator = (() => {
     if (!LIVE_FEED_ENABLED) return;
     loadPool();
 
-    for (let i = 0; i < 8; i++) generateEvent();
+    for (let i = 0; i < 14; i++) generateEvent();
     seedWinEventsFromWinners();
 
     scheduleNext();
@@ -264,7 +278,12 @@ const ActivitySimulator = (() => {
 
     window.SecureWeb3?.on?.((event, data) => {
       if (event === 'ticket-purchased' && data?.id) {
+        recordRealPurchase({ usdAmount: data.usdTotal || data.usdPrice || 0, quantity: data.quantity || 1 });
         onActivity(data.id);
+      }
+      if (event === 'pool-updated') {
+        window.PlatformStats?.renderPlatformMetrics?.();
+        window.LotteryApp?.onSimulatedActivity?.();
       }
     });
 
@@ -279,6 +298,7 @@ const ActivitySimulator = (() => {
   return {
     init, stop, isEnabled, getSimulatedPool, getSimulatedTicketCount,
     getFeedItems, getMergedItems, generateEvent, formatUsd, renderTicker, addWinEvent,
+    recordRealPurchase,
   };
 })();
 
