@@ -2,6 +2,8 @@
  * 6/49 match-tier prizes — shared rules for odds UI and draw payouts
  */
 const PrizeTierMatrix = (() => {
+  /** Real ticket payouts never resolve above this match tier */
+  const MAX_RESOLVED_MATCHES = 4;
   /** Approximate odds of matching exactly k numbers (6 picks from 49) */
   const MATCH_ODDS = {
     6: { label: '1 in 13.98M', winPct: 0.0000072 },
@@ -67,9 +69,15 @@ const PrizeTierMatrix = (() => {
     return ticketNumbers.filter((n) => winSet.has(n)).length;
   }
 
+  function capMatchCount(matchCount) {
+    const n = Math.floor(Number(matchCount) || 0);
+    return Math.min(MAX_RESOLVED_MATCHES, Math.max(0, n));
+  }
+
   function getRow(drawId, matchCount) {
     const tier = MATRIX[drawId] || MATRIX.monthly;
-    return tier.rows.find((r) => r.matches === matchCount) || tier.rows.find((r) => r.type === 'none');
+    const capped = capMatchCount(matchCount);
+    return tier.rows.find((r) => r.matches === capped) || tier.rows.find((r) => r.type === 'none');
   }
 
   function formatUsd(n) {
@@ -84,14 +92,15 @@ const PrizeTierMatrix = (() => {
 
   /** Build draw-engine outcome from match count */
   function resolveOutcome(drawId, matchCount, advertisedPrize, drawPoolUsd = 0) {
-    const row = getRow(drawId, matchCount);
+    const effectiveMatches = capMatchCount(matchCount);
+    const row = getRow(drawId, effectiveMatches);
     if (!row || row.type === 'none') {
       return {
         prizeType: 'none',
         prizeLabel: 'No prize',
         displayUsd: 0,
         isJackpot: false,
-        matchCount,
+        matchCount: effectiveMatches,
         freeQty: 0,
       };
     }
@@ -103,7 +112,7 @@ const PrizeTierMatrix = (() => {
         prizeLabel: `${qty} Free Ticket${qty > 1 ? 's' : ''}`,
         displayUsd: qty,
         isJackpot: false,
-        matchCount,
+        matchCount: effectiveMatches,
         freeQty: qty,
       };
     }
@@ -115,7 +124,7 @@ const PrizeTierMatrix = (() => {
         prizeLabel: formatUsd(cap),
         displayUsd: cap,
         isJackpot: true,
-        matchCount,
+        matchCount: effectiveMatches,
         freeQty: 0,
       };
     }
@@ -126,7 +135,7 @@ const PrizeTierMatrix = (() => {
       prizeLabel: formatUsd(amt),
       displayUsd: amt,
       isJackpot: false,
-      matchCount,
+      matchCount: effectiveMatches,
       freeQty: 0,
     };
   }
@@ -134,8 +143,8 @@ const PrizeTierMatrix = (() => {
   function pickBestTicketByMatches(tickets, winningNumbers) {
     if (!tickets?.length) return null;
     const scored = tickets
-      .map((t) => ({ ticket: t, matches: countMatches(t.numbers, winningNumbers) }))
-      .filter((x) => x.matches >= 2);
+      .map((t) => ({ ticket: t, matches: capMatchCount(countMatches(t.numbers, winningNumbers)) }))
+      .filter((x) => x.matches >= 2 && x.matches <= MAX_RESOLVED_MATCHES);
     if (!scored.length) return null;
     const best = Math.max(...scored.map((s) => s.matches));
     const top = scored.filter((s) => s.matches === best);
@@ -249,6 +258,8 @@ const PrizeTierMatrix = (() => {
   return {
     MATRIX,
     MATCH_ODDS,
+    MAX_RESOLVED_MATCHES,
+    capMatchCount,
     countMatches,
     getRow,
     resolveOutcome,
