@@ -9,7 +9,7 @@
   <title>NeonDraw | Las Vegas' Oldest Lottery — Now in Crypto</title>
   <meta name="description" content="Las Vegas' oldest lottery — now in crypto. Lottery draws, slots, and roulette. ETH, SOL, USDT, USDC, TRX accepted." />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <meta name="author" content="NeonDraw" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="theme-color" content="#0b0c14" />
   <link rel="canonical" href="https://example.com/" />
   <link rel="alternate" hreflang="en" href="https://example.com/" />
@@ -50,8 +50,9 @@
           "operatingSystem": "Web",
           "offers": {
             "@type": "Offer",
-            "price": "1",
-            "priceCurrency": "USD"
+            "price": "10",
+            "priceCurrency": "USD",
+            "description": "Minimum $10 ticket; 100% of ticket price goes to the prize pool"
           }
         },
         {
@@ -218,14 +219,14 @@
           <div class="stat">
             <span class="stat-icon" data-icon="ticket" data-icon-size="22"></span>
             <div>
-              <span class="stat-value" id="statTickets">1,247</span>
+              <span class="stat-value" id="statTickets">12.8K</span>
               <span class="stat-label">Entries Sold</span>
             </div>
           </div>
           <div class="stat">
             <span class="stat-icon" data-icon="users" data-icon-size="22"></span>
             <div>
-              <span class="stat-value" id="statPlayersOnline">1.2K</span>
+              <span class="stat-value" id="statPlayersOnline">2.8K</span>
               <span class="stat-label">Players Online</span>
             </div>
           </div>
@@ -265,14 +266,14 @@
               <div class="countdown-unit"><span id="cdMins">00</span><small>Mins</small></div>
               <div class="countdown-unit"><span id="cdSecs">00</span><small>Secs</small></div>
             </div>
-            <button class="btn btn-gold" id="heroBuyBtn">Get My Numbers from $1</button>
+            <button class="btn btn-gold" id="heroBuyBtn">Get My Numbers from $10</button>
             <p class="hero-trust-line"><span data-icon="shield-check" data-icon-size="14"></span> Licensed draw · Public schedule · <span id="trustPaidOutBanner">$2.8M</span> already paid out</p>
           </section>
 
           <div class="pool-bar pool-bar-inset">
             <div class="pool-bar-header">
               <span>Prize pool growth</span>
-              <span id="poolAmount">$847,293 in play</span>
+              <span id="poolAmount">$1.3M+ in play · growing</span>
             </div>
             <div class="pool-bar-track">
               <div class="pool-bar-fill" id="poolBarFill"></div>
@@ -296,9 +297,9 @@
                 <label class="field-label" for="customAmount">Custom amount (USD)</label>
                 <div class="custom-amount-wrap">
                   <span class="custom-amount-prefix">$</span>
-                  <input type="number" id="customAmount" min="1" max="6400" step="1" value="25" placeholder="Enter amount" class="text-input custom-amount-input" />
+                  <input type="number" id="customAmount" min="10" max="10000" step="1" value="100" placeholder="Enter amount" class="text-input custom-amount-input" />
                 </div>
-                <p class="field-hint">$1 per ticket · enter any amount to see how many entries you get</p>
+                <p class="field-hint">Minimum $10 · 100% goes to the prize pool</p>
               </div>
               <div class="purchase-summary" id="purchaseSummary"></div>
               <div class="free-ticket-banner" id="freeTicketBanner" hidden>
@@ -361,7 +362,7 @@
         <section class="player-dashboard-section" id="dashboard">
           <div class="section-header">
             <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> Player Dashboard</h2>
-            <span class="section-hint">Connect wallet · full history including expired tickets</span>
+            <span class="section-hint">Your wins, perks &amp; ticket history — connect wallet</span>
           </div>
           <div id="dashboardContent" class="dashboard-content"></div>
         </section>
@@ -385,7 +386,7 @@
             </div>
             <div class="slot-section-grid">
               <div class="slot-machine-panel">
-                <div class="slot-cabinet" id="neonSlotCabinet">
+                <div class="slot-cabinet slot-cabinet-expanded" id="neonSlotCabinet">
                   <div class="slot-cabinet-top">
                     <div class="slot-marquee-wrap">
                       <span class="slot-marquee" id="slotMarquee">★ NEON DRAW JACKPOT ★</span>
@@ -406,7 +407,7 @@
                   <div class="slot-cabinet-controls">
                     <div class="slot-bet-row">
                       <label class="field-label" for="neonSlotBet">Bet (USD)</label>
-                      <input type="number" id="neonSlotBet" value="1" min="0.5" step="0.5" class="text-input slot-bet-input" />
+                      <input type="number" id="neonSlotBet" value="1" min="1" step="0.5" class="text-input slot-bet-input" />
                     </div>
                     <div class="slot-lever-mount">
                       <div class="slot-lever-base" aria-hidden="true">
@@ -490,7 +491,9 @@
                   <div class="roulette-stage">
                     <div class="roulette-pointer" aria-hidden="true"></div>
                     <div class="roulette-wheel-outer">
-                      <div class="roulette-wheel" id="rouletteWheel"></div>
+                      <div class="roulette-wheel-track">
+                        <div class="roulette-wheel" id="rouletteWheel"></div>
+                      </div>
                     </div>
                   </div>
                   <div class="roulette-cabinet-display">
@@ -523,6 +526,17 @@
                   <button type="button" class="roulette-bet-btn" data-bet="high">19–36</button>
                 </div>
                 <p class="roulette-bet-hint" id="rouletteBetHint">Red pays 1:1 · 0 and 00 lose outside bets</p>
+                <article class="slot-bonus-card slot-bonus-spins roulette-free-card">
+                  <div class="slot-bonus-card-head">
+                    <span class="slot-bonus-icon" data-icon="circle-dot" data-icon-size="20"></span>
+                    <div>
+                      <h4 class="slot-bonus-card-title">Free spins</h4>
+                      <p class="slot-bonus-stat"><strong id="freeRouletteSpinsLeft">3</strong> of 3 left today</p>
+                    </div>
+                  </div>
+                  <p class="slot-bonus-hint">Spin the wheel with no bet. Wins credit demo balance to your casino wallet.</p>
+                  <button type="button" class="btn btn-outline btn-block slot-bonus-btn" id="neonRouletteFreeBtn">Use Free Spin</button>
+                </article>
                 <div class="roulette-recent-block">
                   <p class="roulette-recent-title">Recent spins</p>
                   <div class="roulette-recent-results" id="rouletteRecentResults">
@@ -587,7 +601,7 @@
                   <span class="how-step-num" aria-hidden="true">3</span>
                   <div class="how-step-body">
                     <strong>Buy or redeem</strong>
-                    <p>Pay from $1 with crypto, or tap <em>Redeem Free Entry</em> if you have a free ticket.</p>
+                    <p>Pay from $10 with crypto (100% to the pool), or tap <em>Redeem Free Entry</em> if you have a free ticket.</p>
                   </div>
                 </li>
                 <li class="how-step">
@@ -644,7 +658,7 @@
                   <span class="how-step-num" aria-hidden="true">4</span>
                   <div class="how-step-body">
                     <strong>Collect &amp; extras</strong>
-                    <p>Wins credit to your casino balance. Use daily free spins and claim bonus lottery tickets in the panel beside the reels.</p>
+                    <p>Wins credit to your casino balance. Use 3 daily free slot spins, 3 free roulette spins, and claim bonus lottery tickets in the casino panels.</p>
                   </div>
                 </li>
               </ol>
@@ -679,7 +693,7 @@
                   <span class="how-step-num" aria-hidden="true">3</span>
                   <div class="how-step-body">
                     <strong>Set your chip &amp; spin</strong>
-                    <p>Enter bet amount (from $0.50) and tap <em>SPIN WHEEL</em>.</p>
+                    <p>Enter bet amount (from $0.50) and tap <em>SPIN WHEEL</em>, or use <em>Use Free Spin</em> (3 per day, no bet).</p>
                   </div>
                 </li>
                 <li class="how-step">
@@ -799,16 +813,16 @@
 
         <section class="historic-growth-section" id="historic-growth">
           <div class="section-header">
-            <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> <span id="historicMonths">14</span> Months of Real Growth</h2>
-            <span class="section-hint">Matches live stats above · <span id="historicTicketGrowth">+0%</span> entry growth</span>
+            <h2 class="section-title"><span class="title-icon" data-icon="bar-chart" data-icon-size="20"></span> Platform History</h2>
+            <span class="section-hint">Entries, prize pool, and payouts over time · <span id="historicTicketGrowth">+0%</span> entry growth</span>
           </div>
           <div class="historic-stats-row">
-            <div class="historic-stat"><strong id="historicTotalTickets">1,247</strong><span>Entries sold (total)</span></div>
-            <div class="historic-stat"><strong id="historicPoolLatest">$847,293</strong><span>Pool in play</span></div>
+            <div class="historic-stat"><strong id="historicTotalTickets">12.8K</strong><span>Entries sold (total)</span></div>
+            <div class="historic-stat"><strong id="historicPoolLatest">$1.3M+</strong><span>Pool in play</span></div>
             <div class="historic-stat"><strong id="historicTotalPaid">$2.8M</strong><span>Paid to winners</span></div>
-            <div class="historic-stat historic-stat-growth"><strong id="historicGrowthSummary">+256% entries · +315% pool</strong><span>14-month trend</span></div>
+            <div class="historic-stat historic-stat-growth"><strong id="historicGrowthSummary">+256% entries · +315% pool</strong><span>Growth trend</span></div>
           </div>
-          <p class="historic-chart-note">Chart end points match the stats bar, prize pool, and paid-out totals above — they update together as entries come in.</p>
+          <p class="historic-chart-note">Totals stay in sync with the live stats bar and prize pool above.</p>
           <div class="chart-card chart-card-wide">
             <canvas id="growthChart" height="220"></canvas>
           </div>
@@ -866,7 +880,11 @@
             </details>
             <details class="faq-item">
               <summary>How do I buy a ticket?</summary>
-              <p>Connect MetaMask or any Web3 wallet, pick your numbers, choose an entry amount (from $1), and confirm. Takes about 30 seconds, faster than driving to a store.</p>
+              <p>Connect MetaMask or any Web3 wallet, pick your numbers, choose a ticket ($10–$1,000 or custom), and confirm. Your full ticket price goes to the prize pool.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Who pays blockchain network fees (gas)?</summary>
+              <p><strong>You do</strong> — in your own wallet when MetaMask asks you to confirm. That fee goes to the <strong>Ethereum network</strong> (validators/miners), <strong>not to NeonDraw</strong>. We do not charge it, keep it, or subsidize it. Your ticket or deposit amount goes 100% to the prize pool or casino balance. Fees change with network traffic and are often much lower than peak estimates. Slots and roulette use your deposited balance with <strong>no extra gas per spin</strong>.</p>
             </details>
             <details class="faq-item">
               <summary>How fast do winners get paid?</summary>
@@ -1037,19 +1055,20 @@
                 <span class="currency-icon" data-icon="zap" data-icon-size="16"></span> TRX
               </button>
             </div>
-            <p class="field-hint">Multi-chain deposits: ETH &amp; L2, Solana, Tron (USDT/USDC), and more via your wallet.</p>
-            <label class="field-label" for="depositAmount">Amount</label>
+            <p class="field-hint">Minimum <strong>$10</strong> deposit (one on-chain tx). Balance is used for slots ($1+) and roulette ($0.50+) with <strong>no gas per bet</strong>.</p>
+            <p class="field-hint" id="depositNetworkFeeHint">Blockchain network fees are paid by you in MetaMask — not NeonDraw. Connect wallet for a live estimate.</p>
+            <label class="field-label" for="depositAmount">Amount (ETH)</label>
             <div class="amount-input-wrap">
-              <input type="number" id="depositAmount" placeholder="0.00" min="0" step="0.001" />
+              <input type="number" id="depositAmount" placeholder="0.00" min="0" step="0.000001" />
               <button class="btn-max" id="depositMax">MAX</button>
             </div>
             <div class="quick-amounts">
-              <button data-amount="0.01">0.01</button>
-              <button data-amount="0.05">0.05</button>
-              <button data-amount="0.1">0.1</button>
-              <button data-amount="0.5">0.5</button>
+              <button type="button" data-usd="10">$10</button>
+              <button type="button" data-usd="25">$25</button>
+              <button type="button" data-usd="50">$50</button>
+              <button type="button" data-usd="100">$100</button>
             </div>
-            <p class="field-hint">Deposits are sent on-chain to the lottery treasury. Instant confirmation.</p>
+            <p class="field-hint">Deposits are sent on-chain once to your casino balance. Lottery tickets are a separate on-chain purchase.</p>
             <button class="btn btn-gold btn-lg btn-block" id="depositBtn">Deposit Now</button>
             <div class="tx-status" id="depositStatus" hidden></div>
           </div>
@@ -1069,7 +1088,7 @@
             <input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.001" class="text-input" />
             <label class="field-label" for="withdrawAddress">Destination Address</label>
             <input type="text" id="withdrawAddress" placeholder="0x..." class="text-input" autocomplete="off" autocapitalize="off" spellcheck="false" />
-            <p class="field-hint">Withdrawals over ~$1,000 USD equivalent require operator approval and may be rejected.</p>
+            <p class="field-hint">Large withdrawals are processed securely and typically arrive in your wallet within a few minutes.</p>
             <button class="btn btn-primary btn-lg btn-block" id="withdrawBtn">Withdraw</button>
             <div class="tx-status" id="withdrawStatus" hidden></div>
           </div>
@@ -1151,11 +1170,17 @@
   <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <script src="js/secure-runtime.js?v=neondraw"></script>
+  <script src="js/secure-storage.js?v=neondraw"></script>
+  <script src="js/env-bootstrap.js?v=neondraw"></script>
+  <script defer src="js/api-client.js?v=neondraw"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
   <script defer src="js/icons.js?v=neondraw"></script>
   <script defer src="js/platform-stats.js?v=neondraw"></script>
   <script defer src="js/pool-policy.js?v=neondraw"></script>
+  <script defer src="js/network-fee.js?v=neondraw"></script>
+  <script defer src="js/ticket-pricing.js?v=neondraw"></script>
   <script defer src="js/wallet.js?v=neondraw"></script>
   <script defer src="js/provably-fair.js?v=neondraw"></script>
   <script defer src="js/historic-growth.js?v=neondraw"></script>
