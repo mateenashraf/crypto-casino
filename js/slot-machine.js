@@ -2,8 +2,8 @@
  * NeonDraw Slots — colorful Vegas-style cabinet with animated reels
  */
 const SlotMachine = (() => {
-  const STORAGE = 'starbitz_slot_history';
-  const STORAGE_FREE = 'starbitz_free_spins_daily';
+  const STORAGE = 'slot_history';
+  const STORAGE_FREE = 'slot_free_daily';
   const PAID_WIN_RATE = 0.25;
   const FREE_WIN_RATE = 0.10;
   const FREE_SPINS_PER_DAY = 3;
@@ -33,8 +33,17 @@ const SlotMachine = (() => {
   }
 
   function loadFreeDaily() {
+    if (window.NeonDrawDev?.hasUnlimitedSpins?.()) {
+      return {
+        day: todayKey(),
+        freeSpinsUsed: 0,
+        freeTicketsUsed: 0,
+        freeWins: 0,
+        freePlays: 0,
+      };
+    }
     try {
-      const data = JSON.parse(localStorage.getItem(STORAGE_FREE) || '{}');
+      const data = SecureStorage.getJSON(STORAGE_FREE, {});
       if (data.day !== todayKey()) {
         return { day: todayKey(), freeSpinsUsed: 0, freeTicketsUsed: 0, freeWins: 0, freePlays: 0 };
       }
@@ -45,7 +54,7 @@ const SlotMachine = (() => {
   }
 
   function saveFreeDaily(data) {
-    localStorage.setItem(STORAGE_FREE, JSON.stringify({ ...data, day: todayKey() }));
+    SecureStorage.setJSON(STORAGE_FREE, { ...data, day: todayKey() });
   }
 
   function pickSymbol() {
@@ -72,9 +81,9 @@ const SlotMachine = (() => {
   }
 
   function recordPlay(wallet, { betUsd, payoutUsd, won, free, reels }) {
-    const list = JSON.parse(localStorage.getItem(STORAGE) || '[]');
+    const list = SecureStorage.getJSON(STORAGE, []);
     list.unshift({ wallet, betUsd, payoutUsd, won, free, reels, timestamp: Date.now() });
-    localStorage.setItem(STORAGE, JSON.stringify(list.slice(0, 500)));
+    SecureStorage.setJSON(STORAGE, list.slice(0, 500));
     window.dispatchEvent(new CustomEvent('slot-played', { detail: { won, payoutUsd, betUsd, free, reels, wallet } }));
     if (won) {
       window.SlotTicker?.addWin?.({ wallet, reels, betUsd, payoutUsd, won, free });
@@ -161,7 +170,7 @@ const SlotMachine = (() => {
     if (!lever) return;
     const clamped = Math.max(0, Math.min(1, ratio));
     lever.style.setProperty('--lever-pull', String(clamped));
-    lever.classList.toggle('is-dragging', clamped > 0 && transition === false);
+    lever.classList.toggle('is-dragging', clamped > 0 && !transition);
     if (transition) {
       lever.classList.add('lever-spring');
       lever.addEventListener('transitionend', () => lever.classList.remove('lever-spring'), { once: true });
@@ -173,15 +182,19 @@ const SlotMachine = (() => {
     const mount = document.querySelector('.slot-lever-mount');
     if (!lever || !mount) return;
 
-    const PULL_THRESHOLD = 0.62;
-    const MAX_PULL_PX = 52;
+    const PULL_THRESHOLD = 0.55;
+    const MAX_PULL_PX = 56;
     let dragging = false;
-    let startY = 0;
     let triggered = false;
 
+    const getPivotY = () => {
+      const base = mount.querySelector('.slot-lever-base');
+      if (base) return base.getBoundingClientRect().top + 2;
+      return mount.getBoundingClientRect().top + 20;
+    };
+
     const getPullFromEvent = (clientY) => {
-      const rect = mount.getBoundingClientRect();
-      const pivotY = rect.top + 18;
+      const pivotY = getPivotY();
       return Math.max(0, Math.min(1, (clientY - pivotY) / MAX_PULL_PX));
     };
 
@@ -189,9 +202,9 @@ const SlotMachine = (() => {
       if (!dragging) return;
       dragging = false;
       lever.classList.remove('is-dragging');
-      if (shouldSpin && !triggered && !spinning) {
+      const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
+      if (shouldSpin && !triggered && !spinning && canAffordPaidSpin(bet)) {
         triggered = true;
-        const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
         play({ free: false, betUsd: bet });
       }
       setLeverPull(0, true);
@@ -202,7 +215,6 @@ const SlotMachine = (() => {
       if (spinning || lever.disabled || lever.classList.contains('disabled')) return;
       dragging = true;
       triggered = false;
-      startY = e.clientY;
       lever.setPointerCapture(e.pointerId);
       lever.classList.add('is-dragging');
       e.preventDefault();
@@ -225,9 +237,8 @@ const SlotMachine = (() => {
     lever.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        if (!spinning && !lever.disabled) {
-          pullLever(true);
-          const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
+        const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
+        if (!spinning && !lever.disabled && canAffordPaidSpin(bet)) {
           play({ free: false, betUsd: bet });
         }
       }
@@ -276,16 +287,56 @@ const SlotMachine = (() => {
     });
   }
 
+  function getFreeSpinsLimit() {
+    return window.NeonDrawDev?.hasUnlimitedSpins?.() ? 9999 : FREE_SPINS_PER_DAY;
+  }
+
+  function getBetUsd() {
+    const raw = parseFloat(document.getElementById('neonSlotBet')?.value || '');
+    return Number.isFinite(raw) ? raw : null;
+  }
+
+  function canAffordPaidSpin(betUsd) {
+    const wallet = window.SecureWeb3?.getAddress?.();
+    if (!wallet) return false;
+    const amount = betUsd ?? getBetUsd();
+    if (amount == null) return false;
+    const minBet = window.TicketPricing?.MIN_SLOT_BET_USD || 1;
+    if (amount < minBet) return false;
+    const betEth = amount / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
+    const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
+    return betEth <= casinoBal;
+  }
+
+  function updatePlayControls() {
+    const connected = window.SecureWeb3?.isConnected?.();
+    const canPaid = connected && canAffordPaidSpin() && !spinning;
+    const lever = document.querySelector('.slot-lever');
+    const altBtn = document.getElementById('neonSlotSpinBtnAlt');
+    if (lever) {
+      lever.disabled = !canPaid;
+      lever.classList.toggle('disabled', !canPaid);
+    }
+    if (altBtn) altBtn.disabled = !canPaid;
+    updateFreeUI();
+  }
+
   function setSpinEnabled(enabled) {
-    ['neonSlotSpinBtnAlt', 'neonSlotFreeBtn'].forEach((id) => {
+    ['neonSlotFreeBtn'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.disabled = !enabled;
     });
     const lever = document.querySelector('.slot-lever');
-    if (lever) {
-      lever.disabled = !enabled;
-      lever.classList.toggle('disabled', !enabled);
+    const altBtn = document.getElementById('neonSlotSpinBtnAlt');
+    if (!enabled) {
+      if (lever) {
+        lever.disabled = true;
+        lever.classList.add('disabled');
+      }
+      if (altBtn) altBtn.disabled = true;
+      return;
     }
+    updatePlayControls();
   }
 
   function celebrateWin(won) {
@@ -311,22 +362,39 @@ const SlotMachine = (() => {
       return;
     }
 
+    const freeState = loadFreeDaily();
+    let won = false;
+    let payoutUsd = 0;
+    let resolvedBetUsd = betUsd;
+
+    if (free) {
+      if (freeState.freeSpinsUsed >= getFreeSpinsLimit()) {
+        window.AppUI?.toast?.('No free spins left today', 'info');
+        return;
+      }
+    } else {
+      resolvedBetUsd = getBetUsd() ?? betUsd;
+      const minBet = window.TicketPricing?.MIN_SLOT_BET_USD || 1;
+      if (!Number.isFinite(resolvedBetUsd) || resolvedBetUsd < minBet) {
+        window.AppUI?.toast?.(`Minimum bet is $${minBet}`, 'info');
+        return;
+      }
+      if (!canAffordPaidSpin(resolvedBetUsd)) {
+        window.AppUI?.toast?.(
+          `Deposit at least ${window.TicketPricing?.formatUsd?.(window.TicketPricing?.MIN_DEPOSIT_USD || 10) || '$10'} to casino balance first`,
+          'error'
+        );
+        updatePlayControls();
+        return;
+      }
+    }
+
     spinning = true;
     setSpinEnabled(false);
     clearWinHighlight();
     pullLever();
 
-    const freeState = loadFreeDaily();
-    let won = false;
-    let payoutUsd = 0;
-
     if (free) {
-      if (freeState.freeSpinsUsed >= FREE_SPINS_PER_DAY) {
-        window.AppUI?.toast?.('No free spins left today', 'info');
-        spinning = false;
-        setSpinEnabled(true);
-        return;
-      }
       freeState.freeSpinsUsed += 1;
       freeState.freePlays += 1;
       won = canFreeWin(freeState);
@@ -338,25 +406,21 @@ const SlotMachine = (() => {
       saveFreeDaily(freeState);
     } else {
       const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
-      const betEth = betUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
-      if (betEth > casinoBal && betUsd > 0) {
-        window.AppUI?.toast?.('Deposit to casino balance first', 'error');
-        spinning = false;
-        setSpinEnabled(true);
-        return;
-      }
-      if (betUsd > 0) {
+      const betEth = resolvedBetUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
+      if (resolvedBetUsd > 0) {
         window.SecureWeb3?.setCasinoBalance?.(wallet, casinoBal - betEth);
       }
       won = Math.random() < PAID_WIN_RATE;
       if (won) {
         const sym = pickSymbol();
         const mult = PAYOUT_MULT[sym] || 3;
-        payoutUsd = betUsd * mult * 0.4;
+        payoutUsd = resolvedBetUsd * mult * 0.4;
         const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
         const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'slot' });
         if (approval?.auto) {
           window.SecureWeb3?.setCasinoBalance?.(wallet, (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth);
+        } else if (approval) {
+          window.PoolPolicy?.notifyPayoutProcessing?.(wallet, payoutUsd);
         }
       }
     }
@@ -383,19 +447,22 @@ const SlotMachine = (() => {
         explainEl.textContent = window.ProvablyFair?.explainOutcome?.(won, free ? 'slot_free' : 'slot_paid') || '';
       }
       celebrateWin(won);
-      recordPlay(wallet, { betUsd: free ? 0 : betUsd, payoutUsd, won, free, reels });
+      recordPlay(wallet, { betUsd: free ? 0 : resolvedBetUsd, payoutUsd, won, free, reels });
       updateFreeUI();
       spinning = false;
       setSpinEnabled(true);
+      updatePlayControls();
+      window.AppUI?.refreshBalances?.();
     });
   }
 
   function updateFreeUI() {
     const freeState = loadFreeDaily();
-    const spinsLeft = Math.max(0, FREE_SPINS_PER_DAY - freeState.freeSpinsUsed);
+    const limit = getFreeSpinsLimit();
+    const spinsLeft = Math.max(0, limit - freeState.freeSpinsUsed);
     const claimsLeft = Math.max(0, FREE_TICKETS_PER_DAY - freeState.freeTicketsUsed);
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set('freeSpinsLeft', String(spinsLeft));
+    set('freeSpinsLeft', window.NeonDrawDev?.hasUnlimitedSpins?.() ? '∞' : String(spinsLeft));
     set('freeTicketsLeft', String(claimsLeft));
 
     const freeBtn = document.getElementById('neonSlotFreeBtn');
@@ -416,46 +483,70 @@ const SlotMachine = (() => {
     if (walletRow) walletRow.hidden = !wallet || balance < 1;
   }
 
+  const PENDING_FREE_TICKET_KEY = '_nd8_pft';
+
+  function claimDailyFreeTicket() {
+    const wallet = window.SecureWeb3?.getAddress?.();
+    if (!wallet) {
+      sessionStorage.setItem(PENDING_FREE_TICKET_KEY, '1');
+      window.AppUI?.openWallet?.();
+      window.AppUI?.toast?.('Connect wallet to claim your free ticket', 'info');
+      return false;
+    }
+    const freeState = loadFreeDaily();
+    if (freeState.freeTicketsUsed >= FREE_TICKETS_PER_DAY) {
+      window.AppUI?.toast?.('Daily free tickets claimed — come back tomorrow', 'info');
+      return false;
+    }
+    freeState.freeTicketsUsed += 1;
+    saveFreeDaily(freeState);
+    window.SecureWeb3?.grantFreeTickets?.(wallet, 1, { source: 'daily_bonus' });
+    window.AppUI?.toast?.('Free ticket added! Redeem it in the lottery section.', 'success');
+    updateFreeUI();
+    window.LotteryApp?.updateFreeTicketUI?.();
+    return true;
+  }
+
+  function processPendingFreeTicketClaim() {
+    if (sessionStorage.getItem(PENDING_FREE_TICKET_KEY) !== '1') return false;
+    if (!window.SecureWeb3?.getAddress?.()) return false;
+    sessionStorage.removeItem(PENDING_FREE_TICKET_KEY);
+    return claimDailyFreeTicket();
+  }
+
   function bindSpin() {
     const handler = () => {
       const bet = parseFloat(document.getElementById('neonSlotBet')?.value || '1');
-      pullLever(true);
       play({ free: false, betUsd: bet });
     };
     document.getElementById('neonSlotSpinBtnAlt')?.addEventListener('click', handler);
   }
 
   function init() {
-    updateFreeUI();
-    bindSpin();
-    bindLeverDrag();
-    renderPaytable();
-    window.SecureWeb3?.on?.((event) => {
-      if (['connected', 'disconnected', 'free-ticket-granted', 'free-ticket-redeemed'].includes(event)) {
-        updateFreeUI();
-      }
-    });
-    document.getElementById('neonSlotFreeBtn')?.addEventListener('click', () => play({ free: true }));
-    document.getElementById('neonSlotGrantFreeTicket')?.addEventListener('click', () => {
-      const wallet = window.SecureWeb3?.getAddress?.();
-      if (!wallet) { window.AppUI?.openWallet?.(); return; }
-      const freeState = loadFreeDaily();
-      if (freeState.freeTicketsUsed >= FREE_TICKETS_PER_DAY) {
-        window.AppUI?.toast?.('Daily free tickets claimed', 'info');
-        return;
-      }
-      freeState.freeTicketsUsed += 1;
-      saveFreeDaily(freeState);
-      window.SecureWeb3?.grantFreeTickets?.(wallet, 1, { source: 'daily_bonus' });
-      window.AppUI?.toast?.('Free ticket added!', 'success');
-      updateFreeUI();
-    });
-
     const reelsWrap = document.getElementById('neonSlotReels');
     if (reelsWrap) {
       reelsWrap.innerHTML = buildReelsHTML(['cherry', 'orange', 'seven']);
     }
     buildLights();
+    renderPaytable();
+
+    updateFreeUI();
+    updatePlayControls();
+    bindSpin();
+    bindLeverDrag();
+    renderPaytable();
+    document.getElementById('neonSlotBet')?.addEventListener('input', () => updatePlayControls());
+    window.SecureWeb3?.on?.((event) => {
+      if (['connected', 'disconnected', 'free-ticket-granted', 'free-ticket-redeemed', 'deposit-success', 'withdraw-success'].includes(event)) {
+        updateFreeUI();
+        updatePlayControls();
+      }
+    });
+    document.getElementById('neonSlotFreeBtn')?.addEventListener('click', () => play({ free: true }));
+    document.getElementById('neonSlotGrantFreeTicket')?.addEventListener('click', () => {
+      claimDailyFreeTicket();
+    });
+
     startMarquee();
   }
 
@@ -466,7 +557,7 @@ const SlotMachine = (() => {
     }
   }
 
-  return { init, play, updateFreeUI };
+  return { init, play, updateFreeUI, updatePlayControls, processPendingFreeTicketClaim, claimDailyFreeTicket };
 })();
 
 window.SlotMachine = SlotMachine;
