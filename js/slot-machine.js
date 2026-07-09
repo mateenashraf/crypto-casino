@@ -8,8 +8,19 @@ const SlotMachine = (() => {
   const FREE_WIN_RATE = 0.10;
   const FREE_SPINS_PER_DAY = 3;
   const FREE_TICKETS_PER_DAY = 2;
-  const SYMBOL_HEIGHT = 92;
   const STRIP_LENGTH = 30;
+
+  function getSymbolHeight() {
+    const cabinet = document.getElementById('neonSlotCabinet');
+    if (!cabinet) return 92;
+    const raw = getComputedStyle(cabinet).getPropertyValue('--slot-symbol-h').trim();
+    const px = parseFloat(raw);
+    return px > 0 ? px : 92;
+  }
+
+  function stripOffset() {
+    return (STRIP_LENGTH - 1) * getSymbolHeight();
+  }
 
   const SYMBOLS = window.SlotSymbols?.getCatalog?.() || [
     { id: 'cherry', label: 'Cherry', color: '#ff4d6d', bg: 'linear-gradient(160deg, #4a1028 0%, #1a0810 100%)' },
@@ -113,7 +124,7 @@ const SlotMachine = (() => {
     return finals.map((sym, i) => `
       <div class="slot-reel-col" data-reel="${i}">
         <div class="slot-reel-viewport">
-          <div class="slot-reel-strip" style="transform: translateY(-${(STRIP_LENGTH - 1) * SYMBOL_HEIGHT}px)">
+          <div class="slot-reel-strip" style="transform: translateY(-${stripOffset()}px)">
             ${buildStrip(sym)}
           </div>
         </div>
@@ -275,7 +286,7 @@ const SlotMachine = (() => {
       setTimeout(() => {
         strip.classList.remove('spinning');
         strip.classList.add('stopping');
-        strip.style.transform = `translateY(-${(STRIP_LENGTH - 1) * SYMBOL_HEIGHT}px)`;
+        strip.style.transform = `translateY(-${stripOffset()}px)`;
 
         col.classList.add('reel-landed');
         setTimeout(() => col.classList.remove('reel-landed'), 380);
@@ -416,12 +427,8 @@ const SlotMachine = (() => {
         const mult = PAYOUT_MULT[sym] || 3;
         payoutUsd = resolvedBetUsd * mult * 0.4;
         const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
-        const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'slot' });
-        if (approval?.auto) {
-          window.SecureWeb3?.setCasinoBalance?.(wallet, (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth);
-        } else if (approval) {
-          window.PoolPolicy?.notifyPayoutProcessing?.(wallet, payoutUsd);
-        }
+        window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'slot' });
+        window.SecureWeb3?.setCasinoBalance?.(wallet, (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth);
       }
     }
 
@@ -447,6 +454,7 @@ const SlotMachine = (() => {
         explainEl.textContent = window.ProvablyFair?.explainOutcome?.(won, free ? 'slot_free' : 'slot_paid') || '';
       }
       celebrateWin(won);
+      if (won) window.PoolPolicy?.notifyWinOnTheWay?.(wallet);
       recordPlay(wallet, { betUsd: free ? 0 : resolvedBetUsd, payoutUsd, won, free, reels });
       updateFreeUI();
       spinning = false;
@@ -522,11 +530,21 @@ const SlotMachine = (() => {
     document.getElementById('neonSlotSpinBtnAlt')?.addEventListener('click', handler);
   }
 
+  function refreshReelLayout() {
+    document.querySelectorAll('#neonSlotReels .slot-reel-strip').forEach((strip) => {
+      if (strip.classList.contains('spinning')) return;
+      strip.style.transform = `translateY(-${stripOffset()}px)`;
+    });
+  }
+
   function init() {
     const reelsWrap = document.getElementById('neonSlotReels');
     if (reelsWrap) {
       reelsWrap.innerHTML = buildReelsHTML(['cherry', 'orange', 'seven']);
     }
+    window.addEventListener('resize', () => {
+      if (!spinning) refreshReelLayout();
+    }, { passive: true });
     buildLights();
     renderPaytable();
 
