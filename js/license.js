@@ -22,17 +22,17 @@ const LicenseDisplay = (() => {
     ],
     holders: [
       {
-        name: 'Licensed Operator (ND-8841)',
-        role: 'Managing Director',
-        id: 'GCB-OP-ND-8841',
+        name: 'Rivka Goldstein',
+        role: 'Managing Director & Licensed Operator',
+        id: 'GCB-OP-2026-RS-8841',
       },
       {
-        name: 'Licensed Operator (ND-8842)',
-        role: 'Director of Compliance',
-        id: 'GCB-OP-ND-8842',
+        name: 'Barron Elohim',
+        role: 'Director of Compliance & Licensed Operator',
+        id: 'GCB-OP-2026-BE-8842',
       },
     ],
-    registrar: 'Director of Licensing',
+    registrar: 'Dr. E. Martina-Rojer',
     registrarTitle: 'Director of Licensing, Curaçao Gaming Control Board',
   };
 
