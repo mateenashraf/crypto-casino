@@ -250,7 +250,6 @@ const PlayerDashboard = (() => {
     const el = document.getElementById('dashboardContent');
     if (!el) return;
     const stats = computeStats(wallet);
-    const pending = window.PoolPolicy?.getPendingForWallet?.(wallet) || [];
     const selectedDraw = window.DrawEngine?.getSelectedDraw?.();
 
     el.innerHTML = `
@@ -269,12 +268,12 @@ const PlayerDashboard = (() => {
         <div class="dash-stat"><span>Tickets on file</span><strong>${stats.tickets}</strong></div>
       </div>
       ${renderPerks(stats)}
+      ${stats.winCount > 0 ? `<div class="dashboard-pending"><strong>Win on the way!</strong> Your winnings are being sent to your wallet — most players receive funds within a few minutes.</div>` : ''}
       <div class="dashboard-quick-actions dashboard-quick-actions-main">
         <button type="button" class="btn btn-gold btn-sm" data-dash-go="#lottery">Buy lottery ticket</button>
         <button type="button" class="btn btn-outline btn-sm" data-dash-go="#slots">Play slots</button>
         <button type="button" class="btn btn-outline btn-sm" data-dash-go="#roulette">Spin roulette</button>
       </div>
-      ${pending.length ? `<div class="dashboard-pending"><strong>Win on the way!</strong> Your payout${pending.length === 1 ? ' is' : 's are'} being sent to your wallet — most players receive funds within a few minutes.</div>` : ''}
       ${renderWinsFeed(stats.recentWins)}
       <div class="dashboard-charts">
         <div class="chart-card chart-card-wide"><h4>Winnings over time</h4><canvas id="dashWinsChart" height="180"></canvas></div>
@@ -414,13 +413,12 @@ const PlayerDashboard = (() => {
   function init() {
     refresh();
     window.SecureWeb3?.on?.((event) => {
-      if (['connected', 'disconnected', 'ticket-purchased', 'withdraw-success', 'payout-pending', 'deposit-success'].includes(event)) {
+      if (['connected', 'disconnected', 'ticket-purchased', 'withdraw-success', 'deposit-success'].includes(event)) {
         refresh();
       }
     });
     window.addEventListener('slot-played', () => refresh());
     window.addEventListener('roulette-played', () => refresh());
-    window.addEventListener('payout-approved', () => refresh());
     window.addEventListener('draw-completed', () => refresh());
   }
 
