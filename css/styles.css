@@ -7,8 +7,8 @@
   --bg-elevated: #222233;
   --border: rgba(255, 255, 255, 0.08);
   --text-primary: #f0f0f5;
-  --text-secondary: #9898b0;
-  --text-muted: #6b6b80;
+  --text-secondary: #a8a8be;
+  --text-muted: #9090a8;
   --accent-gold: #f5b731;
   --accent-gold-hover: #ffc94d;
   --accent-green: #00d68f;
@@ -64,6 +64,11 @@ body {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 input { font-family: inherit; }
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
 
 /* Header */
 .header {
@@ -153,7 +158,7 @@ input { font-family: inherit; }
   font-weight: 600;
   letter-spacing: var(--tracking-tight);
 }
-.section-title { font-size: 1.15rem; }
+.section-title { font-size: 1.22rem; }
 .panel-title { font-size: 1rem; font-weight: 600; }
 .title-icon {
   display: inline-flex;
@@ -479,9 +484,12 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
   margin-bottom: 14px;
 }
-.section-header h2 { font-size: 1.25rem; font-weight: 700; }
+.section-header h2 { font-size: clamp(1.05rem, 2.5vw, 1.25rem); font-weight: 700; }
+.section-hint { font-size: 0.8rem; color: var(--text-secondary); }
 .see-all { font-size: 0.875rem; color: var(--accent-gold); font-weight: 500; }
 .see-all:hover { text-decoration: underline; }
 
@@ -1145,19 +1153,19 @@ input { font-family: inherit; }
 .license-sig-line {
   display: block;
   font-family: "Brush Script MT", "Segoe Script", cursive;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   color: #e8d5a3;
   margin-bottom: 2px;
 }
 .license-sig-role {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 .license-sig-id {
   display: block;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   font-family: ui-monospace, monospace;
   margin-top: 2px;
@@ -2373,7 +2381,7 @@ input { font-family: inherit; }
   border: none;
 }
 
-.section-hint { font-size: 0.8rem; color: var(--text-muted); }
+.section-hint { font-size: 0.8rem; color: var(--text-secondary); }
 .draw-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -2640,12 +2648,12 @@ input { font-family: inherit; }
   border-radius: 999px;
   border: 1px solid rgba(124, 92, 252, 0.35);
   background: rgba(124, 92, 252, 0.08);
-  color: #c4b5fd;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 .dev-grant-btn:hover {
   background: rgba(124, 92, 252, 0.15);
-  color: #e9d5ff;
+  color: var(--text-primary);
 }
 
 .active-offer-banner {
@@ -3248,7 +3256,10 @@ input { font-family: inherit; }
   .menu-toggle { display: flex; }
   .header-nav { display: none; }
   .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.5);
+  }
   .main, .footer {
     margin-left: 0;
     width: 100%;
@@ -3267,6 +3278,18 @@ input { font-family: inherit; }
   .stats-bar-five { grid-template-columns: 1fr 1fr; }
   .trust-pillars { grid-template-columns: 1fr; }
   .trust-ribbon-inner { justify-content: flex-start; }
+  .player-promise { flex-direction: column; text-align: center; }
+  .player-promise-stat {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    width: 100%;
+  }
+  .slot-section-grid,
+  .roulette-section-grid { grid-template-columns: 1fr; }
+  .how-games-grid { grid-template-columns: 1fr; }
+  .heritage-actions { flex-direction: column; }
+  .heritage-actions .btn { width: 100%; }
 }
 
 /* Trust ribbon */
@@ -3309,7 +3332,7 @@ input { font-family: inherit; }
 }
 .trust-pillar {
   padding: 18px 16px;
-  background: var(--bg-card);
+  background: linear-gradient(165deg, rgba(34, 34, 51, 0.6) 0%, var(--bg-card) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: border-color 0.2s, transform 0.2s;
@@ -3331,14 +3354,14 @@ input { font-family: inherit; }
 }
 .trust-pillar-icon svg { stroke: var(--accent-purple); }
 .trust-pillar h3 {
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   margin-bottom: 8px;
   color: var(--text-primary);
 }
 .trust-pillar p {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.55;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.62;
 }
 .player-promise {
   display: flex;
@@ -3363,20 +3386,20 @@ input { font-family: inherit; }
 }
 .player-promise-stat span {
   font-size: 0.7rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 .player-promise-text {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
 }
 
 .panel-hint {
   font-size: 0.82rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin: -8px 0 14px;
   line-height: 1.58;
   font-weight: 400;
@@ -3516,7 +3539,7 @@ input { font-family: inherit; }
 .how-game-tagline {
   margin: 4px 0 0;
   font-size: 0.76rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.45;
   font-weight: 400;
 }
@@ -3778,9 +3801,9 @@ input { font-family: inherit; }
 .faq-item[open] summary::after { content: '−'; }
 .faq-item p {
   padding: 0 14px 14px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  line-height: 1.6;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
 }
 .faq-item a { color: var(--accent-gold); text-decoration: underline; }
 
@@ -3799,8 +3822,8 @@ input { font-family: inherit; }
 }
 .rg-list {
   list-style: none;
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
   line-height: 1.65;
 }
 .rg-list li {
@@ -3832,13 +3855,6 @@ input { font-family: inherit; }
   .lottery-grid-tight .lottery-panel:last-child {
     border-radius: 0 0 var(--radius) var(--radius);
   }
-}
-  .trust-pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .player-promise { flex-direction: column; text-align: center; }
-  .player-promise-stat { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-  .slot-section-grid { grid-template-columns: 1fr; }
-  .dashboard-charts { grid-template-columns: 1fr; }
-  .historic-stats-row { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Heritage banner */
@@ -3904,7 +3920,7 @@ input { font-family: inherit; }
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
 }
-.dash-stat span { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; }
+.dash-stat span { display: block; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 4px; }
 .dash-stat strong { font-size: 1.1rem; }
 .dash-stat.highlight strong { color: var(--accent-gold); }
 .dash-stat-hero {
@@ -3979,7 +3995,7 @@ input { font-family: inherit; }
 .dashboard-wins-empty p {
   margin: 0;
   font-size: 0.82rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.55;
 }
 .dash-wins-list {
@@ -4016,7 +4032,7 @@ input { font-family: inherit; }
   min-width: 0;
 }
 .dash-win-body strong { color: var(--text-primary); font-size: 0.82rem; }
-.dash-win-body span { color: var(--text-muted); font-size: 0.72rem; }
+.dash-win-body span { color: var(--text-secondary); font-size: 0.72rem; }
 .dash-win-amount {
   font-weight: 700;
   color: var(--accent-green);
@@ -4114,9 +4130,14 @@ input { font-family: inherit; }
 }
 .slot-section-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
   align-items: start;
+}
+@media (min-width: 769px) {
+  .slot-section-grid {
+    grid-template-columns: 1.2fr 1fr;
+  }
 }
 .slot-machine-panel {
   display: flex;
@@ -4138,14 +4159,14 @@ input { font-family: inherit; }
   align-items: center;
   gap: 8px;
   margin: 0 0 6px;
-  font-size: 0.94rem;
+  font-size: 1.02rem;
   font-weight: 600;
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
 }
 .slot-bonus-intro {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   color: var(--text-muted);
   line-height: 1.55;
   font-weight: 400;
@@ -4190,7 +4211,7 @@ input { font-family: inherit; }
 .slot-bonus-tickets .slot-bonus-icon { color: var(--accent-gold); }
 .slot-bonus-card-title {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--text-primary);
@@ -4209,7 +4230,7 @@ input { font-family: inherit; }
 .slot-bonus-tickets .slot-bonus-stat strong { color: var(--accent-gold); }
 .slot-bonus-hint {
   margin: 0 0 12px;
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   color: var(--text-secondary);
   line-height: 1.5;
 }
@@ -4316,6 +4337,81 @@ input { font-family: inherit; }
   grid-template-columns: repeat(5, 1fr);
   gap: 6px;
 }
+
+@media (max-width: 768px) {
+  .slot-cabinet {
+    --slot-symbol-h: 78px;
+    min-height: auto;
+    max-width: 100%;
+    padding: 12px 10px 16px;
+    overflow: hidden;
+  }
+  .slot-machine-panel {
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  .slot-marquee { font-size: 0.85rem; letter-spacing: 0.08em; }
+  .slot-art { width: 50px; height: 50px; }
+  .slot-lever-mount { display: none; }
+  .slot-cabinet-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .slot-bet-row {
+    max-width: none;
+    flex: none;
+    width: 100%;
+  }
+  .slot-bet-row .field-label { font-size: 0.88rem; margin-bottom: 6px; }
+  .slot-bet-input {
+    min-height: 48px;
+    font-size: 1.05rem;
+    padding: 12px;
+  }
+  .slot-spin-btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1.05rem;
+    padding: 14px 20px;
+  }
+  .slot-cabinet .slot-result { font-size: 1rem; line-height: 1.45; }
+  .slot-cabinet .slot-explain { font-size: 0.85rem; }
+  .slot-paytable { flex-wrap: wrap; gap: 8px; padding: 10px; min-height: auto; }
+  .slot-pay-icon { width: 44px; height: 44px; }
+  .slot-bonus-btn { min-height: 48px; font-size: 0.95rem; }
+  .slot-bonus-stat { font-size: 0.88rem; }
+  .slot-bonus-stat strong { font-size: 1.15rem; }
+  .section-title { font-size: 1.28rem; }
+  .trust-pillar h3 { font-size: 1.05rem; }
+  .trust-pillar p { font-size: 0.95rem; }
+  .license-sig-line { font-size: 1.75rem; }
+  .license-sig-role { font-size: 0.92rem; }
+  .license-sig-id { font-size: 0.82rem; }
+  .slot-section { padding: 16px 12px; }
+  .slot-section-grid,
+  .roulette-section-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .roulette-cabinet-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .roulette-spin-btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1.05rem;
+  }
+  .roulette-cabinet { max-width: 100%; min-height: auto; }
+  .trust-chip { font-size: 0.82rem; }
+  .btn { min-height: 44px; }
+  .casino-floor-zone { padding: 16px 10px 20px; }
+}
+
 @media (max-width: 640px) {
   .lottery-play-zone { padding: 14px 12px; }
   .casino-floor-zone { padding: 20px 14px 24px; }
@@ -4326,8 +4422,52 @@ input { font-family: inherit; }
   .contact-form-grid { grid-template-columns: 1fr; }
   .dash-ticket-row { grid-template-columns: 1fr; }
   .slot-cabinet { max-width: 100%; }
-  .slot-cabinet-controls { flex-wrap: wrap; justify-content: center; }
+  .slot-cabinet-controls { flex-wrap: nowrap; justify-content: stretch; }
   .slot-bet-row { max-width: 100%; flex: 1 1 100%; }
   .roulette-cabinet { max-width: 100%; }
   .roulette-cabinet-controls { flex-wrap: wrap; }
+  .heritage-banner { padding: 18px 14px; }
+  .heritage-headline { font-size: 1.25rem; }
+  .player-dashboard-section { padding: 14px; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .header-actions .btn { padding: 8px 12px; font-size: 0.78rem; }
+  .dev-grant-panel {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .slot-cabinet {
+    --slot-symbol-h: 68px;
+    padding: 10px 8px 14px;
+  }
+  .slot-art { width: 42px; height: 42px; }
+  .slot-reels-frame { gap: 4px; }
+  .slot-window { padding: 8px; }
+  .slot-window-inner { padding: 6px; }
+  .slot-marquee-wrap { padding: 8px 10px; }
+  .slot-marquee { font-size: 0.72rem; letter-spacing: 0.06em; }
+  .slot-spin-btn { min-height: 54px; font-size: 1.1rem; }
+  .slot-cabinet .slot-result { font-size: 0.95rem; }
+  .stats-bar,
+  .stats-bar-five { grid-template-columns: 1fr; }
+  .dashboard-stats-grid { grid-template-columns: 1fr; }
+  .trust-pillars { grid-template-columns: 1fr; }
+  .draw-cards { grid-template-columns: 1fr; }
+  .header-inner { padding: 0 10px; gap: 8px; }
+  .logo { font-size: 1.05rem; }
+  .btn-lg { padding: 12px 18px; font-size: 0.9rem; }
+}
+
+@media (max-width: 1200px) {
+  .header-nav .nav-link { padding: 8px 10px; font-size: 0.85rem; }
+  .header-inner { gap: 12px; padding: 0 14px; }
+}
+
+@media (max-width: 1024px) {
+  .header-nav { display: none; }
+  .menu-toggle { display: flex; }
 }
