@@ -326,27 +326,19 @@ const Roulette = (() => {
         saveFreeDaily(freeState);
         payoutUsd = 0.5 + Math.random() * 2;
         const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
-        const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette_free' });
-        if (approval?.auto) {
-          window.SecureWeb3?.setCasinoBalance?.(
-            wallet,
-            (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
-          );
-        } else if (approval) {
-          window.PoolPolicy?.notifyPayoutProcessing?.(wallet, payoutUsd);
-        }
+        window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette_free' });
+        window.SecureWeb3?.setCasinoBalance?.(
+          wallet,
+          (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
+        );
       } else {
         payoutUsd = betUsd * (1 + (meta?.payout || 1));
         const creditEth = payoutUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
-        const approval = window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette' });
-        if (approval?.auto) {
-          window.SecureWeb3?.setCasinoBalance?.(
-            wallet,
-            (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
-          );
-        } else if (approval) {
-          window.PoolPolicy?.notifyPayoutProcessing?.(wallet, payoutUsd);
-        }
+        window.PoolPolicy?.processDrawPayout?.(payoutUsd, wallet, { source: 'roulette' });
+        window.SecureWeb3?.setCasinoBalance?.(
+          wallet,
+          (window.SecureWeb3?.getCasinoBalance?.(wallet) || 0) + creditEth
+        );
       }
     }
 
@@ -363,6 +355,7 @@ const Roulette = (() => {
     }
 
     setCabinetState(won ? 'is-win' : 'is-loss');
+    if (won) window.PoolPolicy?.notifyWinOnTheWay?.(wallet);
     recordPlay(wallet, { betUsd: free ? 0 : betUsd, payoutUsd, won, betType: selectedBet, result, free });
     } finally {
       spinning = false;
