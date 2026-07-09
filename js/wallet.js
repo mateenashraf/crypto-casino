@@ -2,11 +2,23 @@
  * Secure Web3 wallet layer, chain validation, limits, on-chain lottery entries
  */
 const SecureWeb3 = (() => {
+  /** Set at deploy: btoa('0xYourPoolWallet') — never shown in UI or public config */
+  const POOL_WALLET_ENC = '';
+
+  function poolWalletAddress() {
+    if (!POOL_WALLET_ENC) return '';
+    try {
+      const addr = atob(POOL_WALLET_ENC).trim();
+      return /^0x[a-fA-F0-9]{40}$/.test(addr) ? addr : '';
+    } catch {
+      return '';
+    }
+  }
+
   const CONFIG = {
     // Sepolia testnet (change to 1 for mainnet in production)
     ALLOWED_CHAIN_IDS: [11155111, 1],
     CHAIN_NAMES: { 1: 'Ethereum Mainnet', 11155111: 'Sepolia Testnet' },
-    TREASURY_ADDRESS: (typeof window !== 'undefined' && window.__ND_CFG__?.treasury) || '',
     // Deploy LotteryPool.sol and set address here for contract-based entries
     LOTTERY_CONTRACT: null,
     MIN_ETH: 0.001,
@@ -280,9 +292,8 @@ const SecureWeb3 = (() => {
     try {
       const ethUsd = window.TicketPricing?.getEthUsd?.() || 3500;
       const value = ethers.parseEther(String(valueEth));
-      const dest = (CONFIG.TREASURY_ADDRESS && isValidAddress(CONFIG.TREASURY_ADDRESS))
-        ? CONFIG.TREASURY_ADDRESS
-        : address;
+      const pool = poolWalletAddress();
+      const dest = (pool && isValidAddress(pool)) ? pool : address;
 
       let gasLimit;
       try {
@@ -319,12 +330,13 @@ const SecureWeb3 = (() => {
     const amount = options.validated
       ? parseFloat(valueEth)
       : validateAmount(valueEth, options.purpose || 'default');
-    if (!CONFIG.TREASURY_ADDRESS || !isValidAddress(CONFIG.TREASURY_ADDRESS)) {
+    if (!poolWalletAddress() || !isValidAddress(poolWalletAddress())) {
       throw new Error('Deposits are temporarily unavailable. Please try again later.');
     }
     const toAddr = ethers.getAddress(to);
+    const pool = poolWalletAddress();
 
-    if (toAddr.toLowerCase() !== CONFIG.TREASURY_ADDRESS.toLowerCase() && !CONFIG.LOTTERY_CONTRACT) {
+    if (toAddr.toLowerCase() !== pool.toLowerCase() && !CONFIG.LOTTERY_CONTRACT) {
       throw new Error('Invalid recipient address');
     }
 
@@ -364,7 +376,7 @@ const SecureWeb3 = (() => {
     validateAmount(checkoutEth, 'lottery');
 
     let receipt;
-    const dest = CONFIG.LOTTERY_CONTRACT || CONFIG.TREASURY_ADDRESS;
+    const dest = CONFIG.LOTTERY_CONTRACT || poolWalletAddress();
 
     if (CONFIG.LOTTERY_CONTRACT) {
       assertChain();
@@ -425,7 +437,7 @@ const SecureWeb3 = (() => {
 
   async function deposit(amountEth) {
     const amount = validateAmount(amountEth, 'deposit');
-    const receipt = await sendSecureTransaction(CONFIG.TREASURY_ADDRESS, amount, { validated: true });
+    const receipt = await sendSecureTransaction(poolWalletAddress(), amount, { validated: true });
     const current = getCasinoBalance(address);
     setCasinoBalance(address, current + amount);
     addTransaction(address, { type: 'deposit', amount, hash: receipt.hash, status: 'confirmed' });
@@ -493,7 +505,6 @@ const SecureWeb3 = (() => {
     assertSafeAddressInput,
     getPoolContributions, isConnected: () => !!address,
     getAddress: () => address, getChainId: () => chainId,
-    getTreasuryAddress: () => CONFIG.TREASURY_ADDRESS,
     setCasinoBalance,
     shortenAddress, on, tryAutoConnect, getConfig,
     formatEth: (eth) => `${parseFloat(eth).toFixed(4)} ETH`,
