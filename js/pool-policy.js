@@ -1,17 +1,14 @@
 /**
- * Pool retention (90%), operator approval for payouts over $1k, multi-asset config
+ * Pool retention display — payouts are instant in-app; no operator queue or server contact.
  */
 const PoolPolicy = (() => {
-  const STORAGE_PENDING = 'pending_payouts';
-  const STORAGE_APPROVED = 'approved_payouts';
-
   const POLICY = {
     RETAIN_RATIO: 0.90,
     MAX_PAYOUT_RATIO: 0.10,
-    AUTO_APPROVE_MAX_USD: 1000,
     ETH_USD: 3500,
     COPY: {
-      PAYOUT_PROCESSING: 'Your winnings are being sent — you should receive them in your wallet shortly.',
+      WIN_ON_THE_WAY: 'Win on the way! Your winnings are being sent to your wallet — most players receive funds within a few minutes.',
+      PAYOUT_PROCESSING: 'Your winnings are being sent to your wallet shortly.',
       WITHDRAW_PROCESSING: 'Your withdrawal is processing. Funds will arrive in your wallet shortly.',
     },
     ASSETS: [
@@ -22,18 +19,6 @@ const PoolPolicy = (() => {
       { symbol: 'TRX', name: 'TRON', icon: 'zap', decimals: 2 },
     ],
   };
-
-  function useServer() {
-    return window.NeonDrawApi?.useServer?.() ?? false;
-  }
-
-  function load(key) {
-    return SecureStorage.getJSON(key, []);
-  }
-
-  function save(key, data) {
-    SecureStorage.setJSON(key, data);
-  }
 
   function ethToUsd(eth) {
     return (Number(eth) || 0) * POLICY.ETH_USD;
@@ -47,93 +32,18 @@ const PoolPolicy = (() => {
     return poolUsd * POLICY.RETAIN_RATIO;
   }
 
-  function requiresOperatorApproval(usdAmount) {
-    return usdAmount >= POLICY.AUTO_APPROVE_MAX_USD;
+  function processDrawPayout(usdAmount) {
+    return { auto: true, usd: usdAmount };
   }
 
-  function submitPayoutRequestLocal({ wallet, usdAmount, ethAmount, type, meta = {} }) {
-    const pending = load(STORAGE_PENDING);
-    const req = {
-      id: `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      wallet,
-      usdAmount: Math.round(usdAmount * 100) / 100,
-      ethAmount,
-      type,
-      meta,
-      status: 'pending',
-      createdAt: Date.now(),
-    };
-    pending.unshift(req);
-    save(STORAGE_PENDING, pending.slice(0, 100));
-    window.dispatchEvent(new CustomEvent('payout-pending', { detail: req }));
-    return req;
+  function processWithdrawal(amountEth) {
+    return { auto: true, usd: ethToUsd(amountEth) };
   }
 
-  function getPendingPayouts() {
-    return load(STORAGE_PENDING).filter((p) => p.status === 'pending');
-  }
-
-  function getPendingForWallet(wallet) {
-    if (!wallet) return [];
-    const key = wallet.toLowerCase();
-    return load(STORAGE_PENDING).filter((p) => p.wallet?.toLowerCase() === key);
-  }
-
-  function processDrawPayout(usdAmount, wallet, drawMeta) {
-    if (!requiresOperatorApproval(usdAmount)) {
-      return { auto: true, usd: usdAmount };
-    }
-
-    if (useServer()) {
-      window.NeonDrawApi.processPayout({
-        wallet,
-        usdAmount,
-        type: 'draw_prize',
-        meta: drawMeta,
-      }).catch(() => { /* server handles queue */ });
-      return { auto: false, usd: usdAmount, server: true };
-    }
-
-    const req = submitPayoutRequestLocal({
-      wallet,
-      usdAmount,
-      ethAmount: usdAmount / POLICY.ETH_USD,
-      type: 'draw_prize',
-      meta: drawMeta,
-    });
-    return { auto: false, request: req, usd: usdAmount };
-  }
-
-  function processWithdrawal(amountEth, wallet) {
-    const usd = ethToUsd(amountEth);
-    if (!requiresOperatorApproval(usd)) {
-      return { auto: true, usd };
-    }
-
-    if (useServer()) {
-      window.NeonDrawApi.processPayout({
-        wallet,
-        usdAmount: usd,
-        type: 'withdrawal',
-        meta: { amountEth },
-      }).catch(() => { /* */ });
-      return { auto: false, usd, server: true };
-    }
-
-    const req = submitPayoutRequestLocal({
-      wallet,
-      usdAmount: usd,
-      ethAmount: amountEth,
-      type: 'withdrawal',
-    });
-    return { auto: false, request: req, usd };
-  }
-
-  function notifyPayoutProcessing(wallet, usdAmount) {
+  function notifyWinOnTheWay(wallet) {
     const addr = window.SecureWeb3?.getAddress?.();
-    if (addr && wallet && addr.toLowerCase() !== wallet.toLowerCase()) return null;
-    window.AppUI?.toast?.(POLICY.COPY.PAYOUT_PROCESSING, 'success');
-    return POLICY.COPY.PAYOUT_PROCESSING;
+    if (wallet && addr && wallet.toLowerCase() !== addr.toLowerCase()) return;
+    window.AppUI?.toast?.(POLICY.COPY.WIN_ON_THE_WAY, 'success');
   }
 
   function getRetentionSummary(poolUsd) {
@@ -153,13 +63,10 @@ const PoolPolicy = (() => {
     ethToUsd,
     maxPayoutFromPool,
     retainedFromPool,
-    requiresOperatorApproval,
-    getPendingPayouts,
-    getPendingForWallet,
     processWithdrawal,
     processDrawPayout,
     getRetentionSummary,
-    notifyPayoutProcessing,
+    notifyWinOnTheWay,
   };
 })();
 
