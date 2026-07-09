@@ -91,7 +91,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=neondraw" />
+  <link rel="stylesheet" href="css/styles.css?v=nd-mobile2" />
 </head>
 <body>
   <div id="app">
@@ -386,7 +386,7 @@
             </div>
             <div class="slot-section-grid">
               <div class="slot-machine-panel">
-                <div class="slot-cabinet" id="neonSlotCabinet">
+                <div class="slot-cabinet slot-cabinet-expanded" id="neonSlotCabinet">
                   <div class="slot-cabinet-top">
                     <div class="slot-marquee-wrap">
                       <span class="slot-marquee" id="slotMarquee">★ NEON DRAW JACKPOT ★</span>
@@ -491,7 +491,9 @@
                   <div class="roulette-stage">
                     <div class="roulette-pointer" aria-hidden="true"></div>
                     <div class="roulette-wheel-outer">
-                      <div class="roulette-wheel" id="rouletteWheel"></div>
+                      <div class="roulette-wheel-track">
+                        <div class="roulette-wheel" id="rouletteWheel"></div>
+                      </div>
                     </div>
                   </div>
                   <div class="roulette-cabinet-display">
@@ -847,7 +849,6 @@
             <label class="field-label" for="contactTopic">Topic</label>
             <select id="contactTopic" name="topic" class="text-input">
               <option value="support">Player support</option>
-              <option value="payout">Payout / withdrawal</option>
               <option value="partnership">Partnership</option>
               <option value="compliance">Compliance / licensing</option>
             </select>
@@ -1171,11 +1172,9 @@
   <script src="js/secure-runtime.js?v=neondraw"></script>
   <script src="js/secure-storage.js?v=neondraw"></script>
   <script src="js/env-bootstrap.js?v=neondraw"></script>
+  <script defer src="js/api-client.js?v=neondraw"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
-  <script src="js/secure-runtime.js"></script>
-  <script src="js/secure-storage.js"></script>
-  <script src="js/env-bootstrap.js"></script>
   <script defer src="js/icons.js?v=neondraw"></script>
   <script defer src="js/platform-stats.js?v=neondraw"></script>
   <script defer src="js/pool-policy.js?v=neondraw"></script>
