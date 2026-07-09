@@ -520,6 +520,9 @@ const DrawEngine = (() => {
             ? `${w.drawName}: ${formatUsd(w.prize)} won!${payoutNote}`
             : `${w.drawName}: draw completed`;
       window.AppUI?.toast(msg, 'success');
+      if (w.fromRealTicket && (w.prize > 0 || w.prizeType === 'free_ticket')) {
+        window.PoolPolicy?.notifyWinOnTheWay?.(w.winner?.wallet);
+      }
     }
     renderWinners();
     highlightLatestWinner();
@@ -610,14 +613,11 @@ const DrawEngine = (() => {
       const outflow = isFreeTicketWinner
         ? ECONOMICS.FREE_TICKET_USD_VALUE * freeQty
         : accountedPayoutUsd;
-      if (outflow > 0 && winner?.wallet && window.PoolPolicy?.processDrawPayout) {
-        const approval = window.PoolPolicy.processDrawPayout(outflow, winner.wallet, {
+      if (outflow > 0 && winner?.wallet) {
+        window.PoolPolicy?.processDrawPayout?.(outflow, winner.wallet, {
           drawId: tier.id,
           drawName: tier.name,
         });
-        if (!approval.auto) {
-          window.PoolPolicy?.notifyPayoutProcessing?.(winner.wallet, outflow);
-        }
       }
       economicsState.dailyOutflowUsd += outflow;
       economicsState.lifetimeOutflowUsd += outflow;
@@ -630,41 +630,7 @@ const DrawEngine = (() => {
     return entry;
   }
 
-  function useServerAuthority() {
-    return window.NeonDrawApi?.useServer?.() ?? false;
-  }
-
-  async function syncWinnersFromServer() {
-    if (!useServerAuthority() || !window.NeonDrawApi?.fetchWinners) return;
-    try {
-      const rows = await window.NeonDrawApi.fetchWinners(50);
-      const mapped = rows.map((w) => {
-        try {
-          return JSON.parse(w.payloadJson);
-        } catch {
-          return {
-            drawId: w.drawId,
-            drawName: w.drawName,
-            prize: w.prizeUsd,
-            paidUsd: w.prizeUsd,
-            prizeLabel: w.prizeLabel,
-            prizeType: w.prizeType,
-            matchCount: w.matchCount,
-            source: w.source,
-            timestamp: w.timestamp,
-            winner: { wallet: w.walletDisplay },
-          };
-        }
-      });
-      if (mapped.length) {
-        SecureStorage.setJSON(STORAGE_WINNERS, mapped);
-        renderWinners();
-      }
-    } catch { /* API unavailable */ }
-  }
-
   function checkDraws() {
-    if (useServerAuthority()) return;
     const now = Date.now();
     DRAW_TIERS.forEach((tier) => {
       if (state[tier.id]?.nextDraw <= now) {
@@ -847,15 +813,10 @@ const DrawEngine = (() => {
     ensureEconomicsWindow();
     normalizeStoredWinners();
     purgeLiveFeedWinners();
-    if (useServerAuthority()) {
-      syncWinnersFromServer();
-      setInterval(syncWinnersFromServer, 20_000);
-    } else {
-      seedWinnersIfNeeded();
-      scheduleShowcaseWin();
-    }
+    seedWinnersIfNeeded();
+    scheduleShowcaseWin();
     syncWalletTicketsToDraws();
-    if (!useServerAuthority()) checkDraws();
+    checkDraws();
     renderDrawCards();
     updateFeaturedDraw();
     renderWinners();
