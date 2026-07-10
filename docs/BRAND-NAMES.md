@@ -1,6 +1,6 @@
-# NeonDraw - Brand Names
+# NeonDraw brand names
 
-**Live brand:** **NeonDraw** - Vegas neon crypto lottery
+**Live brand:** **NeonDraw** (Vegas neon crypto lottery)
 
 ## Previous name
 
@@ -12,7 +12,7 @@
 
 | Name | Accent | Best for |
 |------|--------|----------|
-| **NeonDraw** ✓ | Draw | Current - short, ad-friendly, Vegas neon |
+| **NeonDraw** ✓ | Draw | Current: short, ad-friendly, Vegas neon |
 | **LuxBit Jackpot** | Jackpot | Premium luxury lottery feel |
 | **VegasChain Lotto** | Lotto | Strip credibility + blockchain |
 | **CrownBit Grand** | Grand | High-roller jackpot positioning |

@@ -1,5 +1,5 @@
 /**
- * Player-paid blockchain network fees - NeonDraw never collects gas.
+ * Player-paid blockchain network fees: NeonDraw never collects gas.
  * Estimates vary with traffic; live quote when wallet is connected.
  */
 const NetworkFee = (() => {
@@ -10,10 +10,10 @@ const NetworkFee = (() => {
   const DEFAULT_RANGE = { low: 0.35, high: 12, network: 'Ethereum' };
 
   const COPY = {
-    short: 'Paid by you in your wallet to the blockchain - not NeonDraw.',
+    short: 'Paid by you in your wallet to the blockchain, not NeonDraw.',
     long: 'Blockchain network fees (gas) are set by the Ethereum network and paid from your wallet when you confirm. NeonDraw does not charge, keep, or subsidize this fee. 100% of your ticket or deposit amount goes to the prize pool or casino balance.',
     deposit: 'One network fee when you deposit. Slots and roulette use your balance with no extra on-chain fees per bet.',
-    lottery: 'Your ticket payment goes entirely to the prize pool. Your wallet shows a separate network fee that goes to validators - not to us.',
+    lottery: 'Your ticket payment goes entirely to the prize pool. Your wallet shows a separate network fee that goes to validators, not to us.',
   };
 
   function getRange(chainId) {
@@ -44,7 +44,7 @@ const NetworkFee = (() => {
           <span>${feeLine}</span>
         </div>
         <p class="fee-line-note">${COPY.lottery}</p>
-        <p class="fee-line-note fee-line-note-muted">Fees on ${r.network} change with traffic - often less than the high end. ${COPY.short}</p>
+        <p class="fee-line-note fee-line-note-muted">Fees on ${r.network} change with traffic, often less than the high end. ${COPY.short}</p>
       </div>`;
   }
 

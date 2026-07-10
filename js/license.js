@@ -1,7 +1,7 @@
 /**
- * Curaçao Gaming Authority (CGA) - Online Gaming License disclosure
+ * Curaçao Gaming Authority (CGA): Online Gaming License disclosure
  * Aligned with LOK (National Ordinance on Games of Chance, PB 2024 no. 157).
- * Legacy master/sub-license numbers (e.g. 8048/JAZ) are intentionally omitted - obsolete under LOK.
+ * Legacy master/sub-license numbers (e.g. 8048/JAZ) are intentionally omitted (obsolete under LOK).
  */
 const LicenseDisplay = (() => {
   const LICENSE = {
@@ -53,7 +53,7 @@ const LicenseDisplay = (() => {
       'Pay supervisory fees and cooperate with CGA information requests',
     ],
     playerPromise:
-      'When you play on NeonDraw you are dealing with a Curaçao-incorporated operator under active CGA supervision - not an anonymous offshore script. Draws, payouts, and player protections sit inside a licensed framework.',
+      'When you play on NeonDraw you are dealing with a Curaçao-incorporated operator under active CGA supervision, not an anonymous offshore script. Draws, payouts, and player protections sit inside a licensed framework.',
   };
 
   function sealSvg(sizeClass = '') {
@@ -91,7 +91,7 @@ const LicenseDisplay = (() => {
       bottom.prepend(slot);
     }
     slot.innerHTML = `
-      <a class="cga-seal-link" href="${LICENSE.certPortal}" target="_blank" rel="noopener noreferrer" title="Curaçao Gaming Authority - verify licensed operators">
+      <a class="cga-seal-link" href="${LICENSE.certPortal}" target="_blank" rel="noopener noreferrer" title="Curaçao Gaming Authority: verify licensed operators">
         ${sealSvg('cga-seal-footer')}
         <span class="cga-seal-caption">
           <strong>CGA Licensed</strong>
@@ -220,7 +220,7 @@ const LicenseDisplay = (() => {
             </ol>
             <p class="license-verify-note">
               Under the LOK, only the Curaçao Gaming Authority issues and maintains live license status.
-              NeonDraw does not host a substitute register - verification always resolves to official CGA systems.
+              NeonDraw does not host a substitute register. Verification always resolves to official CGA systems.
             </p>
           </div>
           <div class="license-verify-actions">
@@ -233,7 +233,7 @@ const LicenseDisplay = (() => {
           <p>
             Document type: public operator disclosure for players and counterparties.
             Governing law: ${LICENSE.jurisdiction}. Supervisory body: ${LICENSE.authorityShort}.
-            Legacy master / sub-license identifiers are not used - those regimes ended under the LOK.
+            Legacy master / sub-license identifiers are not used. Those regimes ended under the LOK.
           </p>
         </footer>
       </article>

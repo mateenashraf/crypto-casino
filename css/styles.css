@@ -1134,7 +1134,7 @@ img, video, canvas, svg {
   }
 }
 
-/* Curaçao Gaming Authority - license disclosure */
+/* Curaçao Gaming Authority: license disclosure */
 .license-section { margin-bottom: 48px; }
 .license-intro {
   font-size: 0.9rem;
@@ -1845,7 +1845,7 @@ img, video, canvas, svg {
 .game-preview-hint { margin: 16px 0 24px !important; }
 .game-preview .btn { margin: 0 6px 8px; }
 
-/* Slot machine - Vegas cabinet */
+/* Slot machine: Vegas cabinet */
 .slot-machine {
   text-align: center;
   padding: 20px 0;
@@ -2489,7 +2489,7 @@ img, video, canvas, svg {
 
 .draw-schedule { margin-bottom: 16px; }
 
-/* Unified lottery play zone - jackpot + numbers together */
+/* Unified lottery play zone: jackpot + numbers together */
 .lottery-play-zone {
   margin-bottom: 28px;
   padding: 20px;
@@ -2533,7 +2533,7 @@ img, video, canvas, svg {
   margin-bottom: 20px;
 }
 
-/* Casino floor - separated from lottery */
+/* Casino floor: separated from lottery */
 .zone-divider {
   display: flex;
   align-items: center;
@@ -2955,7 +2955,7 @@ img, video, canvas, svg {
   50% { background: rgba(0, 214, 143, 0.08); }
 }
 
-/* Jackpot winner cards - distinct from secondary prize rows */
+/* Jackpot winner cards: distinct from secondary prize rows */
 .jackpot-win-card {
   margin: 14px 0;
   border-radius: 12px;
@@ -3309,7 +3309,7 @@ img, video, canvas, svg {
 .slot-live-label { color: #a78bfa; }
 .slot-live-ticker { flex: 1; min-width: 0; }
 
-/* Roulette - casino floor */
+/* Roulette: casino floor */
 .casino-game-divider {
   margin: 32px 0 28px;
   height: 1px;

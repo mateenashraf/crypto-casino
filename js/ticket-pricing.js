@@ -1,5 +1,5 @@
 /**
- * Checkout & wallet limits - USD amounts and on-chain conversion.
+ * Checkout & wallet limits: USD amounts and on-chain conversion.
  * Lottery/deposit: one on-chain tx. Slots/roulette: casino balance only (no gas per bet).
  */
 const TicketPricing = (() => {
@@ -10,7 +10,7 @@ const TicketPricing = (() => {
   const MAX_TICKET_USD = 10_000;
   const MAX_DEPOSIT_USD = 10_000;
 
-  /** @deprecated Use NetworkFee.getRange - kept for compatibility */
+  /** @deprecated Use NetworkFee.getRange; kept for compatibility */
   function getEstGasUsd(chainId) {
     const r = window.NetworkFee?.getRange?.(chainId) || { low: 0.35, high: 12 };
     return (r.low + r.high) / 2;

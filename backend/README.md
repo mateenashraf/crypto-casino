@@ -17,8 +17,8 @@ dotnet run --project src/NeonDraw.Api
 
 Endpoints:
 
-- `GET /health` — liveness
-- `GET /api/draws` — open and scheduled draws (seed data in Development)
+- `GET /health` (liveness)
+- `GET /api/draws` (open and scheduled draws; seed data in Development)
 - Swagger UI at `/swagger` in Development
 
 ## Structure

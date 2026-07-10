@@ -1,5 +1,5 @@
 /**
- * Shared live authority - one feed for every visitor (slots, roulette, lottery activity, winners).
+ * Shared live authority: one feed for every visitor (slots, roulette, lottery activity, winners).
  * House payout ratios stay server-side only; never sent to the browser.
  *
  * Used by production-server / dev-server under /api/live/*
@@ -18,7 +18,7 @@ import {
 } from './jackpot-reality.mjs';
 import { burstCount, getCrowdPulse, nextDelayMs } from './crowd-pulse.mjs';
 
-/** Opaque settlement policy - not exposed on public API responses */
+/** Opaque settlement policy: not exposed on public API responses */
 const POLICY = Object.freeze({
   prizeBps: 1000, // 10% of pool max (matches contract defaultPrizeBps)
   dailyPrizeBpsMin: 100,
@@ -140,7 +140,7 @@ export function createLiveAuthority() {
     };
   }
 
-  /** Fixed 15-month archive - identical for every visitor */
+  /** Fixed 15-month archive: identical for every visitor */
   const jackpotHistory = (() => {
     const raw = buildFifteenMonthArchive(mulberry32(0x4e0d7a11));
     const jpGroups = new Map();
@@ -515,7 +515,7 @@ export function createLiveAuthority() {
     };
   }
 
-  /** Health / opaque status - never includes POLICY ratios */
+  /** Health / opaque status: never includes POLICY ratios */
   function status() {
     return {
       ok: true,

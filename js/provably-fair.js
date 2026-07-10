@@ -1,5 +1,5 @@
 /**
- * Commit-reveal draw transparency - public hashes stay visible;
+ * Commit-reveal draw transparency: public hashes stay visible;
  * full seed / verify tools require Fairness Pro ($20/mo), tied to a connected wallet.
  */
 const ProvablyFair = (() => {
@@ -193,7 +193,7 @@ const ProvablyFair = (() => {
     }
     if (context === 'roulette' || context === 'roulette_free') {
       return won
-        ? `${context === 'roulette_free' ? 'Free spin win! ' : ''}Your bet matched the winning pocket. Each wheel spin is independent - the ball has no memory.`
+        ? `${context === 'roulette_free' ? 'Free spin win! ' : ''}Your bet matched the winning pocket. Each wheel spin is independent. The ball has no memory.`
         : 'Ball landed elsewhere this spin. Every spin is a fresh outcome on a fair American wheel.';
     }
     return won
@@ -207,7 +207,7 @@ const ProvablyFair = (() => {
       return `
         <div class="fairness-pro-wallet-box">
           <p class="fairness-pro-wallet-label">No wallet connected</p>
-          <p class="fairness-pro-wallet-hint">Connect the wallet you play with. Access stays on that address - reconnect anytime to use the tools.</p>
+          <p class="fairness-pro-wallet-hint">Connect the wallet you play with. Access stays on that address. Reconnect anytime to use the tools.</p>
         </div>
       `;
     }
@@ -238,7 +238,7 @@ const ProvablyFair = (() => {
       btn.textContent = 'Connect wallet to continue';
       btn.dataset.mode = 'connect';
     } else if (getAccessForWallet(addr)) {
-      btn.textContent = 'Already unlocked - close';
+      btn.textContent = 'Already unlocked. Close';
       btn.dataset.mode = 'done';
     } else {
       const bal = casinoBalanceEth(addr);
@@ -267,10 +267,10 @@ const ProvablyFair = (() => {
         <p class="fairness-pro-copy">
           Public commit hashes stay free. Full server seeds, nonce values, and the
           SHA-256 verify toolkit unlock for <strong>${formatUsd(PRICE_USD)}/month</strong>,
-          paid from your connected wallet’s casino balance - no email or password.
+          paid from your connected wallet’s casino balance. No email or password.
         </p>
         <ul class="fairness-pro-perks">
-          <li>Tied to your wallet address - reconnect to keep access</li>
+          <li>Tied to your wallet address. Reconnect to keep access</li>
           <li>Reveal complete seeds after each draw</li>
           <li>Run SHA-256 verify against the published hash</li>
         </ul>
@@ -408,7 +408,7 @@ const ProvablyFair = (() => {
         ` : `
           <div>
             <strong>Public hashes are free</strong>
-            <span>Full seed reveal &amp; verify toolkit - connect wallet &amp; pay ${formatUsd(PRICE_USD)}/month</span>
+            <span>Full seed reveal &amp; verify toolkit · connect wallet &amp; pay ${formatUsd(PRICE_USD)}/month</span>
           </div>
           <button type="button" class="btn btn-gold" data-fair-unlock>Get Fairness Pro</button>
         `}

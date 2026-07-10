@@ -32,9 +32,9 @@ npm run deploy:sepolia
 
 ## Contract overview
 
-- `createDraw` / `buyTicket` / `closeDraw` — Phase 1 lifecycle
-- `requestDrawRandomness` — Chainlink VRF hook (Phase 2)
-- `fulfillDraw` + `claimPrize` — pull-payment settlement stub
+- `createDraw` / `buyTicket` / `closeDraw` (Phase 1 lifecycle)
+- `requestDrawRandomness` (Chainlink VRF hook, Phase 2)
+- `fulfillDraw` + `claimPrize` (pull-payment settlement stub)
 - OpenZeppelin: `Ownable`, `Pausable`, `ReentrancyGuard`
 
 Legacy `../contracts/LotteryPool.sol` remains for the MVP demo path.

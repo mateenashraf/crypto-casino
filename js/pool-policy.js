@@ -1,5 +1,5 @@
 /**
- * Pool helpers - payouts are instant in-app; settlement ratios stay server/contract-side.
+ * Pool helpers: payouts are instant in-app; settlement ratios stay server/contract-side.
  */
 const PoolPolicy = (() => {
   // Prize fund = 95% of category entry pool; 5% platform
@@ -10,7 +10,7 @@ const PoolPolicy = (() => {
     ETH_USD: 3500,
     PRIZE_FUND_RATIO: _prize,
     COPY: {
-      WIN_ON_THE_WAY: 'Win on the way! Your winnings are being sent to your wallet - most players receive funds within a few minutes.',
+      WIN_ON_THE_WAY: 'Win on the way! Your winnings are being sent to your wallet. Most players receive funds within a few minutes.',
       PAYOUT_PROCESSING: 'Your winnings are being sent to your wallet shortly.',
       WITHDRAW_PROCESSING: 'Your withdrawal is processing. Funds will arrive in your wallet shortly.',
       JACKPOT_FROM_POOL:

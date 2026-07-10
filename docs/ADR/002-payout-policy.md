@@ -9,10 +9,10 @@ Marketing jackpots ($2M-$10M) differ from sustainable payout math (1-3% of pool 
 
 ## Decision
 
-1. **Advertised jackpot** - shown on draw cards only; not implied as guaranteed cash paid unless pool qualifies.
-2. **Actual payout** - `min(pool × tierRatio, globalRemainingBudget)` computed at settlement.
-3. **Enforcement** - Phase 2: primary enforcement in **Solidity** at `settleDraw`; backend mirrors for reporting and compliance alerts.
-4. **Winner display** - always show **paid amount**; optional label “Top prize tier” with advertised max.
+1. **Advertised jackpot:** shown on draw cards only; not implied as guaranteed cash paid unless pool qualifies.
+2. **Actual payout:** `min(pool × tierRatio, globalRemainingBudget)` computed at settlement.
+3. **Enforcement:** Phase 2: primary enforcement in **Solidity** at `settleDraw`; backend mirrors for reporting and compliance alerts.
+4. **Winner display:** always show **paid amount**; optional label “Top prize tier” with advertised max.
 
 ## Consequences
 

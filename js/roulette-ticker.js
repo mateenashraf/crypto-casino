@@ -1,5 +1,5 @@
 /**
- * Live roulette win ticker - prefers shared server feed for all visitors.
+ * Live roulette win ticker: prefers shared server feed for all visitors.
  */
 const RouletteTicker = (() => {
   const ENABLED = true;

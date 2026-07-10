@@ -1,5 +1,5 @@
 /**
- * Contact form - UI only; submissions are not stored or transmitted.
+ * Contact form: UI only; submissions are not stored or transmitted.
  */
 const ContactForm = (() => {
   function init() {

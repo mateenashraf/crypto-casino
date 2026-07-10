@@ -1,5 +1,5 @@
 /**
- * Crowd pulse - weekend / prime-time busyness for live feed + players online.
+ * Crowd pulse: weekend / prime-time busyness for live feed + players online.
  * Browser copy of scripts/crowd-pulse.mjs (keep formulas in sync).
  */
 const CrowdPulse = (() => {
@@ -22,8 +22,8 @@ const CrowdPulse = (() => {
       baseOnline = 4550;
       pace = 2.55;
       label = 'Weekend rush';
-      note = 'Busy weekend - more players locking in numbers right now.';
-      cta = 'Weekends fill up fast - grab your line.';
+      note = 'Busy weekend: more players locking in numbers right now.';
+      cta = 'Weekends fill up fast. Grab your line.';
       busy = true;
     } else if (isFriEvening) {
       baseOnline = 3980;
@@ -36,14 +36,14 @@ const CrowdPulse = (() => {
       baseOnline = 3420;
       pace = 1.65;
       label = 'Prime-time play';
-      note = 'Evening rush - ticket buys are coming in faster.';
-      cta = 'Players are buying in - lock your numbers.';
+      note = 'Evening rush: ticket buys are coming in faster.';
+      cta = 'Players are buying in. Lock your numbers.';
       busy = true;
     } else if (isQuietMorning) {
       baseOnline = 2140;
       pace = 0.7;
       label = 'Morning calm';
-      note = 'Quieter morning - easy window to enter.';
+      note = 'Quieter morning: easy window to enter.';
       cta = 'Good time to set your numbers before it picks up.';
       busy = false;
     }

@@ -8,7 +8,7 @@ const DrawEngine = (() => {
   const STORAGE_TICKETS_BY_DRAW = 'tickets_by_draw';
   const STORAGE_ECONOMICS = 'economics';
   const ECONOMICS = {
-    // Internal settlement math only - never expose raw keys in API payloads
+    // Internal settlement math only. Never expose raw keys in API payloads
     _r: 0.05,
     _g: 0.95,
     _d0: 0.01,
@@ -25,7 +25,7 @@ const DrawEngine = (() => {
   };
   const SHOWCASE_WIN_MS = { min: 5 * 60 * 1000, max: 12 * 60 * 1000 };
   const SEED_WINNERS_COUNT = 14;
-  /** Winners only when a scheduled draw closes - not on a fake timer */
+  /** Winners only when a scheduled draw closes, not on a fake timer */
   const LIVE_WINNERS_ENABLED = false;
   const WINNERS_LIST_LIMIT = 15;
 
@@ -1081,7 +1081,7 @@ const DrawEngine = (() => {
     applySharedWinners,
     getEconomics: () => {
       ensureEconomicsWindow();
-      // Public snapshot - no house-edge ratios
+      // Public snapshot: no house-edge ratios
       return {
         dailyInflowUsd: economicsState.dailyInflowUsd,
         lifetimeInflowUsd: economicsState.lifetimeInflowUsd,

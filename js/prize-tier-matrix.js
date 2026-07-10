@@ -1,5 +1,5 @@
 /**
- * 6/49 match-tier prizes - one math model for the odds UI and live payouts.
+ * 6/49 match-tier prizes: one math model for the odds UI and live payouts.
  *
  * Rules (so the table survives scrutiny):
  * - 6/6 = 100% of that draw’s advertised jackpot (split only if 2-3 tickets hit)
@@ -55,10 +55,10 @@ const PrizeTierMatrix = (() => {
   };
 
   const TOP_LABEL = {
-    daily: '~$2,147 - $3,892',
-    weekly: '~$1.85M - $5.39M',
-    monthly: '~$4.85M - $12.85M',
-    quarterly: '~$9.85M - $28.4M',
+    daily: '~$2,147 to $3,892',
+    weekly: '~$1.85M to $5.39M',
+    monthly: '~$4.85M to $12.85M',
+    quarterly: '~$9.85M to $28.4M',
   };
 
   const NAMES = {
@@ -86,11 +86,11 @@ const PrizeTierMatrix = (() => {
       if (p >= 0.01) return `${p.toFixed(2)}%`;
       return `${p.toFixed(3)}%`;
     };
-    return `${f(lo)} - ${f(hi)}`;
+    return `${f(lo)} to ${f(hi)}`;
   }
 
   function exampleBand(typical, lo, hi) {
-    return `${formatUsd(typical * lo)} - ${formatUsd(typical * hi)}`;
+    return `${formatUsd(typical * lo)} to ${formatUsd(typical * hi)}`;
   }
 
   function midPct(band) {

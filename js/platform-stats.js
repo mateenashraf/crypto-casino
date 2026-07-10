@@ -1,6 +1,6 @@
 /**
  * Single source of truth for platform metrics shown across the site.
- * Economics: 95% prize fund / 5% platform - every public total derives from the same ledger.
+ * Economics: 95% prize fund / 5% platform. Every public total derives from the same ledger.
  */
 const PlatformStats = (() => {
   const MONTHS = 15;
@@ -24,7 +24,7 @@ const PlatformStats = (() => {
   const HERITAGE_YEAR = 1931;
   const CRYPTO_SINCE = 2019;
 
-  /** 15 months ago as a fraction of today’s live totals - all series climb together */
+  /** 15 months ago as a fraction of today’s live totals: all series climb together */
   const START_RATIO = { tickets: 0.30, sales: 0.30, paid: 0.32, pool: 0.22 };
 
   function seededRandom(seed) {
@@ -122,7 +122,7 @@ const PlatformStats = (() => {
       let paidUsd = Math.round(lerp(startPaid, metrics.paidUsd, ease) * (1 + (seededRandom(seed + 3) - 0.5) * 0.02));
       let poolUsd = Math.round(lerp(startPool, metrics.poolUsd, ease) * noise);
 
-      // Monotonic - real platforms don’t shrink lifetime totals
+      // Monotonic: real platforms don’t shrink lifetime totals
       tickets = Math.max(tickets, prevTickets);
       salesUsd = Math.max(salesUsd, prevSales);
       paidUsd = Math.max(paidUsd, prevPaid);

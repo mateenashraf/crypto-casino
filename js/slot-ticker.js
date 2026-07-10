@@ -1,5 +1,5 @@
 /**
- * Live slot win ticker - prefers shared server feed so every visitor sees the same wins.
+ * Live slot win ticker: prefers shared server feed so every visitor sees the same wins.
  */
 const SlotTicker = (() => {
   const ENABLED = true;

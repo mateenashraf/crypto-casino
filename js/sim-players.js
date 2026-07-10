@@ -1,5 +1,5 @@
 /**
- * Shared simulated players for live tickers - recurring wallets like real regulars,
+ * Shared simulated players for live tickers: recurring wallets like real regulars,
  * without the same address flooding every line.
  */
 const SimPlayers = (() => {
@@ -101,7 +101,7 @@ const SimPlayers = (() => {
   }
 
   /**
-   * Slot payout from bet × symbol mult - small wins common, big jackpots allowed.
+   * Slot payout from bet × symbol mult: small wins common, big jackpots allowed.
    */
   function slotPayout(betUsd, mult, { free = false } = {}) {
     if (free) {
@@ -137,7 +137,7 @@ const SimPlayers = (() => {
     return roundMoney(betUsd * 2);
   }
 
-  /** Lottery ticket purchases - include whale tickets */
+  /** Lottery ticket purchases: include whale tickets */
   function lotteryTicketUsd() {
     return weightedPick([
       { value: 5, weight: 20 },

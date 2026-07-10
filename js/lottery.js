@@ -22,7 +22,7 @@ const LotteryApp = (() => {
       badge: 'STARTER',
       badgeClass: 'starter',
       title: '$10 Quick Entry',
-      desc: 'Lowest ticket on the board - full $10 goes straight to the prize pool.',
+      desc: 'Lowest ticket on the board: full $10 goes straight to the prize pool.',
       poolUsd: 10,
       qty: 1,
       cta: 'Try $10',
@@ -32,7 +32,7 @@ const LotteryApp = (() => {
       badge: 'SAVE 10%',
       badgeClass: 'save',
       title: '$50 Value Pack',
-      desc: '$50 pool entry with a bonus second line - two chances, same numbers.',
+      desc: '$50 pool entry with a bonus second line. Two chances, same numbers.',
       poolUsd: 50,
       qty: 2,
       cta: 'Claim Offer',
@@ -42,7 +42,7 @@ const LotteryApp = (() => {
       badge: 'BONUS',
       badgeClass: 'bonus',
       title: '$100 Power Pack',
-      desc: '$100 to the pool plus a bonus entry - two shots at the jackpot.',
+      desc: '$100 to the pool plus a bonus entry. Two shots at the jackpot.',
       poolUsd: 100,
       qty: 2,
       cta: 'Get Power Pack',
@@ -62,7 +62,7 @@ const LotteryApp = (() => {
       badge: '10% OFF',
       badgeClass: 'save',
       title: '$300 Bulk Saver',
-      desc: '$300 pool credit with a bonus entry - maximum pool, extra odds.',
+      desc: '$300 pool credit with a bonus entry: maximum pool, extra odds.',
       poolUsd: 300,
       qty: 2,
       cta: 'Build Bundle',
@@ -72,7 +72,7 @@ const LotteryApp = (() => {
       badge: '2× ENTRIES',
       badgeClass: 'hot',
       title: 'Flash Friday Double',
-      desc: '$100 ticket this Friday includes a matching bonus entry - two chances to win.',
+      desc: '$100 ticket this Friday includes a matching bonus entry. Two chances to win.',
       poolUsd: 100,
       qty: 2,
       cta: 'Double Up',
@@ -538,11 +538,11 @@ const LotteryApp = (() => {
 
     if (selectedNumbers.length !== 6) {
       quickPick();
-      window.AppUI?.toast('Quick Pick applied - redeeming your free entry…', 'info');
+      window.AppUI?.toast('Quick Pick applied. Redeeming your free entry…', 'info');
     }
 
     if (wallet().getFreeTicketBalance(wallet().getAddress()) < 1) {
-      window.AppUI?.toast('No free tickets in wallet - claim one in the casino floor panel', 'info');
+      window.AppUI?.toast('No free tickets in wallet. Claim one in the casino floor panel', 'info');
       updateFreeTicketUI();
       return;
     }
@@ -631,8 +631,8 @@ const LotteryApp = (() => {
       status.hidden = false;
       status.className = 'tx-status pending';
       status.textContent = summary.quantity > 1
-        ? `Confirm ${summary.quantity} tickets in your wallet (network fee is separate - paid to blockchain, not NeonDraw)...`
-        : 'Confirm in your wallet - ticket goes to pool; network fee goes to validators, not us...';
+        ? `Confirm ${summary.quantity} tickets in your wallet (network fee is separate, paid to blockchain, not NeonDraw)...`
+        : 'Confirm in your wallet: ticket goes to pool; network fee goes to validators, not us...';
     }
 
     try {
@@ -650,8 +650,8 @@ const LotteryApp = (() => {
       }
 
       const msg = summary.quantity > 1
-        ? `${summary.quantity} entries purchased - ${TP().formatUsd(summary.poolUsd)} added to pool!`
-        : `Entry purchased - ${TP().formatUsd(summary.poolUsd)} added to pool!`;
+        ? `${summary.quantity} entries purchased. ${TP().formatUsd(summary.poolUsd)} added to pool!`
+        : `Entry purchased. ${TP().formatUsd(summary.poolUsd)} added to pool!`;
 
       if (status) { status.className = 'tx-status success'; status.textContent = msg; }
       window.AppUI?.toast(msg, 'success');

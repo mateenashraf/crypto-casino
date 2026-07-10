@@ -1,5 +1,5 @@
 /**
- * Runtime bootstrap - dev tools on localhost only. No public API or pool config on window.
+ * Runtime bootstrap: dev tools on localhost only. No public API or pool config on window.
  */
 (function () {
   const host = location.hostname;

@@ -207,7 +207,7 @@ contract NeonDrawLottery is Ownable, Pausable, ReentrancyGuard {
 
     /**
      * @notice Settle a closed draw. Payout per winner is capped to
-     *         (poolBalance * prizeBps / 10000) / winnerCount — never the full advertised jackpot.
+     *         (poolBalance * prizeBps / 10000) / winnerCount, never the full advertised jackpot.
      * @param entropy Secret used with keccak to pick winning ticket index. If commit was set,
      *                keccak256(entropy) must match.
      */

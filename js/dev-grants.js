@@ -1,5 +1,5 @@
 /**
- * Local dev only - test grants for lottery, slots, and roulette on localhost.
+ * Local dev only: test grants for lottery, slots, and roulette on localhost.
  */
 (function () {
   const host = location.hostname;

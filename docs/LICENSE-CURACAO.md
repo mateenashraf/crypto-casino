@@ -1,6 +1,6 @@
-# NeonDraw - Curaçao Gaming Authority license disclosure
+# NeonDraw: Curaçao Gaming Authority license disclosure
 
-Aligned with the **National Ordinance on Games of Chance (LOK)** and the **Curaçao Gaming Authority (CGA)** regime (post-December 2024). Legacy master / sub-license numbers (e.g. `8048/JAZ`) are **not** used - those regimes ended under the LOK.
+Aligned with the **National Ordinance on Games of Chance (LOK)** and the **Curaçao Gaming Authority (CGA)** regime (post-December 2024). Legacy master / sub-license numbers (e.g. `8048/JAZ`) are **not** used. Those regimes ended under the LOK.
 
 ## Public particulars (site disclosure)
 

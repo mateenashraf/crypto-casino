@@ -1,5 +1,5 @@
 /**
- * NeonDraw Slots - colorful Vegas-style cabinet with animated reels
+ * NeonDraw Slots: colorful Vegas-style cabinet with animated reels
  */
 const SlotMachine = (() => {
   const STORAGE = 'slot_history';
@@ -443,8 +443,8 @@ const SlotMachine = (() => {
       const sym = getSymbol(reels[0]);
       const symLabel = sym.label || sym.id;
       const msg = won
-        ? `JACKPOT! ${symLabel} ×3 - +$${payoutUsd.toFixed(2)}${free ? ' + free ticket' : ''}`
-        : 'Try again - no match this spin';
+        ? `JACKPOT! ${symLabel} ×3 · +$${payoutUsd.toFixed(2)}${free ? ' + free ticket' : ''}`
+        : 'Try again. No match this spin';
       if (resultEl) {
         resultEl.textContent = msg;
         resultEl.className = `slot-result ${won ? 'win' : 'loss'}`;
@@ -503,7 +503,7 @@ const SlotMachine = (() => {
     }
     const freeState = loadFreeDaily();
     if (freeState.freeTicketsUsed >= FREE_TICKETS_PER_DAY) {
-      window.AppUI?.toast?.('Daily free tickets claimed - come back tomorrow', 'info');
+      window.AppUI?.toast?.('Daily free tickets claimed. Come back tomorrow', 'info');
       return false;
     }
     freeState.freeTicketsUsed += 1;

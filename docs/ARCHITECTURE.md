@@ -4,10 +4,10 @@ This document describes the migration from the static MVP to a production-ready,
 
 ## Principles
 
-1. **Never big-bang rewrite** - the existing static site keeps working until each slice is production-ready.
-2. **Chain is authoritative for money and draws** - randomness, payouts, and ticket ownership live on-chain (Chainlink VRF in Phase 2).
-3. **Backend is authoritative for history and compliance** - PostgreSQL indexes chain events; localStorage is cache-only.
-4. **Frontend is a wallet + display layer** - no `Math.random()` for winners.
+1. **Never big-bang rewrite:** the existing static site keeps working until each slice is production-ready.
+2. **Chain is authoritative for money and draws:** randomness, payouts, and ticket ownership live on-chain (Chainlink VRF in Phase 2).
+3. **Backend is authoritative for history and compliance:** PostgreSQL indexes chain events; localStorage is cache-only.
+4. **Frontend is a wallet + display layer:** no `Math.random()` for winners.
 
 ## Current MVP (legacy)
 
@@ -55,7 +55,7 @@ Each draw has:
 - `winnerCount`, prize distribution rules
 - Lifecycle: `Open` → `Closed` → `VRFRequested` → `Settled`
 
-Payout policy (product): player payouts capped at **1-3% of draw pool** (daily) and **2% global inflow** - enforced on-chain and/or in backend policy engine (ADR-002).
+Payout policy (product): player payouts capped at **1-3% of draw pool** (daily) and **2% global inflow**, enforced on-chain and/or in backend policy engine (ADR-002).
 
 ## Ticket model (canonical)
 
@@ -72,7 +72,7 @@ Browser-generated IDs (`T-${Date.now()}`) are **deprecated**.
 
 ## Migration phases
 
-### Phase 1 - Foundation (this sprint)
+### Phase 1: Foundation (this sprint)
 
 - [x] Architecture docs
 - [x] `NeonDrawLottery.sol` skeleton (buy ticket, draw struct, events, pause)
@@ -81,22 +81,22 @@ Browser-generated IDs (`T-${Date.now()}`) are **deprecated**.
 - [x] Docker Compose for local Postgres
 - [x] Legacy UI unchanged
 
-### Phase 2 - Provable draws
+### Phase 2: Provable draws
 
 - Chainlink VRF v2.5 + Automation
 - Remove client draw execution from `draw-engine.js`
 - Chain event indexer → PostgreSQL
 
-### Phase 3 - Frontend
+### Phase 3: Frontend
 
 - Next.js app; Wagmi + RainbowKit
 - Deprecate simulated activity feed
 
-### Phase 4 - Real-time & admin
+### Phase 4: Real-time & admin
 
 - SignalR, Hangfire, admin APIs, Azure deployment
 
-### Phase 5 - Compliance
+### Phase 5: Compliance
 
 - KYC/AML hooks, limits, geo-block, audit exports
 

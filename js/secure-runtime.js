@@ -1,5 +1,5 @@
 /**
- * Production runtime hardening - deters casual inspection; not a substitute for server-side secrets.
+ * Production runtime hardening: deters casual inspection; not a substitute for server-side secrets.
  */
 const SecureRuntime = (() => {
   const DEV_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0']);

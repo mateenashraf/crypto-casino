@@ -1,5 +1,5 @@
 /**
- * Sealed browser storage - values are MAC-signed; tampered localStorage is rejected.
+ * Sealed browser storage: values are MAC-signed; tampered localStorage is rejected.
  * Note: a determined attacker who reverse-engineers the page can still forge seals.
  * This stops casual DevTools balance edits; real money needs a server ledger.
  */
@@ -8,7 +8,7 @@ const SecureStorage = (() => {
   const SITE_SALT = 'nd2026x';
   const SEAL_VERSION = 2;
 
-  /** Split key material (joined at runtime) - raises the bar vs plain base64 */
+  /** Split key material (joined at runtime) raises the bar vs plain base64 */
   const KM = [
     'n3on', 'Dr4w', '7kQ2', 'mXp9', 'L0cK', 's3al', '9fA1', 'Hv4e',
   ];
@@ -38,7 +38,7 @@ const SecureStorage = (() => {
     dev_ticket_grant: 't1e9',
   };
 
-  /** Money / entitlement keys - unsealed or bad MAC → wiped */
+  /** Money / entitlement keys: unsealed or bad MAC → wiped */
   const SENSITIVE = new Set([
     'balances',
     'transactions',
@@ -231,7 +231,7 @@ const SecureStorage = (() => {
         }
         return env.p;
       }
-      // Legacy salt:payload base64 - sensitive keys rejected; others migrate
+      // Legacy salt:payload base64: sensitive keys rejected; others migrate
       const legacyPrefix = `${SITE_SALT}:`;
       if (text.startsWith(legacyPrefix)) {
         if (SENSITIVE.has(logical)) {
@@ -339,7 +339,7 @@ const SecureStorage = (() => {
       memory.clear();
       reverifySensitive();
     });
-    // Same-tab DevTools edits don't fire `storage` - poll lightly
+    // Same-tab DevTools edits don't fire `storage`; poll lightly
     setInterval(() => {
       SENSITIVE.forEach((logical) => {
         const phys = physicalKey(logical);

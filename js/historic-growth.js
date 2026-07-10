@@ -1,5 +1,5 @@
 /**
- * Platform history charts - same ledger as live stats (entries, sales, paid)
+ * Platform history charts: same ledger as live stats (entries, sales, paid)
  */
 const HistoricGrowth = (() => {
   let chartInstance = null;

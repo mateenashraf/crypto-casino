@@ -1,4 +1,4 @@
-# NeonDraw — Crypto Lottery
+# NeonDraw
 
 Crypto lottery platform with Web3 wallet payments, automatic draws, and live ticket activity.
 
@@ -29,7 +29,7 @@ If you still see old content: hard refresh with **Cmd+Shift+R** or open an incog
 
 | Draw | Prize |
 |------|-------|
-| Daily | $2,000 – $3,500 |
+| Daily | $2,000 to $3,500 |
 | Weekly | $2,000,000 |
 | Monthly | $5,000,000 |
 | Quarterly | $10,000,000 |
@@ -38,8 +38,8 @@ If you still see old content: hard refresh with **Cmd+Shift+R** or open an incog
 
 ## Features
 
-- Pick 6 numbers (1–49) or Quick Pick
-- Ticket tiers: $5 – $500 (ETH via MetaMask)
+- Pick 6 numbers (1 through 49) or Quick Pick
+- Ticket tiers: $5 to $500 (ETH via MetaMask)
 - Automatic scheduled draws with winner history
 - Live global ticket activity feed
 - Secure Web3: chain validation, min/max limits, on-chain deposits
@@ -123,9 +123,9 @@ Requires [GitHub CLI](https://cli.github.com/) (`gh auth login` once).
 
 Edit `js/wallet.js`:
 
-- `TREASURY_ADDRESS` — deposit destination
-- `LOTTERY_CONTRACT` — set after deploying `LotteryPool.sol`
-- `ALLOWED_CHAIN_IDS` — `11155111` (Sepolia), `1` (Mainnet)
+- `TREASURY_ADDRESS`: deposit destination
+- `LOTTERY_CONTRACT`: set after deploying `LotteryPool.sol`
+- `ALLOWED_CHAIN_IDS`: `11155111` (Sepolia), `1` (Mainnet)
 
 ---
 

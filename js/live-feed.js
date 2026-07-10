@@ -1,5 +1,5 @@
 /**
- * Shared live feed client - every visitor polls the same server authority.
+ * Shared live feed client: every visitor polls the same server authority.
  * Falls back to local simulation only if /api/live is unreachable (file open / offline).
  */
 const LiveFeed = (() => {

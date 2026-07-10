@@ -1,6 +1,6 @@
 /**
  * Realistic lottery jackpot amounts, match tiers, and shared-jackpot rules.
- * Draw cadence is enforced: daily / weekly / monthly / quarterly - never spam.
+ * Draw cadence is enforced: daily / weekly / monthly / quarterly. Never spam.
  */
 
 export function mulberry32(seed) {
@@ -79,7 +79,7 @@ export function formatUsdExact(n) {
   return `$${Math.round(Number(n) || 0).toLocaleString('en-US')}`;
 }
 
-/** Irregular lottery-style amounts - avoid clean $2,000,000 / $3,000 figures */
+/** Irregular lottery-style amounts: avoid clean $2,000,000 / $3,000 figures */
 export function messyAmount(rand, lo, hi) {
   const a = Math.min(lo, hi);
   const b = Math.max(lo, hi);
@@ -87,7 +87,7 @@ export function messyAmount(rand, lo, hi) {
   const scale = Math.max(11, n * 0.0028);
   n += (rand() - 0.5) * 2 * scale;
   n = Math.round(n);
-  // Only scramble large round figures - don’t inflate small daily prizes
+  // Only scramble large round figures. Don’t inflate small daily prizes
   if (n >= 5_000 && (n % 1000 < 30 || n % 1000 > 970)) {
     n += 47 + Math.floor(rand() * 853);
   } else if (n >= 500 && n % 100 === 0) {
@@ -251,7 +251,7 @@ export function lastDrawTimestamp(tierId, now = Date.now()) {
  * - Daily: at most one jackpot result per calendar day
  * - Weekly: at most one Sunday draw
  * - Monthly: at most one on the 1st
- * - Quarterly: at most one per quarter (4/year) - never weekly/daily spam
+ * - Quarterly: at most one per quarter (4/year). Never weekly/daily spam
  */
 export function buildFifteenMonthArchive(rand = mulberry32(0x4e0d7a11), now = Date.now()) {
   const end = new Date(now);
@@ -441,7 +441,7 @@ export function buildRecentBoard(archive, rand = mulberry32(0x51a0c0de), limit =
     const jackpots = rows.filter((r) => r.matchCount === 6);
     const secondary = rows.find((r) => r.matchCount !== 6);
 
-    // Caps apply to jackpot headlines only - don't burn a quarterly slot on a 4-of-6 row
+    // Caps apply to jackpot headlines only. Don't burn a quarterly slot on a 4-of-6 row
     if (jackpots.length) {
       if (tier === 'quarterly') {
         if (quarterlyShown >= 1) continue;

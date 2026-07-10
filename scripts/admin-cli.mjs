@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Operator CLI - approve/reject payouts via authenticated admin API.
+ * Operator CLI: approve/reject payouts via authenticated admin API.
  * Usage:
  *   NEONDRAW_ADMIN_KEY=secret node scripts/admin-cli.mjs pending
  *   NEONDRAW_ADMIN_KEY=secret node scripts/admin-cli.mjs approve <uuid>

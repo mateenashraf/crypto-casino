@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build production assets into dist/ - minified JS, no dev tools, no source maps.
+ * Build production assets into dist/: minified JS, no dev tools, no source maps.
  * Usage: node scripts/build-production.mjs
  */
 import { cp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';

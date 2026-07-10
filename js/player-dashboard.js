@@ -1,5 +1,5 @@
 /**
- * Wallet-connected player dashboard - wins, perks, and encouraging activity (no loss tracking)
+ * Wallet-connected player dashboard: wins, perks, and encouraging activity (no loss tracking)
  */
 const PlayerDashboard = (() => {
   const STORAGE_SLOT = 'slot_history';
@@ -96,16 +96,16 @@ const PlayerDashboard = (() => {
 
   function welcomeMessage(stats) {
     if (stats.winCount > 0 && stats.totalWon >= 100) {
-      return `You have ${stats.winCount} win${stats.winCount === 1 ? '' : 's'} on record - keep the momentum going!`;
+      return `You have ${stats.winCount} win${stats.winCount === 1 ? '' : 's'} on record. Keep the momentum going!`;
     }
     if (stats.winCount > 0) {
-      return 'Nice work - every win counts. Your next big hit could be right around the corner.';
+      return 'Nice work. Every win counts. Your next big hit could be right around the corner.';
     }
     if (stats.activeTickets > 0) {
       return `You have ${stats.activeTickets} ticket${stats.activeTickets === 1 ? '' : 's'} in upcoming draws. Good luck!`;
     }
     if (stats.gamesPlayed > 0) {
-      return 'You are in the game - grab a free spin or pick your lucky numbers for the next draw.';
+      return 'You are in the game. Grab a free spin or pick your lucky numbers for the next draw.';
     }
     return 'Welcome! Connect, claim your daily free spins, and pick six numbers for the next draw.';
   }
@@ -185,7 +185,7 @@ const PlayerDashboard = (() => {
       <div class="dashboard-connect">
         <span data-icon="trophy" data-icon-size="48"></span>
         <h3>Your wins &amp; perks hub</h3>
-        <p>Connect your wallet to track winnings, active lottery entries, daily free spins, and your full ticket history - all in one encouraging place.</p>
+        <p>Connect your wallet to track winnings, active lottery entries, daily free spins, and your full ticket history, all in one encouraging place.</p>
         <button type="button" class="btn btn-gold" id="dashboardConnectBtn">Connect Wallet</button>
       </div>`;
     window.Icons?.hydrate?.(el);
@@ -200,7 +200,7 @@ const PlayerDashboard = (() => {
     if (!totalFree) {
       return `
         <div class="dashboard-perks dashboard-perks-muted">
-          <h4><span data-icon="gift" data-icon-size="16"></span> Daily perks used - come back tomorrow</h4>
+          <h4><span data-icon="gift" data-icon-size="16"></span> Daily perks used. Come back tomorrow</h4>
           <p>Free spins reset every day. In the meantime, your casino balance is ready for slots and roulette.</p>
         </div>`;
     }
@@ -225,7 +225,7 @@ const PlayerDashboard = (() => {
       return `
         <div class="dashboard-wins-feed dashboard-wins-empty">
           <h4><span data-icon="sparkles" data-icon-size="16"></span> Recent wins</h4>
-          <p>Your wins will show up here - lottery draws, slot matches, and roulette hits. Try a free spin to get started!</p>
+          <p>Your wins will show up here: lottery draws, slot matches, and roulette hits. Try a free spin to get started!</p>
         </div>`;
     }
     const iconFor = { slots: 'cherry', roulette: 'circle-dot', lottery: 'trophy' };
@@ -268,7 +268,7 @@ const PlayerDashboard = (() => {
         <div class="dash-stat"><span>Tickets on file</span><strong>${stats.tickets}</strong></div>
       </div>
       ${renderPerks(stats)}
-      ${stats.winCount > 0 ? `<div class="dashboard-pending"><strong>Win on the way!</strong> Your winnings are being sent to your wallet - most players receive funds within a few minutes.</div>` : ''}
+      ${stats.winCount > 0 ? `<div class="dashboard-pending"><strong>Win on the way!</strong> Your winnings are being sent to your wallet. Most players receive funds within a few minutes.</div>` : ''}
       <div class="dashboard-quick-actions dashboard-quick-actions-main">
         <button type="button" class="btn btn-gold btn-sm" data-dash-go="#lottery">Buy lottery ticket</button>
         <button type="button" class="btn btn-outline btn-sm" data-dash-go="#slots">Play slots</button>
@@ -305,7 +305,7 @@ const PlayerDashboard = (() => {
     const el = document.getElementById('dashTicketList');
     if (!el) return;
     if (!tickets.length) {
-      el.innerHTML = '<p class="panel-hint">No tickets yet - pick six numbers and join the next draw, or claim a free bonus entry on the casino floor.</p>';
+      el.innerHTML = '<p class="panel-hint">No tickets yet. Pick six numbers and join the next draw, or claim a free bonus entry on the casino floor.</p>';
       return;
     }
     el.innerHTML = tickets.slice(0, 30).map((t) => {
@@ -326,10 +326,10 @@ const PlayerDashboard = (() => {
     if (!el) return;
     const tips = [
       stats.activeTickets
-        ? `You are entered in upcoming draws with ${stats.activeTickets} ticket${stats.activeTickets === 1 ? '' : 's'} - results are provably fair and verified on-chain.`
+        ? `You are entered in upcoming draws with ${stats.activeTickets} ticket${stats.activeTickets === 1 ? '' : 's'}. Results are provably fair and verified on-chain.`
         : 'Pick six numbers for the next scheduled draw. Every ticket is recorded to your wallet forever.',
       stats.perks.slotSpinsLeft || stats.perks.rouletteSpinsLeft
-        ? 'Use your daily free spins on the casino floor - they cost nothing and wins credit to your balance.'
+        ? 'Use your daily free spins on the casino floor. They cost nothing and wins credit to your balance.'
         : 'Deposit once and play slots or roulette from your casino balance with no extra gas per spin.',
       window.ProvablyFair?.explainOutcome?.(true, 'lottery') || 'Every draw uses a published commit hash so results can be verified after the numbers are revealed.',
     ];

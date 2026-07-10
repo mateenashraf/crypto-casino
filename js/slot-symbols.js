@@ -1,5 +1,5 @@
 /**
- * Classic Vegas-style slot symbols - bright glossy SVG art (not emoji)
+ * Classic Vegas-style slot symbols: bright glossy SVG art (not emoji)
  */
 const SlotSymbols = (() => {
   const SVGS = {

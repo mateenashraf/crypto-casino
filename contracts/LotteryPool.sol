@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title LotteryPool — on-chain lottery escrow (deploy & set LOTTERY_CONTRACT in wallet.js)
+ * @title LotteryPool (on-chain lottery escrow; deploy and set LOTTERY_CONTRACT in wallet.js)
  * @notice Production requires audit, licensing, and VRF for draws
  */
 contract LotteryPool {

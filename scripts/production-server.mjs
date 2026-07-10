@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Production static server - security headers, blocked paths, serves dist/ or project root.
+ * Production static server: security headers, blocked paths, serves dist/ or project root.
  * Usage: node scripts/production-server.mjs [port]
  */
 import { createServer, request as httpRequest } from 'node:http';

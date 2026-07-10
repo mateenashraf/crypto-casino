@@ -1,4 +1,4 @@
-# NeonDraw - Google Ads Playbook ($100/month)
+# NeonDraw Google Ads playbook ($100/month)
 
 Budget: **~$3.30/day** · Goal: **ticket purchases / wallet connects**
 
@@ -66,7 +66,7 @@ Remarketing (visited but didn't buy) → "Jackpot ends soon"
 
 ---
 
-## Ad Group 1 - Online lottery (~$40/mo)
+## Ad Group 1: Online lottery (~$40/mo)
 
 **Match types:** Phrase `"keyword"` and Exact `[keyword]` first.
 
@@ -93,7 +93,7 @@ Remarketing (visited but didn't buy) → "Jackpot ends soon"
 
 ---
 
-## Ad Group 2 - Crypto lottery (~$35/mo)
+## Ad Group 2: Crypto lottery (~$35/mo)
 
 ```
 "crypto lottery"
@@ -118,7 +118,7 @@ Remarketing (visited but didn't buy) → "Jackpot ends soon"
 
 ---
 
-## Ad Group 3 - High-intent jackpot (~$25/mo)
+## Ad Group 3: High-intent jackpot (~$25/mo)
 
 ```
 "win million online"
@@ -187,12 +187,12 @@ affiliate program
 1. Win Up To $50 Million
 2. NeonDraw Crypto Lottery
 3. Daily Draws From $2,000
-4. $20M Jackpot - Enter Now
+4. $20M Jackpot. Enter Now
 5. Buy Tickets With Crypto
 6. Bitcoin · Ethereum · USDT
 7. Instant Crypto Payouts
 8. Weekly $2M Mega Draw
-9. Pick 6 Numbers - Win Big
+9. Pick 6 Numbers. Win Big
 10. No Bank Account Needed
 11. Draws Every Day
 12. Join Players Worldwide
@@ -212,7 +212,7 @@ Pick 6 numbers, pay with crypto, win instantly. $20M grand draw + daily prizes f
 The biggest crypto lottery online. Automatic draws. Live jackpots. Secure Web3 payments. Enter before the countdown ends.
 
 **Description 4:**  
-Weekly $2M · Monthly $5M · Yearly $50M. NeonDraw - instant deposits, fast withdrawals, provably fair draws.
+Weekly $2M · Monthly $5M · Yearly $50M. NeonDraw: instant deposits, fast withdrawals, provably fair draws.
 
 ### URL settings
 
@@ -242,12 +242,12 @@ Set **Secondary conversion:** `wallet_connect`
 | 1-3 | Launch 3 ad groups with Exact + Phrase match only |
 | 4-7 | Pause keywords with 0 clicks and CPC > $8 |
 | 7+ | Increase bids on keywords that drove wallet connects |
-| 14+ | Add remarketing campaign: "Jackpot ends in X hours - enter now" |
-| 30 | Review full month - cut bottom 50% of keywords by CPA |
+| 14+ | Add remarketing campaign: "Jackpot ends in X hours. Enter now" |
+| 30 | Review full month. Cut bottom 50% of keywords by CPA |
 
 ---
 
-## If Google rejects ads - alternative platforms
+## If Google rejects ads: alternative platforms
 
 Use the **same keywords and ad copy** on:
 
@@ -255,7 +255,7 @@ Use the **same keywords and ad copy** on:
 |----------|--------|
 | **Meta (Facebook/Instagram)** | Business verification; crypto/gambling policies vary by region |
 | **X (Twitter)** | Strong crypto audience; promote jackpot + urgency |
-| **Reddit** | Target r/cryptocurrency, r/Bitcoin, r/gambling - check subreddit rules |
+| **Reddit** | Target r/cryptocurrency, r/Bitcoin, r/gambling (check subreddit rules) |
 | **Telegram Ads** | Crypto-native; good for lottery/jackpot messaging |
 
 ---
@@ -276,11 +276,11 @@ Use the **same keywords and ad copy** on:
 
 ---
 
-## Quick reference - prize ladder (for ad copy)
+## Quick reference: prize ladder (for ad copy)
 
 | Draw | Prize |
 |------|-------|
-| Daily | $2,000 - $3,500 |
+| Daily | $2,000 to $3,500 |
 | Weekly | $2,000,000 |
 | Monthly | $5,000,000 |
 | Quarterly | $10,000,000 |

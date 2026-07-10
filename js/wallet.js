@@ -2,7 +2,7 @@
  * Secure Web3 wallet layer, chain validation, limits, on-chain lottery entries
  */
 const SecureWeb3 = (() => {
-  /** Set at deploy: btoa('0xYourPoolWallet') - never shown in UI or public config */
+  /** Set at deploy: btoa('0xYourPoolWallet'); never shown in UI or public config */
   const POOL_WALLET_ENC = '';
 
   function poolWalletAddress() {

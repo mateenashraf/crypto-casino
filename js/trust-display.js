@@ -1,5 +1,5 @@
 /**
- * Trust & social-proof stats - players online tracks live crowd pulse
+ * Trust & social-proof stats: players online tracks live crowd pulse
  */
 const TrustDisplay = (() => {
   const SEED = window.PlatformStats?.SEED_PLAYERS_ONLINE ?? 2840;

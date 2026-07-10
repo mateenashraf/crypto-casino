@@ -239,7 +239,7 @@
 
   document.getElementById('depositBtn')?.addEventListener('click', async () => {
     const amount = parseFloat(document.getElementById('depositAmount').value);
-    showTxStatus('depositStatus', 'Confirm in your wallet - deposit to balance; network fee is separate (blockchain, not NeonDraw)...', 'pending');
+    showTxStatus('depositStatus', 'Confirm in your wallet: deposit to balance; network fee is separate (blockchain, not NeonDraw)...', 'pending');
     try {
       const usd = window.TicketPricing?.ethToUsd?.(amount) || amount * 3500;
       window.TicketPricing?.validateDepositUsd?.(usd);

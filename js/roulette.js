@@ -1,5 +1,5 @@
 /**
- * NeonDraw Roulette - American wheel (0, 00, 1-36) · Vegas casino floor
+ * NeonDraw Roulette: American wheel (0, 00, 1-36) · Vegas casino floor
  */
 const Roulette = (() => {
   const STORAGE = 'roulette_history';
@@ -347,7 +347,7 @@ const Roulette = (() => {
     if (resultEl) {
       resultEl.innerHTML = won
         ? `WIN! <span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} · +$${payoutUsd.toFixed(2)}${free ? ' (free spin)' : ''}`
-        : `<span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} - no win${free ? ' (free spin)' : ''}`;
+        : `<span class="roulette-result-num roulette-result-${colorClass}">${result}</span> · ${betLabel} · no win${free ? ' (free spin)' : ''}`;
       resultEl.className = `roulette-result ${won ? 'win' : 'loss'}`;
     }
     if (explainEl) {
