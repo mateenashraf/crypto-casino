@@ -1,0 +1,34 @@
+using NeonDraw.Domain.Enums;
+
+namespace NeonDraw.Application.Payouts;
+
+public sealed record ProcessPayoutRequest(
+    string Wallet,
+    decimal UsdAmount,
+    string Type,
+    string? MetaJson = null);
+
+public sealed record ProcessPayoutResponse(
+    bool Auto,
+    decimal Usd,
+    Guid? RequestId,
+    string? ExternalId,
+    PayoutStatus? Status);
+
+public sealed record PayoutSummaryDto(
+    Guid Id,
+    string ExternalId,
+    string WalletAddress,
+    decimal UsdAmount,
+    string Type,
+    PayoutStatus Status,
+    DateTimeOffset CreatedAt,
+    string? MetaJson);
+
+public interface IPayoutService
+{
+    Task<ProcessPayoutResponse> ProcessAsync(ProcessPayoutRequest request, CancellationToken ct = default);
+    Task<IReadOnlyList<PayoutSummaryDto>> GetPendingAsync(CancellationToken ct = default);
+    Task<PayoutSummaryDto?> ApproveAsync(Guid id, string operatorId, CancellationToken ct = default);
+    Task<PayoutSummaryDto?> RejectAsync(Guid id, string operatorId, CancellationToken ct = default);
+}

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: neondraw-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: neondraw
+      POSTGRES_PASSWORD: neondraw
+      POSTGRES_DB: neondraw
+    ports:
+      - "5432:5432"
+    volumes:
+      - neondraw_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neondraw -d neondraw"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  neondraw_pgdata:

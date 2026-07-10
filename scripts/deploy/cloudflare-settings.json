@@ -1,0 +1,29 @@
+{
+  "ssl": "full_strict",
+  "always_use_https": true,
+  "min_tls_version": "1.2",
+  "security_headers": {
+    "enabled": true,
+    "hsts": { "enabled": true, "max_age": 31536000, "include_subdomains": true, "preload": true }
+  },
+  "bot_fight_mode": true,
+  "browser_integrity_check": true,
+  "challenge_passage": 30,
+  "waf_rules": [
+    { "description": "Rate limit contact + payout endpoints", "expression": "(http.request.uri.path contains \"/api/contact\" or http.request.uri.path contains \"/api/payouts\")", "action": "challenge" },
+    { "description": "Block admin API without Cloudflare Access or IP allowlist", "expression": "(http.request.uri.path contains \"/api/admin\")", "action": "block" }
+  ],
+  "page_rules": [
+    { "url": "your-domain.com/api/*", "cache_level": "bypass", "ssl": "full_strict" },
+    { "url": "your-domain.com/*.js", "cache_level": "cache_everything", "edge_cache_ttl": 86400 },
+    { "url": "your-domain.com/*.css", "cache_level": "cache_everything", "edge_cache_ttl": 86400 }
+  ],
+  "recommended_access": {
+    "admin_api": "Protect /api/admin/* with Cloudflare Access service token or IP allowlist; pass X-Admin-Key from secure worker only"
+  },
+  "origin": {
+    "static": "production-server on port 8080 serving dist/",
+    "api": "NeonDraw.Api on port 5080 behind reverse proxy",
+    "note": "Terminate TLS at Cloudflare; origin serves HTTP on private network only"
+  }
+}

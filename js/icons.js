@@ -1,0 +1,82 @@
+/**
+ * NeonDraw icon system, inline SVG (Lucide-style)
+ */
+const Icons = (() => {
+  const paths = {
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/>',
+    calendar: '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>',
+    'calendar-days': '<rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
+    ticket: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
+    'clipboard-list': '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/>',
+    trophy: '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+    gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>',
+    wallet: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+    'shield-check': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    gem: '<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+    crown: '<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.019a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/>',
+    lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    'refresh-cw': '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+    'bar-chart': '<line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/>',
+    coins: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
+    dices: '<rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01M10 14h.01M14 14h.01M18 18h.01"/>',
+    'circle-dot': '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/>',
+    'link-2': '<path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/>',
+    zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+    bitcoin: '<path d="M11.767 19.089c4.924-2.093 7.227-7.373 5.147-12.297C14.835 1.867 9.525-.209 4.601 1.884S-2.626 9.257-.546 14.18c2.08 4.923 7.39 7 12.313 4.909z"/><path d="M9.147 8.668c.384-1.547-.945-2.337-2.558-2.886l.522-2.091-1.271-.317-.508 2.037c-.334-.083-.677-.162-1.017-.24l.511-2.045-1.269-.317-.522 2.091c-.277-.063-.55-.125-.815-.191l.001-.006-1.751-.437-.34 1.363s.945.216.926.229c.516.129.609.471.594.743l-.595 2.386c.036.009.083.022.135.043l-.137-.034-.834 3.342c-.063.156-.222.39-.58.301.013.019-.926-.231-.926-.231l-.634 1.463 1.652.412c.307.077.609.158.904.234l-.527 2.116 1.27.317.522-2.092c.349.095.686.183 1.015.266l-.519 2.084 1.269.317.527-2.112c2.181.413 3.822.247 4.515-1.724"/>',
+    ethereum: '<path d="M12 2v6.5l6.5 3.5L12 2Z"/><path d="M12 2 5.5 12 12 8.5V2Z"/><path d="M12 15.5V22l6.5-9L12 15.5Z"/><path d="M12 22v-6.5L5.5 13 12 22Z"/><path d="M12 14.5 5.5 12 12 17.5l6.5-5.5L12 14.5Z"/>',
+    'circle-dollar': '<circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/>',
+    solana: '<circle cx="12" cy="12" r="10"/><path d="M8 9h8l-1 2H7l1-2Z"/><path d="M7 12h8l-1 2H6l1-2Z"/><path d="M8 15h8l-1 2H7l1-2Z"/>',
+    cherry: '<path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z"/><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z"/><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 2.94 5.03 3 7.5"/>',
+    lemon: '<path d="M17.5 4.5c-1.95-1.95-5.11-1.95-7.06 0-1.95 1.95-1.95 5.11 0 7.06 1.95 1.95 5.11 1.95 7.06 0 1.95-1.95 1.95-5.11 0-7.06Z"/><path d="M8.5 15.5c-2 2-2 5.5 0 7.5s5.5 2 7.5 0"/>',
+    flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+    clover: '<path d="M12 10.5V22"/><path d="M12 10.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M12 10.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/><path d="M7.5 13a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M16.5 13a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/>',
+    target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    spade: '<path d="M12 18v4"/><path d="M6 8c0 3.314 2.686 6 6 6s6-2.686 6-6a6 6 0 0 0-12 0Z"/><path d="M12 14V2"/>',
+    tent: '<path d="M3.5 21 14 3l10.5 18H3.5Z"/><path d="M14 3v18"/><path d="M8.5 15h11"/>',
+    sparkles: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.5l-6.1-1.7a.5.5 0 0 1 0-.96l6.1-1.7a2 2 0 0 0 1.437-1.437l1.7-6.1a.5.5 0 0 1 .96 0l1.7 6.1a2 2 0 0 0 1.437 1.437l6.1 1.7a.5.5 0 0 1 0 .96l-6.1 1.7a2 2 0 0 0-1.437 1.437l-1.7 6.1a.5.5 0 0 1-.96 0l-1.7-6.1a2 2 0 0 0-1.437-1.437Z"/><path d="M20 3v4M22 5h-4M4 17v4M6 19H2"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    'alert-circle': '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
+    'heart-handshake': '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 5 9 8c-1 .8-2 1.6-2 3a2 2 0 0 0 4 0c0-1.4-1-2.2-2-3Z"/>',
+    'search-x': '<path d="m13.5 13.5 5 5"/><path d="M8.5 8.5 3.5 3.5"/><circle cx="11" cy="11" r="8"/>',
+    'external-link': '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  };
+
+  const GAME_ICON_SET = ['dices', 'cherry', 'gem', 'spade', 'dices', 'star', 'flame', 'crown', 'clover', 'target', 'sparkles', 'zap', 'moon', 'zap', 'tent'];
+  const SLOT_ICON_SET = ['cherry', 'lemon', 'star', 'gem', 'crown', 'zap'];
+
+  function svg(name, size = 20, className = 'icon') {
+    const body = paths[name];
+    if (!body) return '';
+    const extra = name === 'star' ? ' icon-star' : '';
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${className}${extra}" aria-hidden="true">${body}</svg>`;
+  }
+
+  function inline(name, size, className) {
+    return svg(name, size, className);
+  }
+
+  /** Set innerHTML of element to icon + optional text */
+  function setLabel(el, iconName, text, iconSize = 18) {
+    if (!el) return;
+    el.innerHTML = `<span class="icon-label">${svg(iconName, iconSize, 'icon icon-inline')}${text ? `<span>${text}</span>` : ''}</span>`;
+  }
+
+  function hydrate(root = document) {
+    root.querySelectorAll('[data-icon]').forEach((el) => {
+      const name = el.dataset.icon;
+      const size = parseInt(el.dataset.iconSize || '20', 10);
+      const cls = ['icon', el.classList.contains('icon-gold') ? 'icon-gold' : '', el.classList.contains('stat-icon') ? 'icon-stat' : ''].filter(Boolean).join(' ');
+      el.innerHTML = svg(name, size, cls);
+    });
+  }
+
+  return { svg, inline, setLabel, hydrate, refresh: hydrate, paths, GAME_ICON_SET, SLOT_ICON_SET };
+})();
+
+window.Icons = Icons;
