@@ -528,6 +528,70 @@ export function createLiveAuthority() {
     };
   }
 
+  /** In-memory referral ledger (demo): referrer pulls pending rewards after invitee connects */
+  const referralByReferred = new Map();
+  const referralPending = new Map(); // referrer -> [{ id, referred, reward, at }]
+  const REFERRAL_REWARD = Object.freeze({ freeTickets: 1, slotSpins: 2, rouletteSpins: 2 });
+
+  function normWallet(addr) {
+    if (!addr || typeof addr !== 'string') return '';
+    const a = addr.trim().toLowerCase();
+    if (!/^0x[a-f0-9]{40}$/.test(a)) return '';
+    return a;
+  }
+
+  function claimReferral({ referred, referrer }) {
+    const refd = normWallet(referred);
+    const refr = normWallet(referrer);
+    if (!refd || !refr) return { ok: false, error: 'invalid_wallet' };
+    if (refd === refr) return { ok: false, error: 'self' };
+    if (referralByReferred.has(refd)) {
+      return { ok: false, error: 'already', id: referralByReferred.get(refd).id };
+    }
+    const id = `ref-${refd}`;
+    const entry = {
+      id,
+      referrer: refr,
+      referred: refd,
+      reward: { ...REFERRAL_REWARD },
+      at: Date.now(),
+      claimed: false,
+    };
+    referralByReferred.set(refd, entry);
+    const list = referralPending.get(refr) || [];
+    list.push(entry);
+    referralPending.set(refr, list);
+    return { ok: true, id, reward: entry.reward };
+  }
+
+  function pendingReferrals(wallet) {
+    const refr = normWallet(wallet);
+    if (!refr) return [];
+    return (referralPending.get(refr) || [])
+      .filter((e) => !e.claimed)
+      .map((e) => ({
+        id: e.id,
+        referred: e.referred,
+        reward: e.reward,
+        at: e.at,
+      }));
+  }
+
+  function ackReferrals(wallet, ids = []) {
+    const refr = normWallet(wallet);
+    if (!refr || !Array.isArray(ids)) return { ok: false };
+    const want = new Set(ids.map(String));
+    const list = referralPending.get(refr) || [];
+    let n = 0;
+    list.forEach((e) => {
+      if (want.has(e.id) && !e.claimed) {
+        e.claimed = true;
+        n += 1;
+      }
+    });
+    return { ok: true, acked: n };
+  }
+
   function stop() {
     clearTimeout(timer);
   }
@@ -537,6 +601,9 @@ export function createLiveAuthority() {
     publicWinners,
     publicJackpotHistory,
     status,
+    claimReferral,
+    pendingReferrals,
+    ackReferrals,
     stop,
     POLICY_INTERNAL: POLICY,
   };
@@ -555,6 +622,21 @@ export function attachLiveRoutes(req, res, live, securityHeaders = {}) {
     res.end(JSON.stringify(body));
   };
 
+  const readBody = () =>
+    new Promise((resolve, reject) => {
+      const chunks = [];
+      req.on('data', (c) => chunks.push(c));
+      req.on('end', () => {
+        try {
+          const raw = Buffer.concat(chunks).toString('utf8');
+          resolve(raw ? JSON.parse(raw) : {});
+        } catch (err) {
+          reject(err);
+        }
+      });
+      req.on('error', reject);
+    });
+
   if (path === '/api/live/feed' && req.method === 'GET') {
     json(200, live.publicFeed());
     return true;
@@ -569,6 +651,23 @@ export function attachLiveRoutes(req, res, live, securityHeaders = {}) {
   }
   if (path === '/api/live/status' && req.method === 'GET') {
     json(200, live.status());
+    return true;
+  }
+  if (path === '/api/live/referrals/claim' && req.method === 'POST') {
+    readBody()
+      .then((body) => json(200, live.claimReferral(body || {})))
+      .catch(() => json(400, { ok: false, error: 'bad_json' }));
+    return true;
+  }
+  if (path === '/api/live/referrals/pending' && req.method === 'GET') {
+    const wallet = url.searchParams.get('wallet') || '';
+    json(200, { ok: true, rewards: live.pendingReferrals(wallet) });
+    return true;
+  }
+  if (path === '/api/live/referrals/ack' && req.method === 'POST') {
+    readBody()
+      .then((body) => json(200, live.ackReferrals(body?.wallet, body?.ids || [])))
+      .catch(() => json(400, { ok: false, error: 'bad_json' }));
     return true;
   }
   return false;

@@ -36,6 +36,11 @@ const SecureStorage = (() => {
     slot_pending_free: 'r2c4',
     dev_unlimited: 's8d0',
     dev_ticket_grant: 't1e9',
+    referral_codes: 'v4a2',
+    referral_attributions: 'w8b5',
+    referral_stats: 'x1c9',
+    referral_bonus: 'y6d3',
+    referral_applied: 'z2e8',
   };
 
   /** Money / entitlement keys: unsealed or bad MAC → wiped */
@@ -51,6 +56,11 @@ const SecureStorage = (() => {
     'approved_payouts',
     'tickets_by_draw',
     'economics',
+    'referral_codes',
+    'referral_attributions',
+    'referral_stats',
+    'referral_bonus',
+    'referral_applied',
   ]);
 
   const LEGACY_KEYS = {
