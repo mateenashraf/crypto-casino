@@ -55,9 +55,10 @@ const PlayerDashboard = (() => {
         return { used: 0 };
       }
     };
+    const bonus = window.Referrals?.getBonus?.(wallet) || { slots: 0, roulette: 0 };
     return {
-      slotSpinsLeft: Math.max(0, FREE_SPINS_PER_DAY - read(STORAGE_SLOT_FREE).used),
-      rouletteSpinsLeft: Math.max(0, FREE_SPINS_PER_DAY - read(STORAGE_ROULETTE_FREE).used),
+      slotSpinsLeft: Math.max(0, FREE_SPINS_PER_DAY - read(STORAGE_SLOT_FREE).used) + (bonus.slots || 0),
+      rouletteSpinsLeft: Math.max(0, FREE_SPINS_PER_DAY - read(STORAGE_ROULETTE_FREE).used) + (bonus.roulette || 0),
       freeLotteryTickets: window.SecureWeb3?.getFreeTicketBalance?.(wallet) || 0,
     };
   }
@@ -185,7 +186,7 @@ const PlayerDashboard = (() => {
       <div class="dashboard-connect">
         <span data-icon="trophy" data-icon-size="48"></span>
         <h3>Your wins &amp; perks hub</h3>
-        <p>Connect your wallet to track winnings, active lottery entries, daily free spins, and your full ticket history — all in one encouraging place.</p>
+        <p>Connect your wallet to track winnings, active lottery entries, daily free spins, your invite link, and your full ticket history — all in one encouraging place.</p>
         <button type="button" class="btn btn-gold" id="dashboardConnectBtn">Connect Wallet</button>
       </div>`;
     window.Icons?.hydrate?.(el);
@@ -246,6 +247,32 @@ const PlayerDashboard = (() => {
       </div>`;
   }
 
+  function renderReferrals(wallet) {
+    const link = window.Referrals?.getShareLink?.(wallet) || '';
+    const stats = window.Referrals?.getStats?.(wallet) || { invited: 0, rewarded: 0 };
+    const reward = window.Referrals?.REWARD || { freeTickets: 1, slotSpins: 2, rouletteSpins: 2 };
+    const short = link ? `${link.slice(0, 42)}…` : 'Connect to generate';
+    return `
+      <div class="dashboard-referrals">
+        <h4><span data-icon="users" data-icon-size="16"></span> Invite friends, earn free plays</h4>
+        <p class="dashboard-ref-copy">
+          Share your link. When a new wallet connects through it, you get
+          <strong>${reward.freeTickets} free ticket</strong>,
+          <strong>${reward.slotSpins} free slot spins</strong>, and
+          <strong>${reward.rouletteSpins} free roulette spins</strong>.
+        </p>
+        <div class="dashboard-ref-link-row">
+          <input type="text" class="dashboard-ref-input" id="dashRefLink" readonly value="${link.replace(/"/g, '&quot;')}" aria-label="Your referral link" />
+          <button type="button" class="btn btn-gold btn-sm" id="dashRefCopy">Copy link</button>
+        </div>
+        <p class="dashboard-ref-preview">${short}</p>
+        <div class="dashboard-ref-stats">
+          <span><strong>${stats.invited}</strong> friends joined</span>
+          <span><strong>${stats.rewarded}</strong> reward packs earned</span>
+        </div>
+      </div>`;
+  }
+
   function renderDashboard(wallet) {
     const el = document.getElementById('dashboardContent');
     if (!el) return;
@@ -268,6 +295,7 @@ const PlayerDashboard = (() => {
         <div class="dash-stat"><span>Tickets on file</span><strong>${stats.tickets}</strong></div>
       </div>
       ${renderPerks(stats)}
+      ${renderReferrals(wallet)}
       ${stats.winCount > 0 ? `<div class="dashboard-pending"><strong>Win on the way!</strong> Your winnings are being sent to your wallet — most players receive funds within a few minutes.</div>` : ''}
       <div class="dashboard-quick-actions dashboard-quick-actions-main">
         <button type="button" class="btn btn-gold btn-sm" data-dash-go="#lottery">Buy lottery ticket</button>
@@ -293,6 +321,22 @@ const PlayerDashboard = (() => {
 
     el.querySelectorAll('[data-dash-go]').forEach((btn) => {
       btn.addEventListener('click', () => scrollTo(btn.dataset.dashGo));
+    });
+
+    document.getElementById('dashRefCopy')?.addEventListener('click', async () => {
+      const input = document.getElementById('dashRefLink');
+      const value = input?.value || window.Referrals?.getShareLink?.(wallet) || '';
+      if (!value) {
+        window.AppUI?.toast?.('Connect your wallet to get a referral link', 'info');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(value);
+        window.AppUI?.toast?.('Referral link copied', 'success');
+      } catch {
+        input?.select?.();
+        window.AppUI?.toast?.('Select and copy the link manually', 'info');
+      }
     });
 
     renderTicketList(stats.ticketsList);
@@ -420,6 +464,8 @@ const PlayerDashboard = (() => {
     window.addEventListener('slot-played', () => refresh());
     window.addEventListener('roulette-played', () => refresh());
     window.addEventListener('draw-completed', () => refresh());
+    window.addEventListener('referral-credited', () => refresh());
+    window.addEventListener('referral-rewards-claimed', () => refresh());
   }
 
   return { init, refresh, computeStats, getSlotHistory };

@@ -2855,8 +2855,19 @@ img, video, canvas, svg {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   overflow: hidden;
+}
+.ticker-wallet-hint {
+  margin: 0 0 18px;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.slot-live-ticker-wrap + .ticker-wallet-hint,
+.roulette-live-ticker-wrap + .ticker-wallet-hint {
+  margin-top: -8px;
+  margin-bottom: 14px;
 }
 .live-dot {
   width: 8px;
@@ -3940,6 +3951,99 @@ img, video, canvas, svg {
   line-height: 1.5;
 }
 .dashboard-welcome p { margin: 0; }
+
+.invite-showcase {
+  margin: 0 0 22px;
+  padding: 22px 24px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(245, 183, 49, 0.28);
+  background:
+    radial-gradient(ellipse 80% 120% at 100% 0%, rgba(245, 183, 49, 0.12), transparent 55%),
+    linear-gradient(145deg, rgba(245, 183, 49, 0.06) 0%, var(--bg-card) 48%, rgba(124, 92, 252, 0.05) 100%);
+}
+.invite-showcase-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.invite-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-gold, #f5b731);
+}
+.invite-title {
+  margin: 0 0 8px;
+  font-size: clamp(1.25rem, 2.4vw, 1.65rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.invite-lede {
+  margin: 0 0 14px;
+  max-width: 38rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.invite-reward-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.invite-reward-row li {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(245, 183, 49, 0.22);
+  background: rgba(11, 12, 20, 0.35);
+}
+.invite-reward-row strong {
+  color: var(--accent-gold, #f5b731);
+  font-weight: 700;
+  margin-right: 4px;
+}
+.invite-showcase-action {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: min(100%, 220px);
+}
+.invite-showcase-action .btn {
+  white-space: nowrap;
+}
+.invite-action-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-align: center;
+}
+@media (max-width: 720px) {
+  .invite-showcase {
+    padding: 18px 16px;
+  }
+  .invite-showcase-inner {
+    align-items: stretch;
+  }
+  .invite-showcase-action {
+    width: 100%;
+  }
+}
+
 .dashboard-perks {
   margin-bottom: 14px;
   padding: 14px;
@@ -3976,6 +4080,65 @@ img, video, canvas, svg {
   background: rgba(124, 92, 252, 0.15);
   color: #c4b5fd;
   border: 1px solid rgba(124, 92, 252, 0.25);
+}
+.dashboard-referrals {
+  margin-bottom: 14px;
+  padding: 14px;
+  background: linear-gradient(145deg, rgba(245, 183, 49, 0.08) 0%, var(--bg-elevated) 55%);
+  border: 1px solid rgba(245, 183, 49, 0.22);
+  border-radius: var(--radius-sm);
+}
+.dashboard-referrals h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+.dashboard-ref-copy {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.dashboard-ref-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.dashboard-ref-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+.dashboard-ref-preview {
+  display: none;
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.dashboard-ref-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.dashboard-ref-stats strong {
+  color: var(--gold);
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .dashboard-ref-link-row {
+    flex-direction: column;
+  }
 }
 .dashboard-quick-actions {
   display: flex;
