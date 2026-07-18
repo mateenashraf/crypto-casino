@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using NeonDraw.Application.Payouts;
 using NeonDraw.Domain.Entities;
@@ -9,6 +10,7 @@ namespace NeonDraw.Infrastructure.Services;
 public class PayoutService : IPayoutService
 {
     private const decimal AutoApproveMaxUsd = 1000m;
+    private const decimal MaxPayoutUsd = 100_000m;
     private const decimal EthUsd = 3500m;
 
     private readonly NeonDrawDbContext _db;
@@ -22,6 +24,7 @@ public class PayoutService : IPayoutService
 
         var usd = Math.Round(request.UsdAmount, 2);
         if (usd <= 0) throw new ArgumentException("Invalid amount");
+        if (usd > MaxPayoutUsd) throw new ArgumentException("Amount exceeds maximum");
 
         var auto = usd < AutoApproveMaxUsd;
         var eth = Math.Round(usd / EthUsd, 8);
@@ -35,7 +38,7 @@ public class PayoutService : IPayoutService
             UsdAmount = usd,
             EthAmount = eth,
             Type = (request.Type ?? "draw_prize").Trim(),
-            MetaJson = request.MetaJson,
+                MetaJson = ValidateMetaJson(request.MetaJson),
             Status = auto ? PayoutStatus.AutoApproved : PayoutStatus.Pending,
             CreatedAt = DateTimeOffset.UtcNow,
         };
@@ -95,4 +98,13 @@ public class PayoutService : IPayoutService
         p.Status,
         p.CreatedAt,
         p.MetaJson);
+
+    private static string? ValidateMetaJson(string? json)
+    {
+        if (json is null) return null;
+        if (json.Length > 4096) throw new ArgumentException("MetaJson too large");
+        try { using var doc = JsonDocument.Parse(json); }
+        catch { throw new ArgumentException("Invalid MetaJson"); }
+        return json;
+    }
 }
