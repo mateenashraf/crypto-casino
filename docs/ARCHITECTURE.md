@@ -28,11 +28,29 @@ See [README](../README.md) for the demo app. Draw execution lives in `js/draw-en
          │                       │ index events
          ▼                       ▼
 ┌────────────────────────────────────────────────────────────────────┐
-│  NeonDrawLottery.sol  +  Chainlink VRF  +  Automation            │
+│  NeonDrawLottery.sol  +  Chainlink VRF  +  Automation              │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-## Repository layout (incremental)
+## Repository layout (incremental)flowchart LR
+  U["User Browser"] --> DS["Dev Server<br/>scripts/dev-server.mjs:8080"]
+  DS --> FE["Static Frontend<br/>index.html + css + js/*"]
+
+  U -->|"/api/*"| DS
+  DS -->| "Proxy to 127.0.0.1:5080" | API["ASP.NET Core API<br/>backend/src/NeonDraw.Api"]
+
+  API --> EP1["Endpoints<br/>/health, /api/draws, /api/draws/winners,<br/>/api/contact, /api/payouts/process"]
+  API --> SVC["Services<br/>DrawReadService, PayoutService,<br/>DrawSettlementService + BackgroundService"]
+  SVC --> DBCTX["EF Core DbContext<br/>NeonDrawDbContext"]
+  DBCTX --> PG["PostgreSQL<br/>Docker Compose"]
+
+  FE --> WAL["Web3 Layer<br/>js/wallet.js"]
+  WAL --> MM["MetaMask / EIP-1193"]
+  MM --> CHAIN["Blockchain Network"]
+  CHAIN --> C1["contracts/LotteryPool.sol (legacy)"]
+  CHAIN --> C2["blockchain/NeonDrawLottery.sol (phase path)"]
+
+  ADM["Admin Client"] -->| "X-Admin-Key" | API
 
 | Path | Purpose | Phase |
 |------|---------|-------|
