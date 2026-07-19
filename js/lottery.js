@@ -729,11 +729,14 @@ const LotteryApp = (() => {
 
     window.addEventListener('draw-selected', () => updateFreeTicketUI());
 
-    if (window.DrawEngine) {
+    const appMode = String(window.NeonDrawConfig?.mode || 'demo').toLowerCase();
+    const demoMode = appMode !== 'production';
+
+    if (demoMode && window.DrawEngine) {
       window.DrawEngine.init();
     }
 
-    if (window.ActivitySimulator?.isEnabled()) {
+    if (demoMode && window.ActivitySimulator?.isEnabled()) {
       window.ActivitySimulator.init();
     }
   }

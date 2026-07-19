@@ -2,7 +2,8 @@
  * Live lottery activity feed, simulates global ticket purchase stream
  */
 const ActivitySimulator = (() => {
-  const LIVE_FEED_ENABLED = true;
+  const APP_MODE = String(window.NeonDrawConfig?.mode || 'demo').toLowerCase();
+  const LIVE_FEED_ENABLED = APP_MODE !== 'production';
   const STORAGE_KEY = 'live_pool';
   const STORAGE_COUNT = 'live_pool_count';
   const TICKET_AMOUNTS = [1, 5, 10, 50, 100, 300, 500];

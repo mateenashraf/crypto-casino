@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
@@ -157,8 +158,8 @@ describe("NeonDrawLottery", function () {
     });
 
     it("rejects purchase on a closed draw", async function () {
-      const { lottery, owner, player, ticketPrice, opensAt } = await loadFixture(deployFixture);
-      await time.increaseTo(opensAt + 1);
+      const { lottery, owner, player, ticketPrice, closesAt } = await loadFixture(deployFixture);
+      await time.increaseTo(closesAt + 1);
       await lottery.connect(owner).closeDraw(1);
 
       await expect(
@@ -170,8 +171,8 @@ describe("NeonDrawLottery", function () {
   // ── closeDraw ───────────────────────────────────────────────────────
   describe("closeDraw", function () {
     it("closes an open draw and emits DrawClosed", async function () {
-      const { lottery, opensAt } = await loadFixture(deployFixture);
-      await time.increaseTo(opensAt + 1);
+      const { lottery, closesAt } = await loadFixture(deployFixture);
+      await time.increaseTo(closesAt + 1);
 
       await expect(lottery.closeDraw(1)).to.emit(lottery, "DrawClosed");
       const draw = await lottery.draws(1);
@@ -179,17 +180,25 @@ describe("NeonDrawLottery", function () {
     });
 
     it("reverts if draw is already closed", async function () {
-      const { lottery, opensAt } = await loadFixture(deployFixture);
-      await time.increaseTo(opensAt + 1);
+      const { lottery, closesAt } = await loadFixture(deployFixture);
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
 
       await expect(lottery.closeDraw(1))
         .to.be.revertedWithCustomError(lottery, "DrawNotOpen");
     });
 
-    it("reverts if called by non-owner", async function () {
-      const { lottery, player, opensAt } = await loadFixture(deployFixture);
+    it("reverts if close is attempted before closesAt", async function () {
+      const { lottery, opensAt } = await loadFixture(deployFixture);
       await time.increaseTo(opensAt + 1);
+
+      await expect(lottery.closeDraw(1))
+        .to.be.revertedWithCustomError(lottery, "InvalidDrawState");
+    });
+
+    it("reverts if called by non-owner", async function () {
+      const { lottery, player, closesAt } = await loadFixture(deployFixture);
+      await time.increaseTo(closesAt + 1);
 
       await expect(lottery.connect(player).closeDraw(1))
         .to.be.revertedWithCustomError(lottery, "OwnableUnauthorizedAccount");
@@ -252,9 +261,9 @@ describe("NeonDrawLottery", function () {
   // ── requestDrawRandomness ───────────────────────────────────────────
   describe("requestDrawRandomness", function () {
     it("requests randomness for a closed draw", async function () {
-      const { lottery, mockVRF, opensAt } = await loadFixture(deployFixture);
+      const { lottery, mockVRF, closesAt } = await loadFixture(deployFixture);
       await lottery.setVRFCoordinator(await mockVRF.getAddress());
-      await time.increaseTo(opensAt + 1);
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
 
       await expect(lottery.requestDrawRandomness(1))
@@ -275,8 +284,8 @@ describe("NeonDrawLottery", function () {
     });
 
     it("reverts if VRF coordinator is not set", async function () {
-      const { lottery, opensAt } = await loadFixture(deployFixture);
-      await time.increaseTo(opensAt + 1);
+      const { lottery, closesAt } = await loadFixture(deployFixture);
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
 
       await expect(lottery.requestDrawRandomness(1))
@@ -284,9 +293,9 @@ describe("NeonDrawLottery", function () {
     });
 
     it("reverts if called by non-owner", async function () {
-      const { lottery, mockVRF, player, opensAt } = await loadFixture(deployFixture);
+      const { lottery, mockVRF, player, closesAt } = await loadFixture(deployFixture);
       await lottery.setVRFCoordinator(await mockVRF.getAddress());
-      await time.increaseTo(opensAt + 1);
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
 
       await expect(lottery.connect(player).requestDrawRandomness(1))
@@ -297,12 +306,14 @@ describe("NeonDrawLottery", function () {
   // ── fulfillDraw ─────────────────────────────────────────────────────
   describe("fulfillDraw", function () {
     async function settledFixture() {
-      const { lottery, mockVRF, owner, player, player2, ticketPrice, opensAt } = await loadFixture(deployFixture);
+      const { lottery, mockVRF, owner, player, player2, ticketPrice, opensAt, closesAt } = await loadFixture(deployFixture);
       await lottery.setVRFCoordinator(await mockVRF.getAddress());
       await time.increaseTo(opensAt + 1);
 
       await lottery.connect(player).buyTicket(1, [1, 2, 3, 4, 5, 6], { value: ticketPrice });
       await lottery.connect(player2).buyTicket(1, [7, 8, 9, 10, 11, 12], { value: ticketPrice });
+
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
       await lottery.requestDrawRandomness(1);
 
@@ -344,16 +355,38 @@ describe("NeonDrawLottery", function () {
         lottery.connect(player).fulfillDraw(1, [1], [ticketPrice])
       ).to.be.revertedWithCustomError(lottery, "OwnableUnauthorizedAccount");
     });
+
+    it("reverts on payout length mismatch", async function () {
+      const { lottery, ticketPrice } = await settledFixture();
+      await expect(
+        lottery.fulfillDraw(1, [1, 2], [ticketPrice])
+      ).to.be.revertedWithCustomError(lottery, "InvalidPayoutInput");
+    });
+
+    it("reverts on duplicate winning ticket ids", async function () {
+      const { lottery, ticketPrice } = await settledFixture();
+      await expect(
+        lottery.fulfillDraw(1, [1, 1], [ticketPrice, ticketPrice])
+      ).to.be.revertedWithCustomError(lottery, "InvalidPayoutInput");
+    });
+
+    it("reverts when payouts exceed draw pool", async function () {
+      const { lottery, ticketPrice } = await settledFixture();
+      await expect(
+        lottery.fulfillDraw(1, [1], [ticketPrice * 3n])
+      ).to.be.revertedWithCustomError(lottery, "PayoutExceedsPool");
+    });
   });
 
   // ── claimPrize ──────────────────────────────────────────────────────
   describe("claimPrize", function () {
     it("pays out pending claims to winner", async function () {
-      const { lottery, mockVRF, player, ticketPrice, opensAt } = await loadFixture(deployFixture);
+      const { lottery, mockVRF, player, ticketPrice, opensAt, closesAt } = await loadFixture(deployFixture);
       await lottery.setVRFCoordinator(await mockVRF.getAddress());
       await time.increaseTo(opensAt + 1);
 
       await lottery.connect(player).buyTicket(1, [1, 2, 3, 4, 5, 6], { value: ticketPrice });
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
       await lottery.requestDrawRandomness(1);
       await lottery.fulfillDraw(1, [1], [ticketPrice]);
@@ -369,11 +402,12 @@ describe("NeonDrawLottery", function () {
     });
 
     it("emits PrizeClaimed", async function () {
-      const { lottery, mockVRF, player, ticketPrice, opensAt } = await loadFixture(deployFixture);
+      const { lottery, mockVRF, player, ticketPrice, opensAt, closesAt } = await loadFixture(deployFixture);
       await lottery.setVRFCoordinator(await mockVRF.getAddress());
       await time.increaseTo(opensAt + 1);
 
       await lottery.connect(player).buyTicket(1, [1, 2, 3, 4, 5, 6], { value: ticketPrice });
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
       await lottery.requestDrawRandomness(1);
       await lottery.fulfillDraw(1, [1], [ticketPrice]);
@@ -387,6 +421,28 @@ describe("NeonDrawLottery", function () {
       const { lottery, player } = await loadFixture(deployFixture);
       await expect(lottery.connect(player).claimPrize())
         .to.be.revertedWithCustomError(lottery, "NothingToClaim");
+    });
+  });
+
+  describe("withdrawHouseRevenue", function () {
+    it("allows owner to withdraw only non-reserved funds", async function () {
+      const { lottery, mockVRF, owner, player, ticketPrice, opensAt, closesAt } = await loadFixture(deployFixture);
+      await lottery.setVRFCoordinator(await mockVRF.getAddress());
+      await time.increaseTo(opensAt + 1);
+
+      await lottery.connect(player).buyTicket(1, [1, 2, 3, 4, 5, 6], { value: ticketPrice });
+      await time.increaseTo(closesAt + 1);
+      await lottery.closeDraw(1);
+      await lottery.requestDrawRandomness(1);
+      await lottery.fulfillDraw(1, [1], [ticketPrice / 2n]);
+
+      await expect(
+        lottery.withdrawHouseRevenue(owner.address, ticketPrice)
+      ).to.be.revertedWithCustomError(lottery, "InsufficientAvailableBalance");
+
+      await expect(
+        lottery.withdrawHouseRevenue(owner.address, ticketPrice / 2n)
+      ).to.emit(lottery, "HouseRevenueWithdrawn");
     });
   });
 
@@ -415,7 +471,7 @@ describe("NeonDrawLottery", function () {
   // ── full lifecycle ──────────────────────────────────────────────────
   describe("full lifecycle (end-to-end)", function () {
     it("create → buy → close → VRF → settle → claim", async function () {
-      const { lottery, mockVRF, owner, player, ticketPrice, opensAt } = await loadFixture(deployFixture);
+      const { lottery, mockVRF, owner, player, ticketPrice, opensAt, closesAt } = await loadFixture(deployFixture);
       await lottery.setVRFCoordinator(await mockVRF.getAddress());
       await time.increaseTo(opensAt + 1);
 
@@ -423,6 +479,7 @@ describe("NeonDrawLottery", function () {
       await lottery.connect(player).buyTicket(1, [10, 20, 30, 40, 41, 49], { value: ticketPrice });
 
       // close draw
+      await time.increaseTo(closesAt + 1);
       await lottery.closeDraw(1);
       const drawAfterClose = await lottery.draws(1);
       expect(drawAfterClose.status).to.equal(1);

@@ -21,14 +21,14 @@ See [README](../README.md) for the demo app. Draw execution lives in `js/draw-en
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Next.js (TBD)  │────▶│  ASP.NET Core 9  │────▶│   PostgreSQL    │
-│  Wagmi/Rainbow  │     │  SignalR/Hangfire│     │   Redis         │
+│  Next.js 14 app │────▶│  ASP.NET Core 9  │────▶│   PostgreSQL    │
+│  frontend/      │     │  API + workers   │     │   indexed state │
 └────────┬────────┘     └────────┬─────────┘     └─────────────────┘
          │                       │
-         │                       │ index events
+         │                       │ index settlement/payout records
          ▼                       ▼
 ┌────────────────────────────────────────────────────────────────────┐
-│  NeonDrawLottery.sol  +  Chainlink VRF  +  Automation              │
+│  NeonDrawLottery.sol  +  VRF request flow + claim settlement       │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -58,7 +58,7 @@ See [README](../README.md) for the demo app. Draw execution lives in `js/draw-en
 | `contracts/LotteryPool.sol` | Legacy escrow (deprecated path) | — |
 | `blockchain/` | Hardhat, `NeonDrawLottery.sol`, tests, deploy | **1** |
 | `backend/` | .NET 9 API, EF Core, migrations | **1** |
-| `frontend/` | Next.js + TypeScript (future) | 3 |
+| `frontend/` | Next.js + TypeScript production UI (authoritative API reads) | **3** |
 | `docs/ADR/` | Architecture decision records | **1** |
 
 ## Draw business model
@@ -107,8 +107,9 @@ Browser-generated IDs (`T-${Date.now()}`) are **deprecated**.
 
 ### Phase 3 — Frontend
 
-- Next.js app; Wagmi + RainbowKit
-- Deprecate simulated activity feed
+- [x] Next.js app scaffold in `frontend/`
+- [x] Backend-authoritative reads for draws/winners/tickets
+- [x] Legacy static simulation gated by runtime mode (`demo` vs `production`)
 
 ### Phase 4 — Real-time & admin
 

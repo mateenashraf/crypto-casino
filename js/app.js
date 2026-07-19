@@ -3,6 +3,13 @@
  */
 (function () {
   const wallet = window.SecureWeb3;
+  const appMode = String(window.NeonDrawConfig?.mode || 'demo').toLowerCase();
+  const isProductionMode = appMode === 'production';
+  window.NeonDrawRuntime = {
+    mode: appMode,
+    isProduction: isProductionMode,
+    isDemo: !isProductionMode,
+  };
   const walletModal = document.getElementById('walletModal');
   const toastContainer = document.getElementById('toastContainer');
   const walletAddr = document.getElementById('walletAddress');
@@ -255,6 +262,13 @@
   });
 
   document.getElementById('withdrawBtn')?.addEventListener('click', async () => {
+    if (isProductionMode) {
+      const msg = 'Legacy static withdraw flow is disabled in production mode. Use on-chain claim/settlement paths.';
+      showTxStatus('withdrawStatus', msg, 'error');
+      toast(msg, 'error');
+      return;
+    }
+
     const amount = parseFloat(document.getElementById('withdrawAmount').value);
     const to = document.getElementById('withdrawAddress').value.trim();
     showTxStatus('withdrawStatus', 'Processing...', 'pending');
@@ -328,10 +342,12 @@
   window.PartnerNetwork?.init();
   window.LicenseDisplay?.init();
   window.TicketLookup?.init();
-  window.TrustDisplay?.init();
+  if (!isProductionMode) {
+    window.TrustDisplay?.init();
+    window.HistoricGrowth?.init();
+    window.HistoricGrowth?.refresh?.();
+  }
   window.ProvablyFair?.init();
-  window.HistoricGrowth?.init();
-  window.HistoricGrowth?.refresh?.();
   window.PrizeTierMatrix?.init();
   window.PlayerDashboard?.init();
   window.SlotMachine?.init();

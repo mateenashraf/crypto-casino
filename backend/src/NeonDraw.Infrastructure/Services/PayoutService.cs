@@ -89,6 +89,31 @@ public class PayoutService : IPayoutService
         return ToDto(entity);
     }
 
+    public async Task<PayoutStatusDto?> GetByExternalIdAsync(string externalId, CancellationToken ct = default)
+    {
+        var normalized = (externalId ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(normalized)) return null;
+
+        var entity = await _db.PayoutRequests
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ExternalId == normalized, ct);
+
+        if (entity is null) return null;
+
+        return new PayoutStatusDto(
+            entity.Id,
+            entity.ExternalId,
+            entity.WalletAddress,
+            entity.UsdAmount,
+            entity.EthAmount,
+            entity.Type,
+            entity.Status,
+            entity.CreatedAt,
+            entity.ResolvedAt,
+            entity.ResolvedBy,
+            entity.MetaJson);
+    }
+
     private static PayoutSummaryDto ToDto(PayoutRequest p) => new(
         p.Id,
         p.ExternalId,

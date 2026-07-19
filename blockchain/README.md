@@ -19,22 +19,49 @@ Local Hardhat network:
 npm run deploy:local
 ```
 
-Sepolia (requires `.env` at repo root):
+Sepolia profile (`.env` at repo root):
 
 ```
 SEPOLIA_RPC_URL=https://...
-DEPLOYER_PRIVATE_KEY=0x...
+SEPOLIA_DEPLOYER_PRIVATE_KEY=0x...
+NEONDRAW_INITIAL_OWNER=0x...
+# optional for staging, can deploy mock if unset
+NEONDRAW_VRF_COORDINATOR=0x...
 ```
 
 ```bash
+npm run validate:sepolia
 npm run deploy:sepolia
+```
+
+Mainnet profile:
+
+```
+MAINNET_RPC_URL=https://...
+MAINNET_DEPLOYER_PRIVATE_KEY=0x...
+NEONDRAW_INITIAL_OWNER=0x...
+NEONDRAW_VRF_COORDINATOR=0x...
+```
+
+```bash
+npm run validate:mainnet
+npm run deploy:mainnet
 ```
 
 ## Contract overview
 
-- `createDraw` / `buyTicket` / `closeDraw` — Phase 1 lifecycle
-- `requestDrawRandomness` — Chainlink VRF hook (Phase 2)
-- `fulfillDraw` + `claimPrize` — pull-payment settlement stub
+- `createDraw` / `buyTicket` / `closeDraw` — draw lifecycle with time-guarded closure
+- `requestDrawRandomness` — VRF request tracking
+- `fulfillDraw` + `claimPrize` — claimable payout settlement with pool-cap enforcement
+- `withdrawHouseRevenue` — owner withdrawal limited to non-reserved funds
 - OpenZeppelin: `Ownable`, `Pausable`, `ReentrancyGuard`
+
+## Validation commands
+
+```bash
+npm run test
+npm run e2e:staging
+npm run validate:mainnet
+```
 
 Legacy `../contracts/LotteryPool.sol` remains for the MVP demo path.

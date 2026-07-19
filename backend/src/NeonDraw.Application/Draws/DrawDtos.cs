@@ -19,4 +19,5 @@ public sealed record DrawSummaryDto(
 public interface IDrawReadService
 {
     Task<IReadOnlyList<DrawSummaryDto>> GetDrawsAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TicketSummaryDto>> GetTicketsByWalletAsync(string walletAddress, int limit = 100, CancellationToken cancellationToken = default);
 }

@@ -57,8 +57,10 @@ contract NeonDrawLottery is Ownable, Pausable, ReentrancyGuard {
     mapping(uint256 => Ticket) public tickets;
     mapping(uint256 => uint256[]) private _drawTicketIds;
     mapping(address => uint256) public pendingClaims;
+    mapping(uint256 => uint256) public drawByVrfRequestId;
 
     IJackpotVRF public vrfCoordinator;
+    uint256 public totalReservedClaims;
 
     event DrawCreated(
         uint256 indexed drawId,
@@ -79,6 +81,7 @@ contract NeonDrawLottery is Ownable, Pausable, ReentrancyGuard {
     event VRFRequested(uint256 indexed drawId, uint256 requestId);
     event DrawSettled(uint256 indexed drawId, uint256 winnerCount, uint256 totalPaid);
     event PrizeClaimed(address indexed winner, uint256 amount);
+    event HouseRevenueWithdrawn(address indexed to, uint256 amount);
 
     error DrawNotOpen();
     error DrawNotFound();
@@ -87,6 +90,10 @@ contract NeonDrawLottery is Ownable, Pausable, ReentrancyGuard {
     error DrawNotClosed();
     error NothingToClaim();
     error VRFNotConfigured();
+    error InvalidDrawState();
+    error InvalidPayoutInput();
+    error PayoutExceedsPool();
+    error InsufficientAvailableBalance();
 
     constructor(address initialOwner) Ownable(initialOwner) {}
 
@@ -148,43 +155,64 @@ contract NeonDrawLottery is Ownable, Pausable, ReentrancyGuard {
 
     function closeDraw(uint256 drawId) external onlyOwner {
         Draw storage draw = draws[drawId];
+        if (draw.opensAt == 0 && draw.closesAt == 0) revert DrawNotFound();
         if (draw.status != DrawStatus.Open) revert DrawNotOpen();
+        if (block.timestamp < draw.closesAt) revert InvalidDrawState();
+
         draw.status = DrawStatus.Closed;
         emit DrawClosed(drawId, draw.ticketCount, draw.poolBalance);
     }
 
     function requestDrawRandomness(uint256 drawId) external onlyOwner {
         Draw storage draw = draws[drawId];
+        if (draw.opensAt == 0 && draw.closesAt == 0) revert DrawNotFound();
         if (draw.status != DrawStatus.Closed) revert DrawNotClosed();
         if (address(vrfCoordinator) == address(0)) revert VRFNotConfigured();
 
         uint256 requestId = vrfCoordinator.requestRandomWords(drawId);
         draw.vrfRequestId = requestId;
+        drawByVrfRequestId[requestId] = drawId;
         draw.status = DrawStatus.VRFRequested;
         emit VRFRequested(drawId, requestId);
     }
 
     /**
-     * @notice Phase 2: called by VRF consumer. Stub credits a fixed test payout for now.
+     * @notice Owner-triggered settlement with externally computed winners/payouts.
+     * @dev In production, call this after VRF has produced winning data off-chain and been verified operationally.
      */
     function fulfillDraw(uint256 drawId, uint256[] calldata winningTicketIds, uint256[] calldata payoutAmounts)
         external
         onlyOwner
     {
         Draw storage draw = draws[drawId];
-        if (draw.status != DrawStatus.VRFRequested && draw.status != DrawStatus.Closed) {
-            revert DrawNotClosed();
-        }
+        if (draw.opensAt == 0 && draw.closesAt == 0) revert DrawNotFound();
+        if (draw.status != DrawStatus.VRFRequested) revert InvalidDrawState();
+
+        uint256 len = winningTicketIds.length;
+        if (len != payoutAmounts.length) revert InvalidPayoutInput();
+        if (draw.winnerCount > 0 && len > draw.winnerCount) revert InvalidPayoutInput();
 
         uint256 totalPaid;
-        uint256 len = winningTicketIds.length;
         for (uint256 i = 0; i < len; i++) {
-            Ticket storage ticket = tickets[winningTicketIds[i]];
+            uint256 ticketId = winningTicketIds[i];
+            uint256 payout = payoutAmounts[i];
+            if (payout == 0) revert InvalidPayoutInput();
+
+            Ticket storage ticket = tickets[ticketId];
             if (ticket.drawId != drawId) revert DrawNotFound();
-            pendingClaims[ticket.owner] += payoutAmounts[i];
-            totalPaid += payoutAmounts[i];
+
+            for (uint256 j = 0; j < i; j++) {
+                if (winningTicketIds[j] == ticketId) revert InvalidPayoutInput();
+            }
+
+            pendingClaims[ticket.owner] += payout;
+            totalPaid += payout;
         }
 
+        if (totalPaid > draw.poolBalance) revert PayoutExceedsPool();
+
+        draw.poolBalance -= totalPaid;
+        totalReservedClaims += totalPaid;
         draw.status = DrawStatus.Settled;
         emit DrawSettled(drawId, len, totalPaid);
     }
@@ -192,10 +220,24 @@ contract NeonDrawLottery is Ownable, Pausable, ReentrancyGuard {
     function claimPrize() external nonReentrant {
         uint256 amount = pendingClaims[msg.sender];
         if (amount == 0) revert NothingToClaim();
+
         pendingClaims[msg.sender] = 0;
         (bool ok,) = msg.sender.call{value: amount}("");
         require(ok, "Transfer failed");
+
+        totalReservedClaims -= amount;
         emit PrizeClaimed(msg.sender, amount);
+    }
+
+    function withdrawHouseRevenue(address to, uint256 amount) external onlyOwner nonReentrant {
+        if (to == address(0) || amount == 0) revert InvalidPayoutInput();
+
+        uint256 available = address(this).balance - totalReservedClaims;
+        if (amount > available) revert InsufficientAvailableBalance();
+
+        (bool ok,) = to.call{value: amount}("");
+        require(ok, "Transfer failed");
+        emit HouseRevenueWithdrawn(to, amount);
     }
 
     function getDrawTicketIds(uint256 drawId) external view returns (uint256[] memory) {

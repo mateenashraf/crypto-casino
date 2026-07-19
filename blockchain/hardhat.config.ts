@@ -4,8 +4,12 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 
-const SEPOLIA_RPC = process.env.SEPOLIA_RPC_URL || "";
-const DEPLOYER_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
+const SEPOLIA_RPC = process.env.SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
+const MAINNET_RPC = process.env.MAINNET_RPC_URL || "https://ethereum-rpc.publicnode.com";
+
+const SHARED_DEPLOYER_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
+const SEPOLIA_DEPLOYER_KEY = process.env.SEPOLIA_DEPLOYER_PRIVATE_KEY || SHARED_DEPLOYER_KEY;
+const MAINNET_DEPLOYER_KEY = process.env.MAINNET_DEPLOYER_PRIVATE_KEY || SHARED_DEPLOYER_KEY;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -23,8 +27,14 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     sepolia: {
-      url: SEPOLIA_RPC || "https://rpc.sepolia.org",
-      accounts: DEPLOYER_KEY ? [DEPLOYER_KEY] : [],
+      chainId: 11155111,
+      url: SEPOLIA_RPC,
+      accounts: SEPOLIA_DEPLOYER_KEY ? [SEPOLIA_DEPLOYER_KEY] : [],
+    },
+    mainnet: {
+      chainId: 1,
+      url: MAINNET_RPC,
+      accounts: MAINNET_DEPLOYER_KEY ? [MAINNET_DEPLOYER_KEY] : [],
     },
   },
 };

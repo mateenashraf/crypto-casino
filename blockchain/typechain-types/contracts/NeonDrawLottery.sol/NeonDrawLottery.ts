@@ -30,6 +30,7 @@ export interface NeonDrawLotteryInterface extends Interface {
       | "claimPrize"
       | "closeDraw"
       | "createDraw"
+      | "drawByVrfRequestId"
       | "draws"
       | "fulfillDraw"
       | "getDrawTicketIds"
@@ -43,9 +44,11 @@ export interface NeonDrawLotteryInterface extends Interface {
       | "requestDrawRandomness"
       | "setVRFCoordinator"
       | "tickets"
+      | "totalReservedClaims"
       | "transferOwnership"
       | "unpause"
       | "vrfCoordinator"
+      | "withdrawHouseRevenue"
   ): FunctionFragment;
 
   getEvent(
@@ -53,6 +56,7 @@ export interface NeonDrawLotteryInterface extends Interface {
       | "DrawClosed"
       | "DrawCreated"
       | "DrawSettled"
+      | "HouseRevenueWithdrawn"
       | "OwnershipTransferred"
       | "Paused"
       | "PrizeClaimed"
@@ -83,6 +87,10 @@ export interface NeonDrawLotteryInterface extends Interface {
       BigNumberish,
       BigNumberish
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "drawByVrfRequestId",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "draws", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -125,6 +133,10 @@ export interface NeonDrawLotteryInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "totalReservedClaims",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
@@ -133,11 +145,19 @@ export interface NeonDrawLotteryInterface extends Interface {
     functionFragment: "vrfCoordinator",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawHouseRevenue",
+    values: [AddressLike, BigNumberish]
+  ): string;
 
   decodeFunctionResult(functionFragment: "buyTicket", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claimPrize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "closeDraw", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "createDraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "drawByVrfRequestId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "draws", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "fulfillDraw",
@@ -173,12 +193,20 @@ export interface NeonDrawLotteryInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "tickets", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "totalReservedClaims",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "vrfCoordinator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawHouseRevenue",
     data: BytesLike
   ): Result;
 }
@@ -251,6 +279,19 @@ export namespace DrawSettledEvent {
     drawId: bigint;
     winnerCount: bigint;
     totalPaid: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace HouseRevenueWithdrawnEvent {
+  export type InputTuple = [to: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [to: string, amount: bigint];
+  export interface OutputObject {
+    to: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -415,6 +456,12 @@ export interface NeonDrawLottery extends BaseContract {
     "nonpayable"
   >;
 
+  drawByVrfRequestId: TypedContractMethod<
+    [arg0: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   draws: TypedContractMethod<
     [arg0: BigNumberish],
     [
@@ -500,6 +547,8 @@ export interface NeonDrawLottery extends BaseContract {
     "view"
   >;
 
+  totalReservedClaims: TypedContractMethod<[], [bigint], "view">;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -509,6 +558,12 @@ export interface NeonDrawLottery extends BaseContract {
   unpause: TypedContractMethod<[], [void], "nonpayable">;
 
   vrfCoordinator: TypedContractMethod<[], [string], "view">;
+
+  withdrawHouseRevenue: TypedContractMethod<
+    [to: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
@@ -541,6 +596,9 @@ export interface NeonDrawLottery extends BaseContract {
     [bigint],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "drawByVrfRequestId"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "draws"
   ): TypedContractMethod<
@@ -628,6 +686,9 @@ export interface NeonDrawLottery extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "totalReservedClaims"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
   getFunction(
@@ -636,6 +697,13 @@ export interface NeonDrawLottery extends BaseContract {
   getFunction(
     nameOrSignature: "vrfCoordinator"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "withdrawHouseRevenue"
+  ): TypedContractMethod<
+    [to: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   getEvent(
     key: "DrawClosed"
@@ -657,6 +725,13 @@ export interface NeonDrawLottery extends BaseContract {
     DrawSettledEvent.InputTuple,
     DrawSettledEvent.OutputTuple,
     DrawSettledEvent.OutputObject
+  >;
+  getEvent(
+    key: "HouseRevenueWithdrawn"
+  ): TypedContractEvent<
+    HouseRevenueWithdrawnEvent.InputTuple,
+    HouseRevenueWithdrawnEvent.OutputTuple,
+    HouseRevenueWithdrawnEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -733,6 +808,17 @@ export interface NeonDrawLottery extends BaseContract {
       DrawSettledEvent.InputTuple,
       DrawSettledEvent.OutputTuple,
       DrawSettledEvent.OutputObject
+    >;
+
+    "HouseRevenueWithdrawn(address,uint256)": TypedContractEvent<
+      HouseRevenueWithdrawnEvent.InputTuple,
+      HouseRevenueWithdrawnEvent.OutputTuple,
+      HouseRevenueWithdrawnEvent.OutputObject
+    >;
+    HouseRevenueWithdrawn: TypedContractEvent<
+      HouseRevenueWithdrawnEvent.InputTuple,
+      HouseRevenueWithdrawnEvent.OutputTuple,
+      HouseRevenueWithdrawnEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<

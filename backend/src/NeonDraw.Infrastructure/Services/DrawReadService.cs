@@ -29,4 +29,29 @@ public class DrawReadService : IDrawReadService
                 d.WinnerCount))
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<TicketSummaryDto>> GetTicketsByWalletAsync(string walletAddress, int limit = 100, CancellationToken cancellationToken = default)
+    {
+        var normalized = walletAddress.Trim().ToLowerInvariant();
+        var max = Math.Clamp(limit, 1, 200);
+
+        return await _db.Tickets
+            .AsNoTracking()
+            .Include(t => t.Draw)
+            .Where(t => t.WalletAddress.ToLower() == normalized)
+            .OrderByDescending(t => t.PurchasedAt)
+            .Take(max)
+            .Select(t => new TicketSummaryDto(
+                t.Id,
+                t.OnChainTicketId,
+                t.Draw.OnChainDrawId,
+                t.Draw.Tier,
+                t.Numbers,
+                t.TxHash,
+                t.ChainId,
+                t.PurchasedAt,
+                t.IsWinner,
+                t.PaidAmountUsd))
+            .ToListAsync(cancellationToken);
+    }
 }

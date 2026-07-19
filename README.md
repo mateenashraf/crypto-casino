@@ -58,14 +58,13 @@ If you still see old content: hard refresh with **Cmd+Shift+R** or open an incog
 
 ---
 
-## Production stack (Phase 1)
-
-Incremental refactor; the static MVP above keeps working.
+## Production stack
 
 | Path | Stack |
 |------|-------|
 | [blockchain/](blockchain/) | Hardhat, `NeonDrawLottery.sol`, OpenZeppelin |
-| [backend/](backend/) | ASP.NET Core 9, PostgreSQL, `GET /api/draws` |
+| [backend/](backend/) | ASP.NET Core 9, PostgreSQL, production read/admin APIs |
+| [frontend/](frontend/) | Next.js 14 + TypeScript production dashboard |
 
 ```bash
 # Contract
@@ -74,6 +73,9 @@ cd blockchain && npm install && npm run compile && npm test
 # API (requires .NET 9 SDK)
 cd backend && docker compose up -d
 dotnet run --project src/NeonDraw.Api
+
+# Production frontend
+cd frontend && npm install && npm run dev
 ```
 
 ---
@@ -92,7 +94,8 @@ crypto-casino/
 │   └── app.js
 ├── contracts/LotteryPool.sol   # Legacy MVP escrow
 ├── blockchain/                 # Hardhat + NeonDrawLottery.sol
-├── backend/                    # ASP.NET Core 9 API
+├── backend/                    # ASP.NET Core 9 API (authoritative read/admin)
+├── frontend/                   # Next.js production frontend
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── WEBSITE.md
@@ -119,13 +122,28 @@ Requires [GitHub CLI](https://cli.github.com/) (`gh auth login` once).
 
 ---
 
+## Runtime modes
+
+- Legacy static site (`index.html` + `js/*`) is now explicit **demo mode** by default via `window.NeonDrawConfig.mode = 'demo'`.
+- To harden static mode behavior, set `window.NeonDrawConfig.mode = 'production'` before app scripts; this disables simulated draw/activity and demo withdraw flow.
+- Preferred production UI path is `frontend/`.
+
 ## Web3 config
 
-Edit `js/wallet.js`:
+For blockchain deployment profiles, configure `.env` (repo root):
 
-- `TREASURY_ADDRESS` — deposit destination
-- `LOTTERY_CONTRACT` — set after deploying `LotteryPool.sol`
-- `ALLOWED_CHAIN_IDS` — `11155111` (Sepolia), `1` (Mainnet)
+- `SEPOLIA_RPC_URL`, `SEPOLIA_DEPLOYER_PRIVATE_KEY`
+- `MAINNET_RPC_URL`, `MAINNET_DEPLOYER_PRIVATE_KEY`
+- `NEONDRAW_INITIAL_OWNER`, `NEONDRAW_VRF_COORDINATOR`
+
+Validation scripts:
+
+```bash
+cd blockchain
+npm run validate:sepolia
+npm run validate:mainnet
+npm run e2e:staging
+```
 
 ---
 

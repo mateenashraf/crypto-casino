@@ -68,6 +68,12 @@ builder.Services.AddRateLimiter(options =>
         opt.Window = TimeSpan.FromMinutes(10);
         opt.QueueLimit = 0;
     });
+    options.AddFixedWindowLimiter("public-read", opt =>
+    {
+        opt.PermitLimit = 120;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
 });
 
 var app = builder.Build();
@@ -137,7 +143,20 @@ app.MapGet("/api/draws/winners", async (IDrawSettlementService settlement, int? 
     return Results.Ok(items);
 })
 .WithName("GetWinners")
-.WithOpenApi();
+.WithOpenApi()
+.RequireRateLimiting("public-read");
+
+app.MapGet("/api/tickets/{wallet}", async (string wallet, IDrawReadService draws, int? limit, CancellationToken ct) =>
+{
+    if (!Regex.IsMatch(wallet, "^0x[a-fA-F0-9]{40}$", RegexOptions.NonBacktracking))
+        return Results.BadRequest(new { title = "Invalid wallet" });
+
+    var items = await draws.GetTicketsByWalletAsync(wallet, limit ?? 100, ct);
+    return Results.Ok(items);
+})
+.WithName("GetTicketsByWallet")
+.WithOpenApi()
+.RequireRateLimiting("public-read");
 
 app.MapPost("/api/contact", async (ContactRequest req, HttpContext http, NeonDrawDbContext db, CancellationToken ct) =>
 {
@@ -198,6 +217,18 @@ app.MapPost("/api/payouts/process", async (ProcessPayoutRequest req, HttpContext
 .WithName("ProcessPayout")
 .WithOpenApi()
 .RequireRateLimiting("payout");
+
+app.MapGet("/api/payouts/{externalId}", async (string externalId, IPayoutService payouts, CancellationToken ct) =>
+{
+    if (!Regex.IsMatch(externalId, "^PAY-[0-9]{13}-[0-9]{4}$", RegexOptions.NonBacktracking))
+        return Results.BadRequest(new { title = "Invalid payout id" });
+
+    var item = await payouts.GetByExternalIdAsync(externalId, ct);
+    return item is null ? Results.NotFound() : Results.Ok(item);
+})
+.WithName("GetPayoutStatus")
+.WithOpenApi()
+.RequireRateLimiting("public-read");
 
 app.MapGet("/api/admin/payouts/pending", async (HttpContext ctx, IPayoutService payouts, CancellationToken ct) =>
 {
