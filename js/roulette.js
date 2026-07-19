@@ -263,12 +263,14 @@ const Roulette = (() => {
     let forceWin = false;
 
     if (free) {
-      if (freeState.freeSpinsUsed >= getFreeSpinsLimit()) {
+      const dailyLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed);
+      const bonusLeft = window.Referrals?.getBonus?.(wallet)?.roulette || 0;
+      if (dailyLeft <= 0 && bonusLeft <= 0) {
         window.AppUI?.toast?.('No free roulette spins left today', 'info');
         return;
       }
       betUsd = FREE_VIRTUAL_BET_USD;
-      forceWin = canFreeWin(freeState);
+      forceWin = dailyLeft > 0 ? canFreeWin(freeState) : Math.random() < 0.12;
     } else {
       betUsd = getBetUsd();
       const minBet = window.TicketPricing?.MIN_ROULETTE_BET_USD || 0.5;
@@ -292,9 +294,14 @@ const Roulette = (() => {
 
     try {
       if (free) {
-        freeState.freeSpinsUsed += 1;
-        freeState.freePlays += 1;
-        saveFreeDaily(freeState);
+        const dailyLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed);
+        if (dailyLeft > 0) {
+          freeState.freeSpinsUsed += 1;
+          freeState.freePlays += 1;
+          saveFreeDaily(freeState);
+        } else {
+          window.Referrals?.consumeBonusSpin?.(wallet, 'roulette');
+        }
       } else {
         const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
         const betEth = betUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
@@ -369,7 +376,9 @@ const Roulette = (() => {
     const btn = document.getElementById('neonRouletteSpinBtn');
     const freeBtn = document.getElementById('neonRouletteFreeBtn');
     const freeState = loadFreeDaily();
-    const spinsLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed);
+    const wallet = window.SecureWeb3?.getAddress?.();
+    const bonus = wallet ? (window.Referrals?.getBonus?.(wallet)?.roulette || 0) : 0;
+    const spinsLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed) + bonus;
     if (freeBtn) freeBtn.disabled = !enabled || spinsLeft <= 0;
     document.querySelectorAll('.roulette-bet-btn').forEach((b) => { b.disabled = !enabled; });
     if (!enabled) {
@@ -382,7 +391,9 @@ const Roulette = (() => {
   function updateFreeUI() {
     const freeState = loadFreeDaily();
     const limit = getFreeSpinsLimit();
-    const spinsLeft = Math.max(0, limit - freeState.freeSpinsUsed);
+    const wallet = window.SecureWeb3?.getAddress?.();
+    const bonus = wallet ? (window.Referrals?.getBonus?.(wallet)?.roulette || 0) : 0;
+    const spinsLeft = Math.max(0, limit - freeState.freeSpinsUsed) + bonus;
     const countEl = document.getElementById('freeRouletteSpinsLeft');
     const freeBtn = document.getElementById('neonRouletteFreeBtn');
     if (countEl) {
@@ -411,10 +422,13 @@ const Roulette = (() => {
     document.getElementById('neonRouletteBet')?.addEventListener('input', () => updatePlayControls());
 
     window.SecureWeb3?.on?.((event) => {
-      if (['connected', 'disconnected', 'deposit-success', 'withdraw-success'].includes(event)) {
+      if (['connected', 'disconnected', 'deposit-success', 'withdraw-success', 'free-ticket-granted'].includes(event)) {
+        updateFreeUI();
         updatePlayControls();
       }
     });
+    window.addEventListener('referral-credited', () => updateFreeUI());
+    window.addEventListener('referral-rewards-claimed', () => updateFreeUI());
 
     window.addEventListener('roulette-played', renderRecentResults);
   }

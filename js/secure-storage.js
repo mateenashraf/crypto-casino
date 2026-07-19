@@ -28,6 +28,11 @@ const SecureStorage = (() => {
     slot_pending_free: 'r2c4',
     dev_unlimited: 's8d0',
     dev_ticket_grant: 't1e9',
+    referral_codes: 'v4a2',
+    referral_attributions: 'w8b5',
+    referral_stats: 'x1c9',
+    referral_bonus: 'y6d3',
+    referral_applied: 'z2e8',
   };
 
   const LEGACY_KEYS = {

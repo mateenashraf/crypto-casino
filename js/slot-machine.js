@@ -379,7 +379,9 @@ const SlotMachine = (() => {
     let resolvedBetUsd = betUsd;
 
     if (free) {
-      if (freeState.freeSpinsUsed >= getFreeSpinsLimit()) {
+      const dailyLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed);
+      const bonusLeft = window.Referrals?.getBonus?.(wallet)?.slots || 0;
+      if (dailyLeft <= 0 && bonusLeft <= 0) {
         window.AppUI?.toast?.('No free spins left today', 'info');
         return;
       }
@@ -406,15 +408,25 @@ const SlotMachine = (() => {
     pullLever();
 
     if (free) {
-      freeState.freeSpinsUsed += 1;
-      freeState.freePlays += 1;
-      won = canFreeWin(freeState);
-      if (won) {
-        freeState.freeWins += 1;
-        payoutUsd = 0.5 + Math.random() * 4;
-        window.SecureWeb3?.grantFreeTickets?.(wallet, 1, { source: 'free_spin' });
+      const dailyLeft = Math.max(0, getFreeSpinsLimit() - freeState.freeSpinsUsed);
+      if (dailyLeft > 0) {
+        freeState.freeSpinsUsed += 1;
+        freeState.freePlays += 1;
+        won = canFreeWin(freeState);
+        if (won) {
+          freeState.freeWins += 1;
+          payoutUsd = 0.5 + Math.random() * 4;
+          window.SecureWeb3?.grantFreeTickets?.(wallet, 1, { source: 'free_spin' });
+        }
+        saveFreeDaily(freeState);
+      } else {
+        window.Referrals?.consumeBonusSpin?.(wallet, 'slots');
+        won = Math.random() < FREE_WIN_RATE;
+        if (won) {
+          payoutUsd = 0.5 + Math.random() * 4;
+          window.SecureWeb3?.grantFreeTickets?.(wallet, 1, { source: 'referral_spin' });
+        }
       }
-      saveFreeDaily(freeState);
     } else {
       const casinoBal = window.SecureWeb3?.getCasinoBalance?.(wallet) || 0;
       const betEth = resolvedBetUsd / (window.PoolPolicy?.POLICY?.ETH_USD || 3500);
@@ -467,7 +479,9 @@ const SlotMachine = (() => {
   function updateFreeUI() {
     const freeState = loadFreeDaily();
     const limit = getFreeSpinsLimit();
-    const spinsLeft = Math.max(0, limit - freeState.freeSpinsUsed);
+    const wallet = window.SecureWeb3?.getAddress?.();
+    const bonus = wallet ? (window.Referrals?.getBonus?.(wallet)?.slots || 0) : 0;
+    const spinsLeft = Math.max(0, limit - freeState.freeSpinsUsed) + bonus;
     const claimsLeft = Math.max(0, FREE_TICKETS_PER_DAY - freeState.freeTicketsUsed);
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     set('freeSpinsLeft', window.NeonDrawDev?.hasUnlimitedSpins?.() ? '∞' : String(spinsLeft));
@@ -484,7 +498,6 @@ const SlotMachine = (() => {
       claimBtn.textContent = claimsLeft > 0 ? 'Claim Free Ticket' : 'All claimed today';
     }
 
-    const wallet = window.SecureWeb3?.getAddress?.();
     const balance = wallet ? (window.SecureWeb3?.getFreeTicketBalance?.(wallet) || 0) : 0;
     set('slotWalletFreeTickets', String(balance));
     const walletRow = document.getElementById('slotBonusWalletRow');

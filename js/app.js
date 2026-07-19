@@ -180,7 +180,6 @@
   document.getElementById('walletBtn').addEventListener('click', () => openModal(walletModal));
   document.getElementById('connectWalletBtn').addEventListener('click', handleConnect);
   document.getElementById('connectForWithdraw').addEventListener('click', handleConnect);
-  document.getElementById('signInBtn').addEventListener('click', handleConnect);
   document.getElementById('sidebarWalletBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
     openModal(walletModal);
@@ -334,6 +333,7 @@
   window.HistoricGrowth?.refresh?.();
   window.PrizeTierMatrix?.init();
   window.PlayerDashboard?.init();
+  window.Referrals?.init();
   window.SlotMachine?.init();
   window.Roulette?.init();
   window.ContactForm?.init();
