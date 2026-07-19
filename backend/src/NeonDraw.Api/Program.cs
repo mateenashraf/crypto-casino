@@ -93,6 +93,19 @@ bool IsAdmin(HttpContext ctx)
     return CryptographicOperations.FixedTimeEquals(keyBytes, headerBytes);
 }
 
+string GetAdminOperator(HttpContext ctx)
+{
+    var raw = ctx.Request.Headers["X-Admin-Operator"].FirstOrDefault()?.Trim();
+    if (string.IsNullOrEmpty(raw)) return "admin";
+    if (raw.Length > 64) return "admin";
+    return Regex.IsMatch(raw, "^[a-zA-Z0-9._-]{1,64}$", RegexOptions.NonBacktracking) ? raw : "admin";
+}
+
+if (!app.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(AdminKey()))
+{
+    throw new InvalidOperationException("Admin API key must be configured in production via Admin:ApiKey or NEONDRAW_ADMIN_KEY.");
+}
+
 app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
@@ -242,7 +255,7 @@ app.MapGet("/api/admin/payouts/pending", async (HttpContext ctx, IPayoutService 
 app.MapPost("/api/admin/payouts/{id:guid}/approve", async (Guid id, HttpContext ctx, IPayoutService payouts, CancellationToken ct) =>
 {
     if (!IsAdmin(ctx)) return Results.Unauthorized();
-    var op = ctx.Request.Headers["X-Admin-Operator"].FirstOrDefault() ?? "admin";
+    var op = GetAdminOperator(ctx);
     var result = await payouts.ApproveAsync(id, op, ct);
     return result is null ? Results.NotFound() : Results.Ok(result);
 })
@@ -253,7 +266,7 @@ app.MapPost("/api/admin/payouts/{id:guid}/approve", async (Guid id, HttpContext 
 app.MapPost("/api/admin/payouts/{id:guid}/reject", async (Guid id, HttpContext ctx, IPayoutService payouts, CancellationToken ct) =>
 {
     if (!IsAdmin(ctx)) return Results.Unauthorized();
-    var op = ctx.Request.Headers["X-Admin-Operator"].FirstOrDefault() ?? "admin";
+    var op = GetAdminOperator(ctx);
     var result = await payouts.RejectAsync(id, op, ct);
     return result is null ? Results.NotFound() : Results.Ok(result);
 })
