@@ -24,7 +24,7 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
         "Database connection string is not configured. Set 'ConnectionStrings:Default' in appsettings.json or the 'NEONDRAW_DB' environment variable.");
 
 builder.Services.AddDbContext<NeonDrawDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IDrawReadService, DrawReadService>();
 builder.Services.AddScoped<IPayoutService, PayoutService>();
@@ -274,7 +274,7 @@ app.MapPost("/api/admin/draws/tick", async (HttpContext ctx, IDrawSettlementServ
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NeonDrawDbContext>();
-    await db.Database.MigrateAsync();
+    await db.Database.EnsureCreatedAsync();
     if (app.Environment.IsDevelopment())
         await NeonDrawDbContext.SeedDevelopmentDataAsync(db);
 }

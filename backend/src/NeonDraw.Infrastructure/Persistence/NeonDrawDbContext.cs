@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NeonDraw.Domain.Entities;
 using NeonDraw.Domain.Enums;
 
@@ -27,12 +29,22 @@ public class NeonDrawDbContext : DbContext
             entity.Property(d => d.AdvertisedJackpotUsd).HasPrecision(18, 2);
         });
 
+        var numbersComparer = new ValueComparer<int[]>(
+            (a, b) => (a ?? Array.Empty<int>()).SequenceEqual(b ?? Array.Empty<int>()),
+            a => (a ?? Array.Empty<int>()).Aggregate(0, (h, v) => HashCode.Combine(h, v)),
+            a => (a ?? Array.Empty<int>()).ToArray());
+
         modelBuilder.Entity<Ticket>(entity =>
         {
             entity.HasKey(t => t.Id);
             entity.HasIndex(t => t.OnChainTicketId).IsUnique();
             entity.HasIndex(t => t.WalletAddress);
-            entity.Property(t => t.Numbers).HasColumnType("integer[]");
+            entity.Property(t => t.Numbers)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => JsonSerializer.Deserialize<int[]>(v, (JsonSerializerOptions?)null) ?? Array.Empty<int>())
+                .HasMaxLength(256)
+                .Metadata.SetValueComparer(numbersComparer);
             entity.Property(t => t.PaidAmountUsd).HasPrecision(18, 2);
             entity.HasOne(t => t.Draw).WithMany(d => d.Tickets).HasForeignKey(t => t.DrawId);
         });

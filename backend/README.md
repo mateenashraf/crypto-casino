@@ -5,13 +5,12 @@ ASP.NET Core 9 API for draw history, tickets, and compliance indexing.
 ## Prerequisites
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
-- Docker (for PostgreSQL)
+- SQL Server (local or remote)
 
 ## Quick start
 
 ```bash
 cd backend
-docker compose up -d
 dotnet run --project src/NeonDraw.Api
 ```
 
@@ -27,7 +26,7 @@ Endpoints:
 src/
   NeonDraw.Domain/       Entities and enums
   NeonDraw.Application/  DTOs and service interfaces
-  NeonDraw.Infrastructure/ EF Core + PostgreSQL
+  NeonDraw.Infrastructure/ EF Core + SQL Server
   NeonDraw.Api/          HTTP host
 ```
 
